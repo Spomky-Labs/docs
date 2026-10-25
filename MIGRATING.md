@@ -19,12 +19,13 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 |---|---|---|---|
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
 | Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Pull requests open (4.0 to 4.3, #55 to #58), domain on GitBook |
-| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | On GitBook |
-| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
+| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Migrated; the GitBook space is still to remove |
+| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | Migrated; the GitBook space is still to remove |
+| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
-Order of the rest: WebAuthn Framework, then PWA Bundle, from the least to
+Every documentation is migrated. What is left, for each one: remove the domain from its GitBook space, then
+`SUMMARY.md` and `.gitbook.yaml` in a last pull request, from the least to
 the most GitBook formatting to convert.
 
 The central site lists every library and holds the legal notice, the privacy policy and the contact page
@@ -93,7 +94,8 @@ the first group of cards of `docs/index.md`.
     points `edit_uri` at itself. Check each branch by converting its GitBook content from scratch in a
     scratch directory and comparing it with `docs/`, file by file: they must be identical. A change common
     to every version is made on the oldest branch and merged forward. One pull request per version, merged
-    in order.
+    in order. When the branches do not contain each other (WebAuthn Framework), each one is converted on
+    its own, the same way, and a common change is made on each.
 11. **Pull request, merge, then the domain** (below). Then remove the domain from the GitBook space, and
     in a last pull request `SUMMARY.md` and `.gitbook.yaml`.
 12. **Move the library** to the documentation sites on the central site, if it was not there.
@@ -104,14 +106,16 @@ the first group of cards of `docs/index.md`.
 |---|---|
 | `{% hint style="info" %}` … `{% endhint %}` | `!!! info`, the content indented by four spaces; `warning`, `danger`, `success` and `tip` keep their name |
 | `{% code title="f" lineNumbers="true" %}` and its fence | ` ```lang title="f" linenums="1" ` ; `overflow` and `fullWidth` are dropped |
-| `<pre class="language-x" data-title="f" data-line-numbers><code>` with lines in `<strong>` | a fence with `title`, `linenums`, and `hl_lines` for the lines in bold |
+| `<pre class="language-x" data-title="f" data-line-numbers><code>` with lines in `<strong>` | a fence with `title`, `linenums`, and `hl_lines` for the lines whose text is in bold (by the script) |
 | `{% content-ref url="x.md" %}` | a plain link |
-| `<figure><img><figcaption>` | `![alt](path)` and a caption in the text, or the figure kept as HTML |
+| `<figure><picture>` with a dark `<source>` | two Markdown images, `#only-light` and `#only-dark`, in a figure of Material (by the script) |
+| `<figure><img><figcaption>` on one line | `<figure markdown="span">` holding a Markdown image and its `<figcaption>` (by the script): MkDocs rewrites the path of a Markdown image, never the `src` of an HTML one |
 | `<picture>` with a dark `<source>` | two images, `#only-light` and `#only-dark` |
-| `<table>` on one line, with `<th width>` | a Markdown table, `<code>`, `<em>`, `<strong>` and links kept (by the script) |
+| `<table>`, on one line or several, with `<th width>` | a Markdown table, `<code>`, `<em>`, `<strong>` and links kept (by the script) |
 | `<p>a</p><p>b</p>` in a cell | `a<br>b` (by the script) |
-| `<mark style="color:red">` | the text in bold; any other colour, the text alone (by the script): colour never carries a meaning |
+| `<mark style="color:red">` (or a variable of GitBook, `color:$info`) | the text in bold; any other colour, the text alone (by the script): colour never carries a meaning |
 | a link to a directory (`signed-tokens/`) | a link to its `README.md` (by the script) |
+| `(<../.gitbook/assets/name (1).png>)`, a path with spaces | the same image under `assets/images/name-1.png` (by the script) |
 | `.gitbook/assets/…` | `docs/assets/images/`, renamed without spaces or `(1)`, unused files dropped |
 | `layout: landing` | `hide: [navigation, toc]` |
 | `description:` | kept |
@@ -137,7 +141,17 @@ JavaScript, a plain HTTP client does not follow them.
 
 ## Publishing a domain
 
-1. Merge: the push to the version branch publishes `gh-pages` and its root.
+0. **Verify the domain in the organization of the repository**, before anything else. Spomky-Labs has
+   verified `spomky-labs.com`, which reserves the domain and its subdomains for its own repositories: a
+   repository of web-token or web-auth cannot use `web-token.spomky-labs.com` until that organization has
+   verified it too (Settings of the organization, Pages, Add a domain, then the TXT record
+   `_github-pages-challenge-<organization>.<domain>` at Infomaniak). Without it, Pages keeps an empty
+   custom domain and the site answers 404 as soon as the DNS points to GitHub.
+1. Merge: the push to the version branch publishes `gh-pages` and its root. **Merge the pull requests of
+   several versions one by one, each after the publication of the previous one**: the workflow keeps one
+   run waiting in its concurrency group, and a newer one cancels it (JWT 4.2 was cancelled by 4.3).
+   Check `versions.json` on `gh-pages`, and run the workflow again on a missing branch
+   (`gh workflow run pages.yml --ref <branch>`).
 2. Lower the TTL of the record the day before.
 3. **Point the DNS first**: a CNAME to `<organization>.github.io.` (`spomky-labs`, `web-auth`, `web-token`).
 4. **Then** declare the domain: Settings, Pages, deploy from `gh-pages`, root folder, custom domain. The
@@ -169,6 +183,11 @@ the domain and add it again in the Settings page.
 - **Some files of the web set of the design kit still carry a C2PA manifest**, the marks of Access
   Control Framework, PWA Bundle and Web Push Framework among them. `tools/web-svg.py <source> <target>`
   removes it, with the title and the role, and refuses to write if the drawing would change.
+- **A branch left from GitBook can take `latest`.** PWA Bundle kept a `1.x` branch from GitBook, never
+  migrated, which sorts after `1.6`: no published version carried `latest` and the root of the site led
+  nowhere. `pages.yml` now keeps only the branches that hold a `mkdocs.yml` (Spomky-Labs/phpwa-doc#22); the
+  other repositories take the same change with their last pull request. To repair a site at once:
+  `mike alias --push <version> latest` and `mike set-default --push latest` on a clone of the repository.
 - **`sort -V` puts `1.x` before `1.2`.** The newest version branch, the one that carries `latest`, is
   found by sorting on a key where `x` is a large number (`pages.yml` of `web-push-doc`). The reference and
   Beffroi still have the plain sort; no branch named `N.x` exists yet to show it.
@@ -185,6 +204,17 @@ the domain and add it again in the Settings page.
   `default-branch.yml`, like the workflow it replaced, does nothing until it is created.
 - **A documentation repository may have no licence of its own** (`web-push-doc`): the README says what is
   licensed and does not claim more.
+- **Strict mode finds the links GitBook let rot**: a page that moved, an anchor whose heading changed, a
+  `broken-reference` GitBook wrote for a page it lost. Fix them in a commit of their own, **branch by
+  branch from the tree of that branch**: a fix written for 1.5 of PWA Bundle pointed links of 1.4 at pages
+  1.4 does not have. A link to a page that only exists in a later version keeps its text, without a link.
+- **Names of GitBook files hold spaces, apostrophes and parentheses** (`Capture d'écran (1).png`): copy a
+  GitBook tree with `git archive <branch> -- <paths> | tar -x`, never with a loop over file names.
+- **Do not chain a branch switch after a step that leaves a merge uncommitted**: git refuses it, but a
+  silenced error hides that it did.
+- **A page of the GitBook root may not exist in the latest version** (the root of WebAuthn served 5.3,
+  `latest` is 5.4): list, among the addresses of the root and of the published variants, the ones that
+  land on a home page, and redirect each to its new page.
 - **Strict mode fails on a page outside the navigation**: `not_in_nav` or `exclude_docs` for the ones that
   must stay out.
 - **The revision dates need a commit**: a strict build of uncommitted pages fails on the git plugin.
