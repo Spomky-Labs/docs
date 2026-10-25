@@ -1,0 +1,169 @@
+site_name: Documentation
+site_description: The documentation of the open-source security libraries for PHP published by Slabs, with the legal notice, the privacy policy and the contact page of every documentation site.
+site_url: https://docs.spomky-labs.com/
+site_author: Spomky-Labs
+repo_url: https://github.com/Spomky-Labs/docs
+repo_name: spomky-labs/docs
+edit_uri: https://github.com/Spomky-Labs/docs/edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+# The legal notice, the privacy policy and the contact page are linked from the footer of this site and
+# of every documentation site, not from the navigation.
+not_in_nav: |
+  /legal-notice.md
+  /privacy.md
+  /contact.md
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  language: en
+  # Space Grotesk and IBM Plex Mono are served from assets/fonts, declared in slabs.css: the theme loads
+  # no font of its own.
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil-outline
+    annotation: material/plus-circle
+  favicon: assets/brand/favicon.svg
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Follow the system theme
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to the dark theme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to the light theme
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+
+# The tokens of the Slabs design kit, as they are, then the rules that apply them.
+extra_css:
+  - assets/stylesheets/slabs-tokens.css
+  - assets/stylesheets/slabs.css
+
+plugins:
+  - search
+  # Every asset is served from this site. Should a page ever reference an external one, it is downloaded
+  # at build time: nothing a reader loads reaches a third party.
+  - privacy
+  - git-revision-date-localized:
+      enable_creation_date: false
+      type: date
+      fallback_to_build_date: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      title: On this page
+      permalink: true
+      permalink_title: Link to this section
+      toc_depth: 3
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      # A PHP block starts without "<?php", which Pygments needs before it colours anything.
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+      line_spans: __span
+      # The number of a line is written at the start of the line itself, so it cannot drift from it.
+      linenums_style: pymdownx-inline
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tilde
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+  nav:
+    omitted_files: warn
+
+extra:
+  status:
+    draft: This page is a stub, the section it belongs to is not written yet
+    new: Added in this version
+  # The footer of the Slabs guidelines (p. 31): links in Calcaire, then the legal line in Béton.
+  slabs:
+    website: https://spomky-labs.com/
+    links:
+      - name: Spomky-Labs on GitHub
+        link: https://github.com/Spomky-Labs
+      - name: web-auth
+        link: https://github.com/web-auth
+      - name: web-token
+        link: https://github.com/web-token
+      - name: Packagist
+        link: https://packagist.org/packages/spomky-labs/
+      - name: Sponsor
+        link: https://github.com/sponsors/Spomky
+    legal: SPOMKY-LABS · Florent Morselli EI
+    legal_links:
+      - name: Legal notice
+        page: legal-notice/
+      - name: Privacy
+        page: privacy/
+      - name: Contact
+        page: contact/
+
+
+nav:
+  - index.md

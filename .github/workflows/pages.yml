@@ -1,0 +1,51 @@
+name: Pages
+
+# The site has one version: a push to main builds it and publishes it to gh-pages, which Pages serves
+# from its root folder. docs/CNAME is part of the build, so the domain travels with every publication.
+on:
+    push:
+        branches:
+            - main
+        paths-ignore:
+            - '.github/workflows/check.yml'
+    workflow_dispatch:
+
+# MkDocs 2.0 is announced as backward incompatible with every plugin and theme, so the toolchain is pinned
+# to the 1.x line in requirements.txt and the two notices about it are silenced: they are news about the
+# ecosystem, not findings about this site.
+env:
+    NO_MKDOCS_2_WARNING: 'true'
+    DISABLE_MKDOCS_2_WARNING: 'true'
+
+permissions:
+    contents: write
+
+concurrency:
+    group: gh-pages
+    cancel-in-progress: false
+
+jobs:
+    deploy:
+        name: Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.13'
+                  cache: pip
+                  cache-dependency-path: requirements.txt
+
+            - name: Install the toolchain
+              run: pip install -r requirements.txt
+
+            - name: Identify the committer
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            - name: Publish
+              run: mkdocs gh-deploy --strict --force --no-history
