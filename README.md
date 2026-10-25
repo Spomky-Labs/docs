@@ -25,6 +25,7 @@ make check     # the strict build continuous integration runs
 | `docs/assets/stylesheets/` | The look: `slabs-tokens.css`, copied as it is from the Slabs design kit, and `slabs.css`, which applies the guidelines to the theme |
 | `docs/assets/brand/`, `docs/assets/fonts/` | The logotype, the signature, the favicons and the share image of the design kit, and its typefaces (SIL Open Font License) |
 | `docs/CNAME` | The domain of the site |
+| `MIGRATING.md` | How a documentation leaves GitBook: the decisions, the steps, the traps already met. Not published |
 | `.github/workflows/check.yml` | The strict build, on every pull request |
 | `.github/workflows/pages.yml` | The publication of main to gh-pages |
 
