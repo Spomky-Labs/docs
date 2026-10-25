@@ -10,20 +10,21 @@ branch `1.0`.** Every file named below is copied from there. For a repository wh
 like `3.2.x`, or whose project has no mark yet, take `pages.yml`, `slabs.css` and `logo.html` from
 [Spomky-Labs/web-push-doc](https://github.com/Spomky-Labs/web-push-doc) instead.
 
-**The conversion is done by [`tools/gitbook2material.py`](tools/gitbook2material.py)**, in this repository.
+**The conversion is done by [`tools/gitbook2material.py`](tools/gitbook2material.py)**, in this repository,
+and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](tools/web-svg.py)**.
 
 ## Where things are
 
 | Documentation | Repository | Domain | State |
 |---|---|---|---|
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
-| Web Push | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
+| Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | On GitBook |
 | WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | On GitBook |
-| PHPWA | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
+| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
-Order of the rest: Web Push, then JWT Framework, then WebAuthn Framework, then PHPWA, from the least to
+Order of the rest: JWT Framework, then WebAuthn Framework, then PWA Bundle, from the least to
 the most GitBook formatting to convert.
 
 The central site lists every library and holds the legal notice, the privacy policy and the contact page
@@ -39,8 +40,12 @@ the first group of cards of `docs/index.md`.
   copied as it is; `slabs.css` applies it and cites the page of the guidelines each rule comes from. No
   project has a colour of its own.
 - **The header carries the project mark** of the library (Slabs monogram, name, "by Slabs"), in its colour
-  and reversed versions. A project without a mark keeps the Slabs logotype and its name beside it until
-  one exists. The central site carries the Slabs logotype.
+  and reversed versions, from `4-Web/svg/marques-de-projet` of the design kit. Every project of p. 46 of
+  the guidelines has one: WebAuthn Framework, COSE, JWT Framework, OTPHP, CBOR PHP, PKI Framework, Access
+  Control Framework, PWA Bundle, Web Push Framework. The central site carries the Slabs logotype.
+- **Names and packages are those of the table p. 46**: the project name on first mention and in the
+  header, the short form after (ACF, PWA, Web Push, JWT, WebAuthn), and the package a reader installs
+  (`spomky-labs/web-push-lib`, `web-auth/webauthn-lib`).
 - **The footer** is the reversed Slabs signature, the links of the project, a first link "All
   documentation" to `docs.spomky-labs.com`, and the legal line whose three links lead to the central site.
 - **Text is set at 18 px**, 16 px on a phone (p. 34 of the guidelines); code at 14 px; the navigation at
@@ -149,6 +154,9 @@ the domain and add it again in the Settings page.
 - **Material wins on specificity** in a few places: `.md-typeset ul:not([hidden])`, the titles of
   admonitions, the tab labels it turns into anchors. A rule of `slabs.css` that seems ignored usually needs
   a stronger selector.
+- **Some files of the web set of the design kit still carry a C2PA manifest**, the marks of Access
+  Control Framework, PWA Bundle and Web Push Framework among them. `tools/web-svg.py <source> <target>`
+  removes it, with the title and the role, and refuses to write if the drawing would change.
 - **`sort -V` puts `1.x` before `1.2`.** The newest version branch, the one that carries `latest`, is
   found by sorting on a key where `x` is a large number (`pages.yml` of `web-push-doc`). The reference and
   Beffroi still have the plain sort; no branch named `N.x` exists yet to show it.

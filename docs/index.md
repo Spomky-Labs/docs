@@ -17,7 +17,7 @@ where to ask about it.
 <span class="sl-card__label">Authorization</span>
 <span class="sl-card__title">Access Control Framework</span>
 <span class="sl-card__excerpt">Authorization for PHP and Symfony: decides whether a requester is allowed to perform an action on a subject.</span>
-<span class="sl-card__meta">spomky-labs/access-control-framework</span>
+<span class="sl-card__meta">spomky-labs/access-control-lib</span>
 </a>
 <a class="sl-card" href="https://web-token.spomky-labs.com/">
 <span class="sl-card__label">Tokens</span>
@@ -29,19 +29,19 @@ where to ask about it.
 <span class="sl-card__label">Authentication</span>
 <span class="sl-card__title">WebAuthn Framework</span>
 <span class="sl-card__excerpt">WebAuthn and passkeys for PHP and Symfony.</span>
-<span class="sl-card__meta">web-auth/webauthn-framework</span>
+<span class="sl-card__meta">web-auth/webauthn-lib</span>
 </a>
 <a class="sl-card" href="https://pwa.spomky-labs.com/">
 <span class="sl-card__label">Progressive web apps</span>
-<span class="sl-card__title">PHPWA</span>
+<span class="sl-card__title">PWA Bundle</span>
 <span class="sl-card__excerpt">Progressive web apps for Symfony: manifest, service worker and offline support.</span>
 <span class="sl-card__meta">spomky-labs/pwa-bundle</span>
 </a>
 <a class="sl-card" href="https://web-push.spomky-labs.com/">
 <span class="sl-card__label">Notifications</span>
-<span class="sl-card__title">Web Push</span>
+<span class="sl-card__title">Web Push Framework</span>
 <span class="sl-card__excerpt">Web push notifications for PHP and Symfony.</span>
-<span class="sl-card__meta">spomky-labs/web-push</span>
+<span class="sl-card__meta">spomky-labs/web-push-lib</span>
 </a>
 </div>
 
