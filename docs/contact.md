@@ -21,7 +21,7 @@ its security policy, `SECURITY.md`, under the Security tab.
 
 ## For anything else
 
-Write to [contact@spomky-labs.com](mailto:contact@spomky-labs.com).
+Write to [bonjour@spomky-labs.com](mailto:bonjour@spomky-labs.com).
 
 You can also reach me on [GitHub](https://github.com/Spomky), [X](https://twitter.com/spomkylabs) and
 [Mastodon](https://framapiaf.org/@spomky).
