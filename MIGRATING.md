@@ -17,11 +17,11 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 
 | Documentation | Repository | Domain | State |
 |---|---|---|---|
-| Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
-| Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Migrated; the GitBook space is still to remove |
+| Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated; last pull request open (Spomky-Labs/access-control-doc#9) |
+| Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; last pull requests open (Spomky-Labs/web-push-doc#5) |
+| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Migrated; last pull requests open (web-token/jwt-doc#59 to #62) |
+| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | Migrated; last pull requests open (web-auth/doc#64 to #66) |
+| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Migrated; last pull requests open (Spomky-Labs/phpwa-doc#23 to #25) |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
 Every documentation is migrated. What is left, for each one: remove the domain from its GitBook space, then
@@ -40,6 +40,12 @@ the first group of cards of `docs/index.md`.
 - **The look is the Slabs brand guidelines v2.0.** `slabs-tokens.css` is the file of the design kit,
   copied as it is; `slabs.css` applies it and cites the page of the guidelines each rule comes from. No
   project has a colour of its own.
+- **The project name of the guidelines names the site**: the title of the home page, `site_name` and the
+  link of the footer say Access Control Framework, Web Push Framework, JWT Framework, WebAuthn Framework,
+  PWA Bundle.
+- **No illustration of a third party**: the images follow p. 25 of the guidelines; the Freepik
+  illustration of the home page of Web Push went.
+- **The general contact is `bonjour@spomky-labs.com`**, the address of the guidelines.
 - **The header carries the project mark** of the library (Slabs monogram, name, "by Slabs"), in its colour
   and reversed versions, from `4-Web/svg/marques-de-projet` of the design kit. Every project of p. 46 of
   the guidelines has one: WebAuthn Framework, COSE, JWT Framework, OTPHP, CBOR PHP, PKI Framework, Access
@@ -223,7 +229,5 @@ the domain and add it again in the Settings page.
 
 ## Still open
 
-- The general contact address: `contact@spomky-labs.com` (the website) or `bonjour@spomky-labs.com` (the
-  guidelines). The contact page uses the first.
-- The project marks of Web Push and PHPWA, which the design kit does not have.
-- The Slabs icon library, which is not in the design kit: the interface icons of the theme stay until then.
+- The Slabs icon library, which is in neither the design kit nor Spomky-Labs/brand-kit: the interface
+  icons of the theme stay until then.
