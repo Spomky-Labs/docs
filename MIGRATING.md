@@ -6,14 +6,18 @@ This file is the record of what was decided, the steps that work, and the traps 
 part of the published site.
 
 **The reference implementation is [Spomky-Labs/access-control-doc](https://github.com/Spomky-Labs/access-control-doc),
-branch `1.0`.** Every file named below is copied from there.
+branch `1.0`.** Every file named below is copied from there. For a repository whose branches are named
+like `3.2.x`, or whose project has no mark yet, take `pages.yml`, `slabs.css` and `logo.html` from
+[Spomky-Labs/web-push-doc](https://github.com/Spomky-Labs/web-push-doc) instead.
+
+**The conversion is done by [`tools/gitbook2material.py`](tools/gitbook2material.py)**, in this repository.
 
 ## Where things are
 
 | Documentation | Repository | Domain | State |
 |---|---|---|---|
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
-| Web Push | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | In progress |
+| Web Push | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Pull request open, domain on GitBook |
 | JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | On GitBook |
 | WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | On GitBook |
 | PHPWA | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
@@ -59,7 +63,10 @@ the first group of cards of `docs/index.md`.
    other variants to `latest`.
 3. **Move the pages to `docs/`** in a commit of pure renames (`git mv`), so `git log --follow` keeps their
    history. Commit it alone: a rename mixed with edits is seen as a deletion and an addition.
-4. **Convert the GitBook syntax** (table below), then read every converted page in the browser.
+4. **Convert the GitBook syntax** (table below): `python3 -I ~/Projects/docs/tools/gitbook2material.py docs`
+   rewrites the pages, moves the images it finds to `docs/assets/images/`, and lists what it left for a
+   human: any other `{% %}`, and the HTML GitBook writes outside code blocks. Read the diff, then every
+   converted page in the browser.
 5. **Copy the toolchain** from the reference: `mkdocs.yml` (then adapt the names, `site_url`, `repo_url`,
    `edit_uri`, `extra.slabs`, the navigation from `SUMMARY.md`), `requirements.txt`, `Makefile`,
    `.editorconfig`, `.gitignore`, `.github/workflows/` (three files; they replace
@@ -68,7 +75,9 @@ the first group of cards of `docs/index.md`.
    to published version.
 7. **Add the redirects** for the addresses that no longer match a page, in `redirect_maps` of `mkdocs.yml`.
 8. **Put the titles in sentence case**, in the pages; the navigation takes the title of each page from its
-   first heading.
+   first heading. `gitbook2material.py --titles "Web Push,Symfony,Doctrine" docs` does it and prints every
+   change; the list holds the proper nouns of the project. Read the list: a hyphenated name ("Web-Push")
+   or a parenthesis ("TTL (Time-to-live)") still needs a hand.
 9. **`make check`**, then check every address of the sitemap against a local publication (below).
 10. **Pull request, merge, then the domain** (below). Then remove the domain from the GitBook space, and
     in a last pull request `SUMMARY.md` and `.gitbook.yaml`.
@@ -136,6 +145,18 @@ the domain and add it again in the Settings page.
 - **Material wins on specificity** in a few places: `.md-typeset ul:not([hidden])`, the titles of
   admonitions, the tab labels it turns into anchors. A rule of `slabs.css` that seems ignored usually needs
   a stronger selector.
+- **`sort -V` puts `1.x` before `1.2`.** The newest version branch, the one that carries `latest`, is
+  found by sorting on a key where `x` is a large number (`pages.yml` of `web-push-doc`). The reference and
+  Beffroi still have the plain sort; no branch named `N.x` exists yet to show it.
+- **A branch named `3.2.x`** publishes the version `3.2` (`pages.yml` of `web-push-doc`).
+- **The name beside the logo** is hidden only beside a project mark: the mark images carry the class
+  `sl-logo--mark`, and `slabs.css` tests it with `:has()`.
+- **`git add -A docs` takes what was staged before**, deleted files included. After a conversion, add the
+  pages by name for a commit about pages, and check `git show --stat` before pushing.
+- **`DEFAULT_BRANCH_TOKEN` does not exist**, neither on the repositories nor on the organizations:
+  `default-branch.yml`, like the workflow it replaced, does nothing until it is created.
+- **A documentation repository may have no licence of its own** (`web-push-doc`): the README says what is
+  licensed and does not claim more.
 - **Strict mode fails on a page outside the navigation**: `not_in_nav` or `exclude_docs` for the ones that
   must stay out.
 - **The revision dates need a commit**: a strict build of uncommitted pages fails on the git plugin.
