@@ -20,11 +20,11 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
 | Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | In progress: 5.2, 5.3 and 5.4 |
+| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | Pull requests open (5.2 to 5.4, #61 to #63), domain on GitBook |
 | PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
-Order of the rest: WebAuthn Framework, then PWA Bundle, from the least to
+Order of the rest: PWA Bundle, from the least to
 the most GitBook formatting to convert.
 
 The central site lists every library and holds the legal notice, the privacy policy and the contact page
@@ -93,7 +93,8 @@ the first group of cards of `docs/index.md`.
     points `edit_uri` at itself. Check each branch by converting its GitBook content from scratch in a
     scratch directory and comparing it with `docs/`, file by file: they must be identical. A change common
     to every version is made on the oldest branch and merged forward. One pull request per version, merged
-    in order.
+    in order. When the branches do not contain each other (WebAuthn Framework), each one is converted on
+    its own, the same way, and a common change is made on each.
 11. **Pull request, merge, then the domain** (below). Then remove the domain from the GitBook space, and
     in a last pull request `SUMMARY.md` and `.gitbook.yaml`.
 12. **Move the library** to the documentation sites on the central site, if it was not there.
@@ -104,14 +105,15 @@ the first group of cards of `docs/index.md`.
 |---|---|
 | `{% hint style="info" %}` … `{% endhint %}` | `!!! info`, the content indented by four spaces; `warning`, `danger`, `success` and `tip` keep their name |
 | `{% code title="f" lineNumbers="true" %}` and its fence | ` ```lang title="f" linenums="1" ` ; `overflow` and `fullWidth` are dropped |
-| `<pre class="language-x" data-title="f" data-line-numbers><code>` with lines in `<strong>` | a fence with `title`, `linenums`, and `hl_lines` for the lines in bold |
+| `<pre class="language-x" data-title="f" data-line-numbers><code>` with lines in `<strong>` | a fence with `title`, `linenums`, and `hl_lines` for the lines whose text is in bold (by the script) |
 | `{% content-ref url="x.md" %}` | a plain link |
-| `<figure><img><figcaption>` | `![alt](path)` and a caption in the text, or the figure kept as HTML |
+| `<figure><img><figcaption>` on one line | `<figure markdown="span">` holding a Markdown image and its `<figcaption>` (by the script): MkDocs rewrites the path of a Markdown image, never the `src` of an HTML one |
 | `<picture>` with a dark `<source>` | two images, `#only-light` and `#only-dark` |
 | `<table>` on one line, with `<th width>` | a Markdown table, `<code>`, `<em>`, `<strong>` and links kept (by the script) |
 | `<p>a</p><p>b</p>` in a cell | `a<br>b` (by the script) |
 | `<mark style="color:red">` | the text in bold; any other colour, the text alone (by the script): colour never carries a meaning |
 | a link to a directory (`signed-tokens/`) | a link to its `README.md` (by the script) |
+| `(<../.gitbook/assets/name (1).png>)`, a path with spaces | the same image under `assets/images/name-1.png` (by the script) |
 | `.gitbook/assets/…` | `docs/assets/images/`, renamed without spaces or `(1)`, unused files dropped |
 | `layout: landing` | `hide: [navigation, toc]` |
 | `description:` | kept |
@@ -195,6 +197,11 @@ the domain and add it again in the Settings page.
   `default-branch.yml`, like the workflow it replaced, does nothing until it is created.
 - **A documentation repository may have no licence of its own** (`web-push-doc`): the README says what is
   licensed and does not claim more.
+- **Strict mode finds the links GitBook let rot**: a page that moved, an anchor whose heading changed. Fix
+  them in a commit of their own, on every branch that has them.
+- **A page of the GitBook root may not exist in the latest version** (the root of WebAuthn served 5.3,
+  `latest` is 5.4): list, among the addresses of the root and of the published variants, the ones that
+  land on a home page, and redirect each to its new page.
 - **Strict mode fails on a page outside the navigation**: `not_in_nav` or `exclude_docs` for the ones that
   must stay out.
 - **The revision dates need a commit**: a strict build of uncommitted pages fails on the git plugin.

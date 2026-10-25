@@ -17,7 +17,12 @@ Twig in an example ({% if %}, {% block %}) is code, not GitBook. What is convert
   keeps its insistence in bold, any other mark leaves its text alone;
 - <p>a</p><p>b</p> in a cell of a table: a<br>b;
 - a <table> GitBook writes on one line: a Markdown table, with its code, emphasis, bold and links;
-- a relative link to a directory that holds a README.md: a link to that README.md, which MkDocs wants.
+- a relative link to a directory that holds a README.md: a link to that README.md, which MkDocs wants;
+- an image path GitBook writes between angle brackets because it holds spaces, (<…/images (1).jpeg>);
+- a <figure> GitBook writes on one line: a figure of Material, <figure markdown="span"> holding a Markdown
+  image (whose path MkDocs rewrites, unlike the src of an HTML <img>) and its caption;
+- a code block GitBook exported as HTML, <pre class="language-x" data-title="f" data-line-numbers><code>,
+  with its highlighted lines in <strong>: a fence with title, linenums and hl_lines.
 
 With --titles, the script only puts the headings in sentence case, as the Slabs guidelines want every
 title on the web: the first word keeps its capital, and so do acronyms (VAPID, JSON), identifiers with an
@@ -52,6 +57,46 @@ ASSET = re.compile(r"(?:\.\./)*\.gitbook/assets/([^)\"'\s>]+(?:\s[^)\"'>]+?)?)(?
 
 MARK = re.compile(r'<mark\s+style="[^"]*?color:\s*([a-z]+)[^"]*"\s*>(.*?)</mark>', re.S)
 TABLE_LINE = re.compile(r"^\s*<table\b.*</table>\s*$")
+PRE_OPEN = re.compile(r'^\s*<pre class="language-([\w+-]+)"([^>]*)><code[^>]*>(.*)$', re.S)
+FIGURE = re.compile(
+    r'^\s*<figure>\s*<img\s+src="([^"]+)"(?:\s+alt="([^"]*)")?(?:\s+width="(\d+)")?[^>]*>'
+    r'(?:\s*<figcaption>\s*(?:<p>)?(.*?)(?:</p>)?\s*</figcaption>)?\s*</figure>\s*$'
+)
+ANGLE_ASSET = re.compile(r"\(<((?:\.\./)*\.gitbook/assets/[^>]+)>\)")
+
+
+def html_pre(lines: list[str]) -> str:
+    """The lines of a <pre> block, from the opening line to the one holding </code></pre>, as a fence."""
+    import html
+
+    first = PRE_OPEN.match(lines[0])
+    language, attributes = first.group(1), first.group(2)
+    body = [first.group(3)] + lines[1:]
+    body[-1] = body[-1][: body[-1].index("</code></pre>")]
+    code, highlighted, strong = [], [], False
+    for number, line in enumerate(body, 1):
+        bold = False
+        for token in re.split(r"(</?strong>)", line):
+            if token == "<strong>":
+                strong = True
+            elif token == "</strong>":
+                strong = False
+            elif strong and re.sub(r"<[^>]+>", "", token).strip():
+                bold = True
+        if bold:
+            highlighted.append(number)
+        code.append(html.unescape(re.sub(r"<[^>]+>", "", line)))
+    while code and not code[-1].strip():
+        code.pop()
+    title = re.search(r'data-title="([^"]*)"', attributes)
+    info = [language]
+    if title and title.group(1):
+        info.append(f'title="{title.group(1)}"')
+    if "data-line-numbers" in attributes:
+        info.append('linenums="1"')
+    if highlighted:
+        info.append('hl_lines="' + " ".join(str(n) for n in highlighted if n <= len(code)) + '"')
+    return "\n".join(["```" + " ".join(info)] + code + ["```"])
 
 
 def unmark(text: str) -> str:
@@ -122,9 +167,12 @@ class Page:
         self.reports.append(f"{self.path.relative_to(self.docs)}:{number}: {message}")
 
     def asset(self, match: re.Match) -> str:
+        return self.asset_path(match.group(1))
+
+    def asset_path(self, raw: str) -> str:
         from urllib.parse import unquote
 
-        name = unquote(match.group(1))
+        name = unquote(raw)
         self.assets.add(name)
         depth = len(self.path.relative_to(self.docs).parts) - 1
         return "../" * depth + "assets/images/" + slug(name)
@@ -208,6 +256,34 @@ class Page:
                 index = end + 1
                 continue
 
+            if PRE_OPEN.match(line):
+                end = next((i for i in range(index, len(lines)) if "</code></pre>" in lines[i]), None)
+                if end is None:
+                    self.report(number, "<pre> without </code></pre>, left as it is")
+                else:
+                    if out and out[-1].strip():
+                        out.append("")
+                    out.append(html_pre(lines[index : end + 1]))
+                    if end + 1 < len(lines) and lines[end + 1].strip():
+                        out.append("")
+                    index = end + 1
+                    continue
+
+            figure = FIGURE.match(line)
+            if figure:
+                source, alt, width, caption = figure.groups()
+                source = ASSET.sub(self.asset, source)
+                image = f"![{alt or caption or ''}]({source})" + (f'{{ width="{width}" }}' if width else "")
+                if out and out[-1].strip():
+                    out.append("")
+                out.append('<figure markdown="span">')
+                out.append("  " + image)
+                if caption:
+                    out.append(f"  <figcaption>{caption}</figcaption>")
+                out.append("</figure>")
+                index += 1
+                continue
+
             if TABLE_LINE.match(line):
                 table = html_table(line)
                 if table is not None:
@@ -225,6 +301,7 @@ class Page:
             if HTML.search(re.sub(r"<br>", "", line)):
                 self.report(number, "HTML to convert by hand: " + line.strip()[:100])
 
+            line = ANGLE_ASSET.sub(lambda m: "(" + self.asset_path(m.group(1).split(".gitbook/assets/", 1)[1]) + ")", line)
             out.append(self.directory_links(ASSET.sub(self.asset, line)))
             index += 1
 
@@ -301,27 +378,37 @@ def sentence_case(title: str, names: list[str]) -> str:
     for name in sorted(names, key=len, reverse=True):
         text = re.sub(r"(?<![\w-])" + re.escape(name) + r"(?![\w-])", protect, text)
 
+    def lower(word: str) -> str:
+        """Lowers the first letter of each part of a word ("(Registration)", "Cross-Origin", "a/Decoding")
+        when the rest of the part is in lower case: an acronym or a name with an inner capital stays."""
+        def part(chunk: str) -> str:
+            match = re.search(r"[A-Za-z]", chunk)
+            if not match:
+                return chunk
+            i = match.start()
+            rest = chunk[i + 1 :]
+            if chunk[i].isupper() and (not rest or rest[:1].islower()) and not re.search(r"[A-Z]", rest):
+                return chunk[:i] + chunk[i].lower() + rest
+            return chunk
+        return re.sub(r"[^-/]+", lambda m: part(m.group(0)), word)
+
     words = re.split(r"(\s+)", text)
     first = True
     for index, word in enumerate(words):
-        if not word.strip() or "\x00" in word:
-            if word.strip():
-                first = word.endswith(":")
+        if not word.strip():
             continue
+        if "\x00" in word:
+            first = word.endswith(":")
+            continue
+        if not re.search(r"[A-Za-z0-9]", word):
+            continue  # an emoji or a sign does not start the sentence
         letters = re.sub(r"[^A-Za-z]", "", word)
-        keep = (
-            first
-            or (letters.isupper() and len(letters) > 1)
-            or re.search(r"[a-z][A-Z]", word)
-            or re.match(r"^[A-Z][a-z]*[A-Z]", word)
-        )
-        if not keep:
-            words[index] = word[:1].lower() + word[1:] if word[:1].isupper() and word[1:2].islower() or len(word) == 1 else word
-            if "-" in words[index]:
-                words[index] = "-".join(part[:1].lower() + part[1:] if part[1:2].islower() else part for part in words[index].split("-"))
-        elif first and "-" in word:
-            head, *rest = word.split("-")
-            words[index] = "-".join([head] + [part[:1].lower() + part[1:] if part[1:2].islower() else part for part in rest])
+        acronym = letters.isupper() and len(letters) > 1
+        if first:
+            head, sep, tail = word.partition("-") if "-" in word else (word, "", "")
+            words[index] = head + (sep + lower(tail) if sep else "")
+        elif not acronym:
+            words[index] = lower(word)
         # After a number ("1.") or a colon ("Step 9:"), the next word starts a sentence again.
         first = bool(re.match(r"^\d+\.$", word) or word.endswith(":"))
     text = "".join(words)
