@@ -16,9 +16,12 @@ Twig in an example ({% if %}, {% block %}) is code, not GitBook. What is convert
 - <mark style="color:…">: the colour goes, the guidelines never let a colour carry a meaning; a red mark
   keeps its insistence in bold, any other mark leaves its text alone;
 - <p>a</p><p>b</p> in a cell of a table: a<br>b;
-- a <table> GitBook writes on one line: a Markdown table, with its code, emphasis, bold and links;
+- a <table> GitBook writes, on one line or several: a Markdown table, with its code, emphasis, bold and
+  links;
 - a relative link to a directory that holds a README.md: a link to that README.md, which MkDocs wants;
 - an image path GitBook writes between angle brackets because it holds spaces, (<…/images (1).jpeg>);
+- a <figure><picture> with a dark <source>: two Markdown images, #only-light and #only-dark, in a figure
+  of Material;
 - a <figure> GitBook writes on one line: a figure of Material, <figure markdown="span"> holding a Markdown
   image (whose path MkDocs rewrites, unlike the src of an HTML <img>) and its caption;
 - a code block GitBook exported as HTML, <pre class="language-x" data-title="f" data-line-numbers><code>,
@@ -55,11 +58,16 @@ LIQUID = re.compile(r"\{%.*?%\}")
 HTML = re.compile(r"<(figure|img|picture|table|mark|pre|details|div|p|br)\b", re.I)
 ASSET = re.compile(r"(?:\.\./)*\.gitbook/assets/([^)\"'\s>]+(?:\s[^)\"'>]+?)?)(?=[)\"'>])")
 
-MARK = re.compile(r'<mark\s+style="[^"]*?color:\s*([a-z]+)[^"]*"\s*>(.*?)</mark>', re.S)
+MARK = re.compile(r'<mark\s+style="[^"]*?color:\s*\$?([a-z-]+)[^"]*"\s*>(.*?)</mark>', re.S)
 TABLE_LINE = re.compile(r"^\s*<table\b.*</table>\s*$")
 PRE_OPEN = re.compile(r'^\s*<pre class="language-([\w+-]+)"([^>]*)><code[^>]*>(.*)$', re.S)
 FIGURE = re.compile(
     r'^\s*<figure>\s*<img\s+src="([^"]+)"(?:\s+alt="([^"]*)")?(?:\s+width="(\d+)")?[^>]*>'
+    r'(?:\s*<figcaption>\s*(?:<p>)?(.*?)(?:</p>)?\s*</figcaption>)?\s*</figure>\s*$'
+)
+PICTURE = re.compile(
+    r'^\s*<figure>\s*<picture>\s*<source\s+srcset="([^"]+)"\s+media="\(prefers-color-scheme:\s*dark\)"\s*>'
+    r'\s*<img\s+src="([^"]+)"(?:\s+alt="([^"]*)")?[^>]*>\s*</picture>'
     r'(?:\s*<figcaption>\s*(?:<p>)?(.*?)(?:</p>)?\s*</figcaption>)?\s*</figure>\s*$'
 )
 ANGLE_ASSET = re.compile(r"\(<((?:\.\./)*\.gitbook/assets/[^>]+)>\)")
@@ -172,7 +180,9 @@ class Page:
     def asset_path(self, raw: str) -> str:
         from urllib.parse import unquote
 
-        name = unquote(raw)
+        import html
+
+        name = html.unescape(unquote(raw))
         self.assets.add(name)
         depth = len(self.path.relative_to(self.docs).parts) - 1
         return "../" * depth + "assets/images/" + slug(name)
@@ -269,10 +279,24 @@ class Page:
                     index = end + 1
                     continue
 
+            picture = PICTURE.match(line)
+            if picture:
+                dark, light, alt, caption = picture.groups()
+                if out and out[-1].strip():
+                    out.append("")
+                out.append('<figure markdown="span">')
+                out.append(f"  ![{alt or caption or ''}]({self.source(light)}#only-light)")
+                out.append(f"  ![{alt or caption or ''}]({self.source(dark)}#only-dark)")
+                if caption:
+                    out.append(f"  <figcaption>{caption}</figcaption>")
+                out.append("</figure>")
+                index += 1
+                continue
+
             figure = FIGURE.match(line)
             if figure:
                 source, alt, width, caption = figure.groups()
-                source = ASSET.sub(self.asset, source)
+                source = self.source(source)
                 image = f"![{alt or caption or ''}]({source})" + (f'{{ width="{width}" }}' if width else "")
                 if out and out[-1].strip():
                     out.append("")
@@ -283,6 +307,12 @@ class Page:
                 out.append("</figure>")
                 index += 1
                 continue
+
+            if re.match(r"^\s*<table\b", line) and "</table>" not in line:
+                end = next((i for i in range(index, len(lines)) if "</table>" in lines[i]), None)
+                if end is not None:
+                    line = " ".join(l.strip() for l in lines[index : end + 1])
+                    index = end
 
             if TABLE_LINE.match(line):
                 table = html_table(line)
@@ -298,7 +328,7 @@ class Page:
 
             if LIQUID.search(line):
                 self.report(number, "GitBook syntax left as it is: " + LIQUID.search(line).group(0))
-            if HTML.search(re.sub(r"<br>", "", line)):
+            if HTML.search(re.sub(r'<br>|<figure markdown="span">', "", line)):
                 self.report(number, "HTML to convert by hand: " + line.strip()[:100])
 
             line = ANGLE_ASSET.sub(lambda m: "(" + self.asset_path(m.group(1).split(".gitbook/assets/", 1)[1]) + ")", line)
@@ -308,6 +338,12 @@ class Page:
         if pending_code is not None:
             self.report(offset + len(lines), "code block announced and never opened")
         return out
+
+    def source(self, path: str) -> str:
+        """The new path of an image GitBook stored in .gitbook/assets, parentheses and escapes included."""
+        if ".gitbook/assets/" in path:
+            return self.asset_path(path.split(".gitbook/assets/", 1)[1])
+        return path
 
     def directory_links(self, line: str) -> str:
         def replace(match: re.Match) -> str:
@@ -405,8 +441,8 @@ def sentence_case(title: str, names: list[str]) -> str:
         letters = re.sub(r"[^A-Za-z]", "", word)
         acronym = letters.isupper() and len(letters) > 1
         if first:
-            head, sep, tail = word.partition("-") if "-" in word else (word, "", "")
-            words[index] = head + (sep + lower(tail) if sep else "")
+            parts = re.split(r"([-/])", word)
+            words[index] = parts[0] + "".join(p if p in "-/" else lower(p) for p in parts[1:])
         elif not acronym:
             words[index] = lower(word)
         # After a number ("1.") or a colon ("Step 9:"), the next word starts a sentence again.
