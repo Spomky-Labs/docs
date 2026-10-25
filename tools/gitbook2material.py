@@ -3,6 +3,7 @@
 
     python3 -I tools/gitbook2material.py <docs directory>
     python3 -I tools/gitbook2material.py --titles "Web Push,Symfony,Doctrine" <docs directory>
+    python3 -I tools/gitbook2material.py --nav <docs directory>
 
 Every Markdown file under the directory is rewritten in place. Only the text outside code blocks is read:
 Twig in an example ({% if %}, {% block %}) is code, not GitBook. What is converted:
@@ -11,12 +12,22 @@ Twig in an example ({% if %}, {% block %}) is code, not GitBook. What is convert
 - {% code title="f" lineNumbers="true" %} and its fence  ->  the fence with title="f" linenums="1";
 - {% content-ref url="x" %} ... {% endcontent-ref %}  ->  the link it holds;
 - .gitbook/assets/<file>  ->  assets/images/<file renamed>, relative to the page; the files are moved;
-- layout: in the front matter is dropped (Material has no layouts; a landing page hides its sidebars).
+- layout: in the front matter is dropped (Material has no layouts; a landing page hides its sidebars);
+- <mark style="color:…">: the colour goes, the guidelines never let a colour carry a meaning; a red mark
+  keeps its insistence in bold, any other mark leaves its text alone;
+- <p>a</p><p>b</p> in a cell of a table: a<br>b;
+- a <table> GitBook writes on one line: a Markdown table, with its code, emphasis, bold and links;
+- a relative link to a directory that holds a README.md: a link to that README.md, which MkDocs wants.
 
 With --titles, the script only puts the headings in sentence case, as the Slabs guidelines want every
 title on the web: the first word keeps its capital, and so do acronyms (VAPID, JSON), identifiers with an
 inner capital (OperationException, JavaScript), inline code, HTTP status lines (404 Not Found) and the
 proper nouns given in the list. Every change is printed, to be read before it is committed.
+
+With --nav, the script prints the nav: block of mkdocs.yml for the SUMMARY.md of the directory: a "##"
+heading becomes a section, in sentence case; a page with pages under it becomes a section of the same
+title that opens with the page; every other page is listed by its path, and the navigation takes its
+title from the first heading of the page.
 
 Anything else in {% %} outside a fence, and every HTML element GitBook writes outside a fence, is reported
 and left as it is: those are converted by hand, page by page. The script never guesses.
@@ -38,6 +49,54 @@ ATTRIBUTE = re.compile(r'(\w+)="([^"]*)"')
 LIQUID = re.compile(r"\{%.*?%\}")
 HTML = re.compile(r"<(figure|img|picture|table|mark|pre|details|div|p|br)\b", re.I)
 ASSET = re.compile(r"(?:\.\./)*\.gitbook/assets/([^)\"'\s>]+(?:\s[^)\"'>]+?)?)(?=[)\"'>])")
+
+MARK = re.compile(r'<mark\s+style="[^"]*?color:\s*([a-z]+)[^"]*"\s*>(.*?)</mark>', re.S)
+TABLE_LINE = re.compile(r"^\s*<table\b.*</table>\s*$")
+
+
+def unmark(text: str) -> str:
+    def replace(match: re.Match) -> str:
+        colour, inner = match.group(1), match.group(2).strip()
+        if colour != "red" or not inner:
+            return inner
+        if re.fullmatch(r"(\*\*.*\*\*|<strong>.*</strong>)", inner, re.S):
+            return inner
+        return f"**{inner}**"
+
+    return MARK.sub(replace, text)
+
+
+def cell_paragraphs(text: str) -> str:
+    """<p>a</p><p>b</p> -> a<br>b, empty paragraphs dropped."""
+    text = re.sub(r"<p>\s*</p>", "", text)
+    if "<p>" not in text:
+        return text
+    parts = [part.strip() for part in re.findall(r"<p>(.*?)</p>", text, re.S)]
+    rest = re.sub(r"<p>.*?</p>", "", text, flags=re.S).strip()
+    return "<br>".join([p for p in parts if p] + ([rest] if rest else []))
+
+
+def inline_markdown(html_text: str) -> str:
+    text = cell_paragraphs(unmark(html_text))
+    text = re.sub(r"<code>(.*?)</code>", lambda m: "`" + m.group(1).replace("`", "\\`") + "`", text, flags=re.S)
+    text = re.sub(r"<(strong|b)>(.*?)</\1>", r"**\2**", text, flags=re.S)
+    text = re.sub(r"<(em|i)>(.*?)</\1>", r"*\2*", text, flags=re.S)
+    text = re.sub(r'<a\s+href="([^"]*)"[^>]*>(.*?)</a>', r"[\2](\1)", text, flags=re.S)
+    text = re.sub(r"<br\s*/?>", "<br>", text)
+    return text.replace("|", "\\|").replace("\n", " ").strip()
+
+
+def html_table(line: str) -> str | None:
+    rows = re.findall(r"<tr>(.*?)</tr>", line, re.S)
+    if not rows:
+        return None
+    table = [[inline_markdown(cell) for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, re.S)] for row in rows]
+    width = max(len(row) for row in table)
+    table = [row + [""] * (width - len(row)) for row in table]
+    lines = ["| " + " | ".join(table[0]) + " |", "|" + "---|" * width]
+    lines += ["| " + " | ".join(row) + " |" for row in table[1:]]
+    return "\n".join(lines)
+
 
 ADMONITIONS = {"info": "info", "warning": "warning", "danger": "danger", "success": "success", "tip": "tip"}
 
@@ -149,17 +208,40 @@ class Page:
                 index = end + 1
                 continue
 
+            if TABLE_LINE.match(line):
+                table = html_table(line)
+                if table is not None:
+                    if out and out[-1].strip():
+                        out.append("")
+                    out.append(ASSET.sub(self.asset, table))
+                    index += 1
+                    continue
+            line = unmark(line)
+            if line.lstrip().startswith("|"):
+                line = "|".join(cell_paragraphs(cell) for cell in line.split("|"))
+
             if LIQUID.search(line):
                 self.report(number, "GitBook syntax left as it is: " + LIQUID.search(line).group(0))
-            if HTML.search(line):
+            if HTML.search(re.sub(r"<br>", "", line)):
                 self.report(number, "HTML to convert by hand: " + line.strip()[:100])
 
-            out.append(ASSET.sub(self.asset, line))
+            out.append(self.directory_links(ASSET.sub(self.asset, line)))
             index += 1
 
         if pending_code is not None:
             self.report(offset + len(lines), "code block announced and never opened")
         return out
+
+    def directory_links(self, line: str) -> str:
+        def replace(match: re.Match) -> str:
+            target, anchor = match.group(1), match.group(2) or ""
+            if re.match(r"^[a-z]+:", target) or target.startswith("/"):
+                return match.group(0)
+            if (self.path.parent / target / "README.md").is_file():
+                return f"]({target}README.md{anchor})"
+            return match.group(0)
+
+        return re.sub(r"\]\(([^)\s#]+/)(#[^)\s]*)?\)", replace, line)
 
     def block(self, lines: list[str], start: int, opening: re.Pattern, closing: re.Pattern):
         """The lines up to the closing tag that matches, nested blocks and fences included."""
@@ -273,8 +355,51 @@ def titles(docs: Path, names: list[str]) -> int:
     return 0
 
 
+def nav(docs: Path, names: list[str]) -> int:
+    """A "##" heading becomes a section; a page with pages under it becomes a section that opens with it."""
+    groups: list[tuple[str | None, list]] = [(None, [])]
+    stack: list[tuple[int, list]] = []
+    for line in (docs / "SUMMARY.md").read_text(encoding="utf-8").splitlines():
+        heading = re.match(r"^##\s+(.+)$", line)
+        item = re.match(r"^(\s*)[*-]\s+\[([^\]]*)\]\(([^)]+)\)", line)
+        if heading or line.strip() == "---":
+            groups.append((heading.group(1).strip() if heading else None, []))
+            stack = []
+        elif item:
+            depth = len(item.group(1).replace("\t", "  "))
+            node = {"title": item.group(2), "path": item.group(3), "children": []}
+            while stack and stack[-1][0] >= depth:
+                stack.pop()
+            (stack[-1][1] if stack else groups[-1][1]).append(node)
+            stack.append((depth, node["children"]))
+
+    def emit(nodes: list, indent: str) -> None:
+        for node in nodes:
+            if node["children"]:
+                print(f'{indent}- "{sentence_case(node["title"], names)}":')
+                print(f'{indent}    - {node["path"]}')
+                emit(node["children"], indent + "    ")
+            else:
+                print(f"{indent}- {node['path']}")
+
+    print("nav:")
+    for title, nodes in groups:
+        if not nodes:
+            continue
+        if title is None:
+            emit(nodes, "  ")
+        else:
+            print(f'  - "{sentence_case(title, names)}":')
+            emit(nodes, "      ")
+    return 0
+
+
 def main() -> int:
     arguments = sys.argv[1:]
+    if len(arguments) == 2 and arguments[0] == "--nav":
+        return nav(Path(arguments[1]).resolve(), [])
+    if len(arguments) == 3 and arguments[0] == "--nav":
+        return nav(Path(arguments[2]).resolve(), [n.strip() for n in arguments[1].split(",") if n.strip()])
     if len(arguments) == 3 and arguments[0] == "--titles":
         return titles(Path(arguments[2]).resolve(), [n.strip() for n in arguments[1].split(",") if n.strip()])
     if len(arguments) != 1:

@@ -19,12 +19,12 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 |---|---|---|---|
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
 | Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | On GitBook |
+| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Pull requests open (4.0 to 4.3, #55 to #58), domain on GitBook |
 | WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | On GitBook |
 | PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
-Order of the rest: JWT Framework, then WebAuthn Framework, then PWA Bundle, from the least to
+Order of the rest: WebAuthn Framework, then PWA Bundle, from the least to
 the most GitBook formatting to convert.
 
 The central site lists every library and holds the legal notice, the privacy policy and the contact page
@@ -49,10 +49,12 @@ the first group of cards of `docs/index.md`.
 - **The footer** is the reversed Slabs signature, the links of the project, a first link "All
   documentation" to `docs.spomky-labs.com`, and the legal line whose three links lead to the central site.
 - **Text is set at 18 px**, 16 px on a phone (p. 34 of the guidelines); code at 14 px; the navigation at
-  15 px, in a 288 px column.
+  15 px. The navigation, on the left, and the contents of the page, on the right, are 288 px wide each;
+  the reading column 864 px on a wide screen.
 - **Every title is in sentence case.** Names keep their capitals.
-- **Only the versions that exist in git are published.** A GitBook variant whose content never reached a
-  branch is redirected to the same page of the latest version.
+- **The maintained versions are published**, among those that exist in git (JWT Framework: 4.0 to 4.3,
+  not 1.x to 3.3). Every other GitBook variant is redirected to the same page of the latest version, or
+  to its home page when that page no longer exists there: `site-root/404.html` asks with a HEAD request.
 - **Nothing a reader loads reaches a third party**: fonts are served by the site, and the header does not
   ask the API of GitHub for the stars of the repository. The privacy policy says so; keep it true.
 
@@ -71,9 +73,10 @@ the first group of cards of `docs/index.md`.
 4. **Convert the GitBook syntax** (table below): `python3 -I ~/Projects/docs/tools/gitbook2material.py docs`
    rewrites the pages, moves the images it finds to `docs/assets/images/`, and lists what it left for a
    human: any other `{% %}`, and the HTML GitBook writes outside code blocks. Read the diff, then every
-   converted page in the browser.
+   converted page in the browser. The script is idempotent: running it again changes nothing.
 5. **Copy the toolchain** from the reference: `mkdocs.yml` (then adapt the names, `site_url`, `repo_url`,
-   `edit_uri`, `extra.slabs`, the navigation from `SUMMARY.md`), `requirements.txt`, `Makefile`,
+   `edit_uri`, `extra.slabs`, and the navigation, which `gitbook2material.py --nav "<names>" docs` writes
+   from `SUMMARY.md`), `requirements.txt`, `Makefile`,
    `.editorconfig`, `.gitignore`, `.github/workflows/` (three files; they replace
    `auto-switch-default-branch.yml`), `docs/assets/`, `docs/overrides/`, `site-root/`.
 6. **Fill `site-root/`**: `CNAME` with the domain, and in `404.html` the `VARIANTS` table, GitBook prefix
@@ -84,9 +87,16 @@ the first group of cards of `docs/index.md`.
    change; the list holds the proper nouns of the project. Read the list: a hyphenated name ("Web-Push")
    or a parenthesis ("TTL (Time-to-live)") still needs a hand.
 9. **`make check`**, then check every address of the sitemap against a local publication (below).
-10. **Pull request, merge, then the domain** (below). Then remove the domain from the GitBook space, and
+10. **Several versions**: convert the oldest published branch first. Each next one starts from its own
+    branch, merges the converted branch of the previous version (`git merge --no-commit`), then puts back
+    under `docs/` the GitBook content of its own version, converts it again, regenerates its navigation and
+    points `edit_uri` at itself. Check each branch by converting its GitBook content from scratch in a
+    scratch directory and comparing it with `docs/`, file by file: they must be identical. A change common
+    to every version is made on the oldest branch and merged forward. One pull request per version, merged
+    in order.
+11. **Pull request, merge, then the domain** (below). Then remove the domain from the GitBook space, and
     in a last pull request `SUMMARY.md` and `.gitbook.yaml`.
-11. **Move the library** to the documentation sites on the central site, if it was not there.
+12. **Move the library** to the documentation sites on the central site, if it was not there.
 
 ## From GitBook to Material
 
@@ -98,8 +108,10 @@ the first group of cards of `docs/index.md`.
 | `{% content-ref url="x.md" %}` | a plain link |
 | `<figure><img><figcaption>` | `![alt](path)` and a caption in the text, or the figure kept as HTML |
 | `<picture>` with a dark `<source>` | two images, `#only-light` and `#only-dark` |
-| `<table>` with `<th width>` | a Markdown table when the cells allow it, the HTML table otherwise |
-| `<mark style="color:…">` | the word itself; colour never carries a meaning |
+| `<table>` on one line, with `<th width>` | a Markdown table, `<code>`, `<em>`, `<strong>` and links kept (by the script) |
+| `<p>a</p><p>b</p>` in a cell | `a<br>b` (by the script) |
+| `<mark style="color:red">` | the text in bold; any other colour, the text alone (by the script): colour never carries a meaning |
+| a link to a directory (`signed-tokens/`) | a link to its `README.md` (by the script) |
 | `.gitbook/assets/…` | `docs/assets/images/`, renamed without spaces or `(1)`, unused files dropped |
 | `layout: landing` | `hide: [navigation, toc]` |
 | `description:` | kept |
@@ -163,6 +175,10 @@ the domain and add it again in the Settings page.
 - **A branch named `3.2.x`** publishes the version `3.2` (`pages.yml` of `web-push-doc`).
 - **The name beside the logo** is hidden only beside a project mark: the mark images carry the class
   `sl-logo--mark`, and `slabs.css` tests it with `:has()`.
+- **`git checkout --theirs` takes the whole file**, not the side of the conflict: on `mkdocs.yml` it brings
+  back the navigation and the `edit_uri` of the other version. Take `--ours` and resolve the lines by hand.
+- **The README of the GitBook home page and the README of the repository have the same name**: a script
+  that puts the GitBook content back under `docs/` must not remove the second one.
 - **`git add -A docs` takes what was staged before**, deleted files included. After a conversion, add the
   pages by name for a commit about pages, and check `git show --stat` before pushing.
 - **`DEFAULT_BRANCH_TOKEN` does not exist**, neither on the repositories nor on the organizations:
