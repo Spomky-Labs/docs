@@ -21,10 +21,11 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 | Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Pull requests open (1.4 to 1.6, #19 to #21), domain on GitBook |
+| PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
-PWA Bundle is the last one, from the least to
+Every documentation is migrated. What is left, for each one: remove the domain from its GitBook space, then
+`SUMMARY.md` and `.gitbook.yaml` in a last pull request, from the least to
 the most GitBook formatting to convert.
 
 The central site lists every library and holds the legal notice, the privacy policy and the contact page
@@ -182,6 +183,11 @@ the domain and add it again in the Settings page.
 - **Some files of the web set of the design kit still carry a C2PA manifest**, the marks of Access
   Control Framework, PWA Bundle and Web Push Framework among them. `tools/web-svg.py <source> <target>`
   removes it, with the title and the role, and refuses to write if the drawing would change.
+- **A branch left from GitBook can take `latest`.** PWA Bundle kept a `1.x` branch from GitBook, never
+  migrated, which sorts after `1.6`: no published version carried `latest` and the root of the site led
+  nowhere. `pages.yml` now keeps only the branches that hold a `mkdocs.yml` (Spomky-Labs/phpwa-doc#22); the
+  other repositories take the same change with their last pull request. To repair a site at once:
+  `mike alias --push <version> latest` and `mike set-default --push latest` on a clone of the repository.
 - **`sort -V` puts `1.x` before `1.2`.** The newest version branch, the one that carries `latest`, is
   found by sorting on a key where `x` is a large number (`pages.yml` of `web-push-doc`). The reference and
   Beffroi still have the plain sort; no branch named `N.x` exists yet to show it.
