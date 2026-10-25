@@ -1,5 +1,4 @@
 ---
-title: Documentation
 description: The documentation of the open-source security libraries for PHP published by Slabs.
 hide:
   - navigation
