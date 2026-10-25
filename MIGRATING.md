@@ -19,8 +19,8 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 |---|---|---|---|
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
 | Web Push Framework | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
-| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Pull requests open (4.0 to 4.3, #55 to #58), domain on GitBook |
-| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | On GitBook |
+| JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | Migrated; the GitBook space is still to remove |
+| WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | In progress: 5.2, 5.3 and 5.4 |
 | PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
@@ -137,7 +137,17 @@ JavaScript, a plain HTTP client does not follow them.
 
 ## Publishing a domain
 
-1. Merge: the push to the version branch publishes `gh-pages` and its root.
+0. **Verify the domain in the organization of the repository**, before anything else. Spomky-Labs has
+   verified `spomky-labs.com`, which reserves the domain and its subdomains for its own repositories: a
+   repository of web-token or web-auth cannot use `web-token.spomky-labs.com` until that organization has
+   verified it too (Settings of the organization, Pages, Add a domain, then the TXT record
+   `_github-pages-challenge-<organization>.<domain>` at Infomaniak). Without it, Pages keeps an empty
+   custom domain and the site answers 404 as soon as the DNS points to GitHub.
+1. Merge: the push to the version branch publishes `gh-pages` and its root. **Merge the pull requests of
+   several versions one by one, each after the publication of the previous one**: the workflow keeps one
+   run waiting in its concurrency group, and a newer one cancels it (JWT 4.2 was cancelled by 4.3).
+   Check `versions.json` on `gh-pages`, and run the workflow again on a missing branch
+   (`gh workflow run pages.yml --ref <branch>`).
 2. Lower the TTL of the record the day before.
 3. **Point the DNS first**: a CNAME to `<organization>.github.io.` (`spomky-labs`, `web-auth`, `web-token`).
 4. **Then** declare the domain: Settings, Pages, deploy from `gh-pages`, root folder, custom domain. The
