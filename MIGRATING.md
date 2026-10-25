@@ -17,7 +17,7 @@ like `3.2.x`, or whose project has no mark yet, take `pages.yml`, `slabs.css` an
 | Documentation | Repository | Domain | State |
 |---|---|---|---|
 | Access Control Framework | `Spomky-Labs/access-control-doc` | `acf.spomky-labs.com` | Migrated |
-| Web Push | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Pull request open, domain on GitBook |
+| Web Push | `Spomky-Labs/web-push-doc` | `web-push.spomky-labs.com` | Migrated; the GitBook space is still to remove |
 | JWT Framework | `web-token/jwt-doc` | `web-token.spomky-labs.com` | On GitBook |
 | WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | On GitBook |
 | PHPWA | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | On GitBook |
@@ -128,6 +128,10 @@ JavaScript, a plain HTTP client does not follow them.
    reads the domain from `CNAME`.
 5. Wait for the certificate, then enforce HTTPS.
 6. Check every address of the sitemap on the live site, then remove the domain from GitBook.
+
+A record changed at Infomaniak can take a quarter of an hour to reach its own servers
+(`web-push.spomky-labs.com`). Ask them directly before declaring the domain: the public resolvers keep the
+old answer for the TTL of the record, an hour by default.
 
 A domain declared before its DNS existed got no certificate for a long while (`docs.spomky-labs.com`):
 removing it and adding it again by the API did not start one. If the certificate does not come, remove
