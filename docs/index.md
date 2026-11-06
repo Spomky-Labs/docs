@@ -17,13 +17,13 @@ certificates that carry the answer.
 { .sl-lead }
 
 <div class="sl-cards">
-<a class="sl-card" href="https://webauthn-doc.spomky-labs.com/">
+<a class="sl-card" href="/webauthn/">
 <span class="sl-card__label">Authentication</span>
 <span class="sl-card__title">WebAuthn Framework</span>
 <span class="sl-card__excerpt">WebAuthn and passkeys for PHP and Symfony.</span>
 <span class="sl-card__meta">web-auth/webauthn-lib</span>
 </a>
-<a class="sl-card" href="https://web-token.spomky-labs.com/">
+<a class="sl-card" href="/jwt/">
 <span class="sl-card__label">Tokens</span>
 <span class="sl-card__title">JWT Framework</span>
 <span class="sl-card__excerpt">JSON Web Tokens for PHP and Symfony: signature (JWS), encryption (JWE) and keys (JWK).</span>
@@ -35,13 +35,13 @@ certificates that carry the answer.
 <span class="sl-card__excerpt">TOTP and HOTP one-time passwords, after RFC 6238 and RFC 4226.</span>
 <span class="sl-card__meta">spomky-labs/otphp</span>
 </a>
-<a class="sl-card" href="https://acf.spomky-labs.com/">
+<a class="sl-card" href="/acf/">
 <span class="sl-card__label">Authorization</span>
 <span class="sl-card__title">Access Control Framework</span>
 <span class="sl-card__excerpt">Authorization for PHP and Symfony: decides whether a requester is allowed to perform an action on a subject.</span>
 <span class="sl-card__meta">spomky-labs/access-control-lib</span>
 </a>
-<a class="sl-card" href="https://pki.spomky-labs.com/">
+<a class="sl-card" href="/pki/">
 <span class="sl-card__label">Certificates</span>
 <span class="sl-card__title">PKI Framework</span>
 <span class="sl-card__excerpt">X.509 certificates, ASN.1 and public key infrastructure.</span>
@@ -55,13 +55,13 @@ Bundles that hand an application a capability of the web platform, configured ra
 { .sl-lead }
 
 <div class="sl-cards">
-<a class="sl-card" href="https://pwa.spomky-labs.com/">
+<a class="sl-card" href="/pwa/">
 <span class="sl-card__label">Progressive web apps</span>
 <span class="sl-card__title">PWA Bundle</span>
 <span class="sl-card__excerpt">Progressive web apps for Symfony: manifest, service worker and offline support.</span>
 <span class="sl-card__meta">spomky-labs/pwa-bundle</span>
 </a>
-<a class="sl-card" href="https://web-push.spomky-labs.com/">
+<a class="sl-card" href="/web-push/">
 <span class="sl-card__label">Notifications</span>
 <span class="sl-card__title">Web Push Framework</span>
 <span class="sl-card__excerpt">Web push notifications for PHP and Symfony.</span>
@@ -76,12 +76,12 @@ documentation is here for the day you read a stack trace or write a layer of you
 { .sl-lead }
 
 <div class="sl-cards sl-cards--compact">
-<a class="sl-card sl-card--compact" href="https://cbor.spomky-labs.com/">
+<a class="sl-card sl-card--compact" href="/cbor/">
 <span class="sl-card__title">CBOR PHP</span>
 <span class="sl-card__excerpt">CBOR encoding and decoding, after RFC 8949.</span>
 <span class="sl-card__meta">spomky-labs/cbor-php</span>
 </a>
-<a class="sl-card sl-card--compact" href="https://cose.spomky-labs.com/">
+<a class="sl-card sl-card--compact" href="/cose/">
 <span class="sl-card__title">COSE</span>
 <span class="sl-card__excerpt">COSE signing, encryption and key management, after RFC 9052 and RFC 9053.</span>
 <span class="sl-card__meta">web-auth/cose-lib</span>
