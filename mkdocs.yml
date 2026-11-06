@@ -55,7 +55,6 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.tracking
-    - navigation.sections
     - navigation.indexes
     - navigation.top
     - navigation.footer
