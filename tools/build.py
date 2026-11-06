@@ -86,6 +86,14 @@ def main() -> int:
     if out.exists():
         shutil.rmtree(out)
 
+    # The front matter of a page is YAML, and --strict does not check it: a block that fails to parse is
+    # rendered as the content of the page, which loses its title, with the build green throughout.
+    check = subprocess.run([sys.executable, "-I", str(ROOT / "tools" / "front-matter.py"),
+                            str(ROOT / "docs"), *(str(p) for p in sorted(ROOT.glob("projects/*/*/docs")))],
+                           cwd=ROOT)
+    if check.returncode != 0:
+        return check.returncode
+
     # The hub owns the root, so it is built first: a project writes only its own directory afterwards.
     print("hub")
     copy_shared(ROOT)

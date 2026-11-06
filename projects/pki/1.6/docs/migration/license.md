@@ -50,8 +50,8 @@ That is the only runtime dependency beyond the PHP extensions listed in
 
 The documentation site is set in Space Grotesk and IBM Plex Mono, both under the
 [SIL Open Font License](https://openfontlicense.org/). The licence of each is served beside the font
-files, in `docs/assets/fonts/` of the
-[documentation repository](https://github.com/Spomky-Labs/pki-framework-doc).
+files, in `shared/assets/fonts/` of the
+[documentation repository](https://github.com/Spomky-Labs/docs).
 
 ## Supporting the work
 

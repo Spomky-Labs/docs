@@ -1,5 +1,10 @@
 # Migrating a documentation from GitBook
 
+> **This is a record, not a guide.** The nine repositories it names were retired once every documentation
+> moved into this one; their links no longer resolve. What replaced them is in
+> [CONSOLIDATING.md](CONSOLIDATING.md), and how to work on the pages today is in [README.md](README.md).
+
+
 How a documentation published by GitBook becomes a documentation site of Slabs: MkDocs and Material for
 MkDocs, in the look of the Slabs brand guidelines v2.0, published on GitHub Pages under its own domain.
 This file is the record of what was decided, the steps that work, and the traps already met. It is not

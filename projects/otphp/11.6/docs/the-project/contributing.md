@@ -38,12 +38,14 @@ with the lowest allowed dependencies.
 
 ## This documentation
 
-The pages of this site live in
-[Spomky-Labs/otphp-doc](https://github.com/Spomky-Labs/otphp-doc), one branch per version of the library.
-Every page has an *edit* pencil at the top that opens it on the right branch.
+Every documentation of Slabs lives in one repository,
+[Spomky-Labs/docs](https://github.com/Spomky-Labs/docs), under `projects/<project>/<version>/`. These
+pages are in `projects/otphp/11.6/`. The *edit* pencil at the top of a page opens its source there.
 
 ```bash
-make install   # the toolchain, in .venv
-make serve     # http://127.0.0.1:8000
-make check     # the strict build continuous integration runs
+git clone https://github.com/Spomky-Labs/docs.git
+cd docs
+make install                 # the toolchain, in .venv
+make serve p=otphp v=11.6   # http://127.0.0.1:8000, rebuilt as you save
+make check                   # the strict build continuous integration runs
 ```

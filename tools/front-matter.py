@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check that the front matter of every page parses as YAML.
 
-    python3 -I tools/front-matter.py docs
+    python3 -I tools/front-matter.py <directory> [<directory>...]
 
 MkDocs reads the block between the two "---" lines as YAML. A value holding a colon followed by a
 space ("for PHP: signing") or a backslash ("Cose\\...Tag") is not a plain scalar, so the block fails
@@ -11,7 +11,7 @@ and the page loses its title in the navigation.
 "mkdocs build --strict" does not catch this, which is why it is checked here. Quote the value with
 single quotes, doubling any inner one; double quotes do not work, a backslash being an escape there.
 
-This belongs in Spomky-Labs/docs/tools with the other shared tools once the other sites adopt it.
+tools/build.py runs it over the hub and every version before it builds anything.
 """
 
 import re
@@ -24,13 +24,13 @@ FRONT_MATTER = re.compile(r"^---\n(.*?\n)---\n", re.S)
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print(__doc__.strip().splitlines()[2].strip(), file=sys.stderr)
         return 2
 
-    pages = sorted(Path(sys.argv[1]).rglob("*.md"))
+    pages = sorted(page for directory in sys.argv[1:] for page in Path(directory).rglob("*.md"))
     if not pages:
-        print(f"No page found in {sys.argv[1]}", file=sys.stderr)
+        print(f"No page found in {', '.join(sys.argv[1:])}", file=sys.stderr)
         return 1
 
     failures = 0

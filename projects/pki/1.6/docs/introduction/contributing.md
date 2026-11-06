@@ -45,23 +45,23 @@ every exchange.
 
 ## This documentation
 
-The pages live in their own repository,
-[Spomky-Labs/pki-framework-doc](https://github.com/Spomky-Labs/pki-framework-doc). The pencil at the top
-right of a page opens it for editing on the branch of the version you are reading.
+Every documentation of Slabs lives in one repository,
+[Spomky-Labs/docs](https://github.com/Spomky-Labs/docs), under `projects/<project>/<version>/`. These
+pages are in `projects/pki/1.6/`. The pencil at the top right of a page opens its source there.
 
 ```bash
-git clone https://github.com/Spomky-Labs/pki-framework-doc.git
-cd pki-framework-doc
-make install   # the toolchain, in .venv
-make serve     # http://127.0.0.1:8000, rebuilt as you save
-make check     # the strict build continuous integration runs
+git clone https://github.com/Spomky-Labs/docs.git
+cd docs
+make install                 # the toolchain, in .venv
+make serve p=pki v=1.6   # http://127.0.0.1:8000, rebuilt as you save
+make check                   # the strict build continuous integration runs
 ```
 
 `make check` is the gate: a broken internal link, an anchor that does not exist, a page absent from the
 navigation or a navigation entry without a page fails the build.
 
-One branch of that repository is one version of the library, named like its maintenance branch. A
-correction that applies to every version is made on the oldest maintained branch and merged forward.
+One directory of that repository is one version of the library. A correction that applies to every
+version is made in each of them: the versions are directories, not branches.
 
 Titles are in sentence case; names keep their capitals. Every code block is expected to run against the
 version the page documents.
