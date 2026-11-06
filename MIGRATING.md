@@ -25,6 +25,7 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 | PKI Framework | `Spomky-Labs/pki-framework-doc` | `pki.spomky-labs.com` | Written from scratch, never published by GitBook: the library was documented in its README |
 | CBOR PHP | `Spomky-Labs/cbor-php-doc` | `cbor.spomky-labs.com` | Written from the doc/ directory of the library, never published by GitBook |
 | COSE | `web-auth/cose-doc` | `cose.spomky-labs.com` | Written from the doc/ directory of the library, never published by GitBook |
+| OTPHP | `Spomky-Labs/otphp-doc` | `otphp.spomky-labs.com` | Written from the doc/ directory of the library, never published by GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
 Every documentation is migrated. What is left, for each one: remove the domain from its GitBook space, then
@@ -32,8 +33,9 @@ Every documentation is migrated. What is left, for each one: remove the domain f
 the most GitBook formatting to convert.
 
 The central site lists every library and holds the legal notice, the privacy policy and the contact page
-that every documentation site links to from its footer. A library that gets a documentation site moves to
-the first group of cards of `docs/index.md`.
+that every documentation site links to from its footer. OTPHP was the last library documented in its own
+repository, so `docs/index.md` now holds a single group of cards: a new library is added to it, and the
+second group comes back only if one is ever documented in its repository again.
 
 ## What was decided
 
