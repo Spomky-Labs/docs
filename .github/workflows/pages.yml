@@ -1,16 +1,13 @@
 name: Pages
 
-# The site holds the hub at its root and one directory per project:
+# The whole site is built here and published to gh-pages, which Pages serves from its root folder:
 #
 #     /                     the hub, the legal notice, the privacy policy, the contact page
-#     /otphp/11.6/          a version of a project, deployed by mike from Spomky-Labs/otphp-doc
-#     /otphp/latest/        the alias that project's root redirects to
-#     /otphp/versions.json  what that project publishes
+#     /jwt/4.3/             a version, built from projects/jwt/4.3/
+#     /jwt/latest/          a copy of the newest version
+#     /jwt/versions.json    what the version selector of that project reads
 #
-# This workflow owns the root and nothing else. Each project repository deploys its own directory into this
-# branch with "mike deploy --deploy-prefix <project> -r <this repository>", so a publication of the hub
-# must leave those directories alone: it replaces every root entry that is not a project, and a project is
-# a directory holding a versions.json.
+# One repository, one build, one branch. Nothing else writes gh-pages.
 on:
     push:
         branches:
@@ -19,9 +16,6 @@ on:
             - '.github/workflows/check.yml'
     workflow_dispatch:
 
-# MkDocs 2.0 is announced as backward incompatible with every plugin and theme, so the toolchain is pinned
-# to the 1.x line in requirements.txt and the two notices about it are silenced: they are news about the
-# ecosystem, not findings about this site.
 env:
     NO_MKDOCS_2_WARNING: 'true'
     DISABLE_MKDOCS_2_WARNING: 'true'
@@ -29,8 +23,6 @@ env:
 permissions:
     contents: write
 
-# Ten repositories write this branch. This group only serialises the runs of this one; a push that races a
-# project is retried below.
 concurrency:
     group: gh-pages
     cancel-in-progress: false
@@ -40,6 +32,7 @@ jobs:
         name: Deploy
         runs-on: ubuntu-latest
         steps:
+            # The whole history: the revision date of a page is read from it.
             - uses: actions/checkout@v5
               with:
                   fetch-depth: 0
@@ -53,61 +46,35 @@ jobs:
             - name: Install the toolchain
               run: pip install -r requirements.txt
 
+            - name: Build
+              run: python -I tools/build.py --strict
+
             - name: Identify the committer
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-            - name: Build
-              run: mkdocs build --strict
-
-            # The branch may not exist yet on a repository that has never published.
-            - name: Publish the root of the site
+            # site/ already holds CNAME, 404.html and .nojekyll: tools/build.py copies site-root over it.
+            # gh-pages is replaced wholesale, so a page removed from a project leaves the site with it.
+            - name: Publish
               run: |
                   set -euo pipefail
                   root="${RUNNER_TEMP}/gh-pages"
-
-                  for attempt in 1 2 3 4 5; do
-                    rm -rf "$root"
-                    git worktree remove --force "$root" 2>/dev/null || true
-
-                    if git fetch --quiet origin gh-pages 2>/dev/null; then
-                      git worktree add --quiet "$root" FETCH_HEAD --detach
-                    else
-                      git worktree add --quiet --detach "$root"
-                      git -C "$root" checkout --quiet --orphan gh-pages
-                      git -C "$root" rm -rq --cached . 2>/dev/null || true
-                      find "$root" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-                    fi
-
-                    # Everything at the root that is not a project belongs to the hub and is replaced.
-                    find "$root" -mindepth 1 -maxdepth 1 ! -name .git -print0 \
-                      | while IFS= read -r -d '' entry; do
-                          [ -f "$entry/versions.json" ] && continue
-                          rm -rf "$entry"
-                        done
-
-                    cp -R site/. "$root/"
-                    cp -R site-root/. "$root/"
-                    touch "$root/.nojekyll"
-
-                    cd "$root"
-                    git add --all
-                    if git diff --cached --quiet; then
-                      echo "The root of the site is up to date."
-                      exit 0
-                    fi
-                    git commit --quiet -m "Publish the root of the site from ${GITHUB_SHA::7}"
-
-                    if git push --quiet origin "HEAD:gh-pages"; then
-                      echo "Published."
-                      exit 0
-                    fi
-
-                    echo "A project wrote gh-pages first, attempt ${attempt} of 5; starting again."
-                    cd "${GITHUB_WORKSPACE}"
-                    sleep $(( attempt * 5 ))
-                  done
-
-                  echo "gh-pages could not be written after five attempts." >&2
-                  exit 1
+                  if git fetch --quiet origin gh-pages 2>/dev/null; then
+                    git worktree add --quiet "$root" FETCH_HEAD --detach
+                  else
+                    git worktree add --quiet --detach "$root"
+                    git -C "$root" checkout --quiet --orphan gh-pages
+                    git -C "$root" rm -rq --cached . 2>/dev/null || true
+                  fi
+                  find "$root" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+                  cp -R site/. "$root/"
+                  cd "$root"
+                  git add --all
+                  if git diff --cached --quiet; then
+                    echo "The site is up to date."
+                    exit 0
+                  fi
+                  git commit --quiet -m "Publish the site from ${GITHUB_SHA::7}"
+                  git push --quiet origin "HEAD:gh-pages"
+                  echo "Published."

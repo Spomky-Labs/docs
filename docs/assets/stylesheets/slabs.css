@@ -162,7 +162,8 @@ body {
   color: var(--doc-text);
 }
 
-/* The logotype, 32 px high, the colour version on light grounds and the reversed one on dark. */
+/* The logo, 32 px high: the project mark, or the Slabs logotype for a project that has none yet. The
+   colour version on light grounds, the reversed one on dark. */
 .md-header__button.md-logo {
   margin: 0 0 0 var(--slabs-gutter-mobile);
   padding: 0;
@@ -175,8 +176,10 @@ body {
   width: auto;
 }
 
+/* In the drawer of a narrow screen, the mark takes the width of the drawer. */
 .md-nav__button.md-logo .sl-logo {
-  height: var(--slabs-header-logo);
+  height: auto;
+  max-width: 100%;
 }
 
 [data-md-color-scheme="default"] .sl-logo--dark,
@@ -184,7 +187,9 @@ body {
   display: none !important;
 }
 
-/* The project name, after a rule, the way the guidelines set it beside the logotype (p. 30). */
+/* The title of the page, after a rule, once the reader has scrolled past its heading. A project mark
+   already names the project: on a screen wide enough to show it, the name is not written a second time.
+   Beside the Slabs logotype, the name stays. */
 .md-header__title {
   font-size: var(--slabs-nav);
   font-weight: 600;
@@ -194,6 +199,16 @@ body {
 .md-header__title .md-header__ellipsis {
   border-left: 1px solid var(--doc-rule);
   padding-left: var(--slabs-gutter);
+}
+
+@media screen and (min-width: 76.25em) {
+  .md-header:has(.sl-logo--mark) .md-header__title:not(.md-header__title--active) .md-header__ellipsis {
+    border-left-color: transparent;
+  }
+
+  .md-header:has(.sl-logo--mark) .md-header__title .md-header__topic:first-child {
+    visibility: hidden;
+  }
 }
 
 .md-header__button,
@@ -379,36 +394,22 @@ body {
   text-underline-offset: 0.35em;
 }
 
-/* A section is a label that folds its pages away: Plex Mono SemiBold capitals, 12 px, tracked, in the
-   secondary colour, with the chevron of the theme at its right. The section of the open page is unfolded,
-   and a click folds it back. */
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > label.md-nav__link,
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container,
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container > .md-nav__link {
+/* A section title is a label: Plex Mono SemiBold capitals, 12 px, tracked, in the secondary colour. */
+.md-nav--primary .md-nav__item--section > .md-nav__link,
+.md-nav--primary .md-nav__item--section > .md-nav__container > .md-nav__link {
   color: var(--doc-text-secondary);
+  cursor: default;
   font-family: var(--md-code-font-family);
   font-size: var(--slabs-caption);
   font-weight: 600;
   letter-spacing: var(--slabs-label-tracking);
+  margin-top: calc(var(--slabs-space-base) * 6);
   text-decoration: none;
   text-transform: uppercase;
 }
 
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > label.md-nav__link,
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container {
-  margin-top: calc(var(--slabs-space-base) * 6);
-}
-
-/* A section that has a page of its own holds three elements that are all .md-nav__link: the container, the
-   link and the label carrying the chevron. The spacing is the container's, so the two inside it take none
-   of their own and the title keeps the line of the sections beside it. */
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container > .md-nav__link {
-  margin-top: 0;
-}
-
-/* The pages of an unfolded section, under its label. */
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav > .md-nav__list {
-  padding-bottom: calc(var(--slabs-space-base) * 2);
+.md-nav--primary .md-nav__item--section > .md-nav__link .md-nav__icon {
+  display: none;
 }
 
 @media screen and (min-width: 76.25em) {
@@ -987,109 +988,6 @@ body {
   bottom: calc(var(--slabs-space-base) * 1);
   left: calc(var(--slabs-space-base) * 4);
   right: calc(var(--slabs-space-base) * 8);
-}
-
-/* ---------------------------------------------------------------- Cards (p. 32) */
-
-/* A card: Calcaire clair, a 1 px Plâtre border, the radius of a card. The category written as a label,
-   the title, an excerpt of two lines at most, then the package in Plex Mono. No coloured edge, no slab.
-   The whole card is the link; under the pointer the border takes the colour of the text and the title its
-   orange underline. */
-.md-typeset .sl-cards {
-  display: grid;
-  gap: var(--slabs-gutter);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  margin: calc(var(--slabs-space-base) * 6) 0;
-}
-
-.md-typeset a.sl-card {
-  background-color: var(--doc-raised);
-  border: 1px solid var(--doc-rule);
-  border-radius: var(--slabs-radius-card);
-  color: var(--doc-text);
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--slabs-space-base) * 2);
-  padding: calc(var(--slabs-space-base) * 5) calc(var(--slabs-space-base) * 6);
-  text-decoration: none;
-  transition: border-color 150ms;
-}
-
-.md-typeset a.sl-card:is(:hover, :focus-visible) {
-  border-color: var(--doc-rule-strong);
-  color: var(--doc-text);
-}
-
-.md-typeset .sl-card__label,
-.md-typeset .sl-card__meta {
-  color: var(--doc-text-secondary);
-  font-family: var(--md-code-font-family);
-  font-size: var(--slabs-caption);
-  line-height: var(--slabs-lh-ui);
-}
-
-.md-typeset .sl-card__label {
-  font-weight: 600;
-  letter-spacing: var(--slabs-label-tracking);
-  text-transform: uppercase;
-}
-
-.md-typeset .sl-card__title {
-  font-size: var(--slabs-h4);
-  font-weight: 600;
-  line-height: var(--slabs-h4-lh);
-  text-decoration: underline 2px transparent;
-  text-underline-offset: 0.2em;
-  transition: text-decoration-color 150ms;
-}
-
-.md-typeset a.sl-card:is(:hover, :focus-visible) .sl-card__title {
-  text-decoration-color: var(--slabs-orange);
-}
-
-.md-typeset .sl-card__excerpt {
-  font-size: var(--slabs-body);
-  line-height: var(--slabs-lh-ui);
-}
-
-.md-typeset .sl-card__meta {
-  margin-top: auto;
-  padding-top: calc(var(--slabs-space-base) * 2);
-}
-
-/* The last rank of a page: the same card, with the category dropped, the title one step down and the
-   padding of a dense block. Its columns are narrower too, so a building block never takes the width of a
-   framework. */
-.md-typeset .sl-cards--compact {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  margin: calc(var(--slabs-space-base) * 4) 0 calc(var(--slabs-space-base) * 6);
-}
-
-.md-typeset a.sl-card--compact {
-  gap: var(--slabs-space-base);
-  padding: calc(var(--slabs-space-base) * 3) calc(var(--slabs-space-base) * 4);
-}
-
-.md-typeset .sl-card--compact .sl-card__title {
-  font-size: var(--slabs-body);
-  line-height: var(--slabs-lh-ui);
-}
-
-.md-typeset .sl-card--compact .sl-card__excerpt {
-  color: var(--doc-text-secondary);
-  font-size: var(--slabs-caption);
-}
-
-.md-typeset .sl-card--compact .sl-card__meta {
-  padding-top: var(--slabs-space-base);
-}
-
-/* The sentence under a section heading: it says what rank the cards below hold, in Béton and over the
-   width of a reading line, so it is read as a caption and not as the body of the page. */
-.md-typeset .sl-lead {
-  color: var(--doc-text-secondary);
-  margin-bottom: 0;
-  max-width: 68ch;
 }
 
 /* ---------------------------------------------------------------- Footer (p. 31) */
