@@ -24,6 +24,7 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 | PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Migrated; last pull requests open (Spomky-Labs/phpwa-doc#23 to #25) |
 | PKI Framework | `Spomky-Labs/pki-framework-doc` | `pki.spomky-labs.com` | Written from scratch, never published by GitBook: the library was documented in its README |
 | CBOR PHP | `Spomky-Labs/cbor-php-doc` | `cbor.spomky-labs.com` | Written from the doc/ directory of the library, never published by GitBook |
+| COSE | `web-auth/cose-doc` | `cose.spomky-labs.com` | Written from the doc/ directory of the library, never published by GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
 Every documentation is migrated. What is left, for each one: remove the domain from its GitBook space, then
@@ -223,6 +224,14 @@ the domain and add it again in the Settings page.
 - **A page of the GitBook root may not exist in the latest version** (the root of WebAuthn served 5.3,
   `latest` is 5.4): list, among the addresses of the root and of the published variants, the ones that
   land on a home page, and redirect each to its new page.
+- **The front matter of a page is YAML, and `--strict` does not check it.** A value holding a colon
+  followed by a space (`description: For PHP: signing`) or a backslash (`Cose\...Tag`) is not a plain
+  scalar: MkDocs fails to parse the block, renders it as the content of the page, and the page loses its
+  title in the navigation. The build stays green, so only looking at the page shows it. Quote the value
+  with single quotes, doubling any inner one; double quotes do not work, a backslash being an escape
+  there. It bit 14 of the 55 pages of COSE, 6 of PKI Framework and the examples page of Beffroi, which was
+  live. `tools/front-matter.py` of `web-auth/cose-doc` checks it before the strict build; it belongs here
+  once the other sites adopt it.
 - **Strict mode fails on a page outside the navigation**: `not_in_nav` or `exclude_docs` for the ones that
   must stay out.
 - **The revision dates need a commit**: a strict build of uncommitted pages fails on the git plugin.
