@@ -64,6 +64,9 @@
   --doc-field: #ffffff;
   --doc-field-border: var(--slabs-schiste);
   --doc-note-ground: var(--slabs-calcaire-ombre);
+  /* A block laid on the ground: a card, a panel. Code keeps the Anthracite the guidelines give it. */
+  --doc-surface: var(--slabs-calcaire-clair);
+  --doc-code-ground: var(--slabs-code-bg);
 }
 
 [data-md-color-scheme="slate"] {
@@ -76,11 +79,14 @@
   --doc-rule-strong: var(--slabs-calcaire);
   --doc-link-underline: var(--slabs-beton);
   --doc-focus: var(--slabs-orange);
-  /* A code block is Anthracite on an Anthracite ground: a Schiste line keeps its edge. */
   --doc-code-edge: var(--slabs-schiste);
   --doc-field: var(--slabs-anthracite);
   --doc-field-border: var(--slabs-beton);
-  --doc-note-ground: var(--slabs-calcaire-clair);
+  /* A block on a dark ground is a Schiste surface. The page keeps its night, the block is read without a
+     rule, and Anthracite goes back to being the ground of the code written inside such a block. */
+  --doc-note-ground: var(--slabs-schiste);
+  --doc-surface: var(--slabs-schiste);
+  --doc-code-ground: var(--slabs-schiste);
 }
 
 [data-md-color-scheme="default"],
@@ -112,7 +118,7 @@
   --md-typeset-table-color: var(--doc-rule);
 
   --md-code-fg-color: var(--slabs-code-text);
-  --md-code-bg-color: var(--slabs-code-bg);
+  --md-code-bg-color: var(--doc-code-ground);
   --md-code-hl-color: var(--slabs-schiste);
   --md-code-hl-number-color: var(--slabs-code-string);
   --md-code-hl-string-color: var(--slabs-code-string);
@@ -644,7 +650,7 @@ body {
 
 /* A code block: Plex Mono 14 px on Anthracite, the radius of a card. */
 .md-typeset .highlight {
-  background-color: var(--slabs-code-bg);
+  background-color: var(--doc-code-ground);
   border: 1px solid var(--doc-code-edge);
   border-radius: var(--slabs-radius-card);
   overflow: hidden;
@@ -653,7 +659,7 @@ body {
 /* A numbered block is a table inside the block: the block already draws the edge. */
 .md-typeset .highlight .highlighttable,
 .md-typeset .highlighttable {
-  background-color: var(--slabs-code-bg);
+  background-color: var(--doc-code-ground);
   border: 0;
   border-radius: 0;
   margin: 0;
@@ -669,7 +675,7 @@ body {
 
 .md-typeset pre > code,
 .md-typeset .highlighttable code {
-  background-color: var(--slabs-code-bg);
+  background-color: var(--doc-code-ground);
   color: var(--slabs-code-text);
   font-size: var(--slabs-code-size);
   line-height: var(--slabs-lh-code);
@@ -688,7 +694,7 @@ body {
 
 /* The filename of a block, a caption above the code. */
 .md-typeset .highlight span.filename {
-  background-color: var(--slabs-code-bg);
+  background-color: var(--doc-code-ground);
   border-bottom: 1px solid var(--slabs-schiste);
   color: var(--slabs-beton);
   font-family: var(--md-code-font-family);
@@ -704,7 +710,7 @@ body {
 
 /* Line numbers, at the start of each line, in Béton behind a Schiste rule. */
 .md-typeset .highlight [data-linenos]::before {
-  background-color: var(--slabs-code-bg);
+  background-color: var(--doc-code-ground);
   box-shadow: -1px 0 var(--slabs-schiste) inset;
   color: var(--slabs-code-comment);
   margin-right: calc(var(--slabs-space-base) * 4);
@@ -897,6 +903,36 @@ body {
   background-color: var(--slabs-calcaire-clair);
 }
 
+/* On a dark ground the note is a Schiste surface, so its text is Calcaire and no longer Anthracite, and
+   a code block or an inline chip inside it goes back down to Anthracite: a block inside a block still
+   reads as one. */
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) {
+  --md-typeset-a-color: var(--slabs-calcaire);
+
+  color: var(--slabs-calcaire);
+}
+
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) > :is(.admonition-title, summary),
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) :is(a, a:hover) {
+  color: var(--slabs-calcaire);
+}
+
+[data-md-color-scheme="slate"] .md-typeset details > summary::after {
+  background-color: var(--slabs-calcaire);
+}
+
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) a {
+  text-decoration-color: var(--slabs-beton);
+}
+
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) :not(pre) > code,
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) .highlight,
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) .highlighttable,
+[data-md-color-scheme="slate"] .md-typeset :is(.admonition, details) .highlighttable code {
+  background-color: var(--slabs-anthracite);
+  color: var(--slabs-code-text);
+}
+
 /* ---------------------------------------------------------------- Tables (p. 33) */
 
 .md-typeset table:not([class]) {
@@ -1018,7 +1054,7 @@ body {
 }
 
 .md-typeset a.sl-card {
-  background-color: var(--doc-raised);
+  background-color: var(--doc-surface);
   border: 1px solid var(--doc-rule);
   border-radius: var(--slabs-radius-card);
   color: var(--doc-text);
