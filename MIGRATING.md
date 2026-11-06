@@ -113,6 +113,14 @@ Do one project at a time, and finish it before starting the next.
 
 ### Traps
 
+- **`actions/checkout` persists the `GITHUB_TOKEN` of its own repository** into
+  `http.https://github.com/.extraheader`. That header applies to every github.com URL and takes precedence
+  over the credentials carried by the URL of a remote, so a push to the site leaves as
+  `github-actions[bot]` and is refused: "Permission to Spomky-Labs/docs.git denied". The token is set and
+  correct; it is simply never used. `persist-credentials: false` on the checkout keeps the header out,
+  and a public repository needs nothing from it afterwards. It cost the first publication of OTPHP.
+- **A push refused for want of a right is not a race.** The retry loop must tell the two apart, or a 403
+  is tried five times over a minute and reported as contention.
 - **mike needs a local `gh-pages` seeded from the site.** Without `git fetch site gh-pages` and
   `git branch -f gh-pages FETCH_HEAD`, mike builds a branch of its own and the push is refused as a
   non-fast-forward, with a message about "work that you do not have locally".
