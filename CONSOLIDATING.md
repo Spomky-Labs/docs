@@ -166,31 +166,49 @@ versions and no other.
 
 ## What becomes of the former domain
 
-Three of them were deleted outright — `acf`, `pwa` and `web-push` no longer resolve. A domain that served
-under GitBook before it served here carries addresses published elsewhere, and two were kept for that:
+Three were deleted outright — `acf`, `pwa` and `web-push` no longer resolve. A domain that served under
+GitBook before it served here carries addresses published elsewhere, and two were kept for that:
 `web-token.spomky-labs.com` and `webauthn-doc.spomky-labs.com`.
 
-**A kept domain cannot answer with a 301**: GitHub Pages does not issue one. What it can do is answer
-everything with a page that redirects. The `gh-pages` of the former repository is emptied of its site and
-given two pages by [`tools/domain-shell.py`](tools/domain-shell.py):
+**What matters for a documentation is the path, not the status code.** A reader following a link to one
+page who lands on a home page has lost the page *and* the version, and has to search for both. Three ways
+were tried, in this order.
 
-```bash
-git clone --branch gh-pages --single-branch git@github.com:web-token/jwt-doc.git
-cd jwt-doc && git rm -rq .
-python3 -I ~/Projects/docs/tools/domain-shell.py . web-token.spomky-labs.com jwt "JWT Framework"
-git add -A && git commit && git push origin gh-pages
+### The web redirection of the Manager: no
+
+Infomaniak offers a web redirection on a domain, 301 or 302, set from the Manager. **It discards the
+path**: `web-token.spomky-labs.com/4.0/introduction/security-recommendations/` and
+`web-token.spomky-labs.com/4.3/` both answered `301` to the single address configured. Its advanced
+options offer only *visible* or *invisible (iframe)*, with a title and meta tags for the iframe — nothing
+about the path. The documentation says nothing either way, which is why it was found in production.
+
+### A page that redirects, on GitHub Pages: works, but is not a 301
+
+GitHub Pages issues no redirect of its own. The `gh-pages` of the former repository is emptied of its site
+and given two pages by [`tools/domain-shell.py`](tools/domain-shell.py): `index.html` sends the root to
+the project, and `404.html`, which Pages serves for every other address, prefixes the path it was asked
+for. Every address lands on its page, versions included.
+
+It stays the fallback, and the one to use when there is no hosting: it needs nothing but the repository.
+A reader without JavaScript sees the page rather than being sent on, and search engines see no 301.
+
+### A rewrite on a web hosting: both
+
+Point the former domains at an Infomaniak hosting and put
+[`tools/former-domains.htaccess`](tools/former-domains.htaccess) at its document root. A real 301, and the
+path kept, which the Manager's redirection cannot do:
+
+```apache
+RewriteCond %{HTTP_HOST} ^web-token\.spomky-labs\.com$ [NC]
+RewriteRule ^(.*)$ https://docs.spomky-labs.com/jwt/$1 [R=301,L]
 ```
 
-`index.html` sends the root to the project. `404.html`, which GitHub Pages serves for every other address,
-prefixes the path it was asked for: `/4.3/the-components/claim-checker/` becomes
-`/jwt/4.3/the-components/claim-checker/`. The versions were already in those addresses, so they land on a
-page rather than on a home page — checked on both domains, for the newest version and for the oldest.
+Both domains share one document root, so each rule tests the host it answers for and no other site on
+that hosting is touched. In a `.htaccess` the pattern sees the path without its leading slash, so `$1` is
+the whole of it, and mod_rewrite appends the query string by itself.
 
-The repository keeps publishing into the site from its version branches; only its own `gh-pages` changed.
-
-**This is not a 301**, and a reader without JavaScript sees the page rather than being sent on. A
-redirection at the registrar would be better, and would let the branch, the Pages configuration and the
-domain go altogether.
+Once it answers, the `gh-pages` of the former repository and its custom domain in the Pages settings can
+go. Check first: the rules are on a hosting, not in a repository, and nothing in git tells you they broke.
 
 ## Removing the old site
 
