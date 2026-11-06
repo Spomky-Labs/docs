@@ -1,0 +1,234 @@
+site_name: COSE
+site_description: CBOR Object Signing and Encryption for PHP. Signing, MAC, encryption and key management, after RFC 9052 and RFC 9053.
+site_url: https://docs.spomky-labs.com/cose/4.9/
+site_author: Spomky-Labs
+repo_url: https://github.com/web-auth/cose-lib
+repo_name: web-auth/cose-lib
+edit_uri: https://github.com/Spomky-Labs/docs/edit/main/projects/cose/4.9/docs/
+
+docs_dir: docs
+site_dir: site
+
+
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  # Space Grotesk and IBM Plex Mono are served from assets/fonts, declared in slabs.css: the theme loads
+  # no font of its own.
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil-outline
+    annotation: material/plus-circle
+  favicon: assets/brand/favicon.svg
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Follow the system theme
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to the dark theme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to the light theme
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+
+# The tokens of the Slabs design kit, as they are, then the rules that apply them.
+extra_css:
+  - assets/stylesheets/slabs-tokens.css
+  - assets/stylesheets/slabs.css
+
+plugins:
+  - search
+  # Every asset is served from this site. Should a page ever reference an external one, it is downloaded
+  # at build time: nothing a reader loads reaches a third party.
+  - privacy
+  - git-revision-date-localized:
+      enable_creation_date: false
+      type: date
+      fallback_to_build_date: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      title: On this page
+      permalink: true
+      permalink_title: Link to this section
+      toc_depth: 3
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      # A PHP block of these pages starts without "<?php", which Pygments needs before it colours anything.
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+      line_spans: __span
+      # The number of a line is written at the start of the line itself, so it cannot drift from it.
+      linenums_style: pymdownx-inline
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tilde
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+  nav:
+    omitted_files: warn
+
+extra:
+  status:
+    draft: This page is a stub, the section it belongs to is not written yet
+    new: Added in this version
+  version:
+    provider: mike
+    alias: true
+    default: latest
+  # The footer of the Slabs guidelines (p. 31): links in Calcaire, then the legal line in Béton.
+  slabs:
+    website: https://spomky-labs.com/
+    links:
+      - name: All documentation
+        link: https://docs.spomky-labs.com/
+      - name: COSE on GitHub
+        link: https://github.com/web-auth/cose-lib
+      - name: Packagist
+        link: https://packagist.org/packages/web-auth/cose-lib
+      - name: Security
+        link: https://github.com/web-auth/cose-lib/security/policy
+      - name: Sponsor
+        link: https://github.com/sponsors/Spomky
+    legal: SPOMKY-LABS · Florent Morselli EI
+    # The legal notice, the privacy policy and the contact page are shared by every documentation site,
+    # on the central one.
+    legal_links:
+      - name: Legal notice
+        link: https://docs.spomky-labs.com/legal-notice/
+      - name: Privacy
+        link: https://docs.spomky-labs.com/privacy/
+      - name: Contact
+        link: https://docs.spomky-labs.com/contact/
+
+# The title of each page is its first heading.
+nav:
+  - README.md
+  - "Introduction":
+      - introduction/provided-features.md
+      - introduction/pre-requisite.md
+      - introduction/installation.md
+      - introduction/security-recommendations.md
+      - introduction/contributing.md
+  - "Messages, structures and headers":
+      - messages/README.md
+      - messages/cryptographic-structures.md
+      - messages/reading-headers.md
+      - messages/common-header-parameters.md
+      - messages/detached-content.md
+      - messages/external-additional-authenticated-data.md
+  - "Signing and verifying":
+      - signing/README.md
+      - signing/cose-sign1.md
+      - signing/what-the-application-must-check.md
+      - signing/cose-sign.md
+      - signing/the-verification-contract.md
+      - signing/verifying-with-a-certificate.md
+      - signing/countersignatures.md
+  - "Message authentication codes":
+      - mac/README.md
+      - mac/cose-mac0.md
+      - mac/cose-mac.md
+      - mac/the-tag-covers-the-mac-structure.md
+  - "Encryption":
+      - encryption/README.md
+      - encryption/cose-encrypt0.md
+      - encryption/cose-encrypt.md
+      - encryption/the-nonce.md
+  - "Key management":
+      - key-management/README.md
+      - key-management/the-two-sides-of-an-algorithm.md
+      - key-management/what-each-family-enforces.md
+      - key-management/the-kdf-context.md
+      - key-management/key-restrictions.md
+  - "Keys":
+      - keys/README.md
+      - keys/key-parameter-forms.md
+      - keys/ed25519-private-keys.md
+      - keys/key-restrictions.md
+      - keys/validating-rsa-keys.md
+      - keys/validating-symmetric-keys.md
+      - keys/key-thumbprints.md
+      - keys/loading-a-key-from-a-certificate.md
+  - "Algorithms":
+      - algorithms/README.md
+      - algorithms/signature-algorithms.md
+      - algorithms/ml-dsa.md
+      - algorithms/insecure-algorithms.md
+      - algorithms/mac-algorithms.md
+      - algorithms/content-encryption-algorithms.md
+      - algorithms/key-management-algorithms.md
+      - algorithms/hash-algorithms.md
+      - algorithms/registering-algorithms.md
+  - "Header parameters and profiles":
+      - header-parameters/cwt.md
+      - header-parameters/x509.md
+      - header-parameters/hash-envelope.md
+      - header-parameters/receipts.md
+      - header-parameters/timestamp-tokens.md
+  - "Migration":
+      - migration/upgrading.md

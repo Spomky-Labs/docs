@@ -1,34 +1,72 @@
 # The documentation of Slabs
 
-The central site of the documentation of Slabs: a page that lists every library and its documentation,
-and the legal notice, the privacy policy and the contact page that every documentation site links to
-from its footer.
+Every documentation of [Slabs](https://spomky-labs.com/) lives here: the hub at the root of the site, and
+one directory per project and per version.
 
-Published with [MkDocs](https://www.mkdocs.org/) and
-[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) on GitHub Pages:
 **<https://docs.spomky-labs.com/>**
+
+| | |
+|---|---|
+| [`/acf/`](https://docs.spomky-labs.com/acf/) | Access Control Framework |
+| [`/cbor/`](https://docs.spomky-labs.com/cbor/) | CBOR PHP |
+| [`/cose/`](https://docs.spomky-labs.com/cose/) | COSE |
+| [`/jwt/`](https://docs.spomky-labs.com/jwt/) | JWT Framework |
+| [`/otphp/`](https://docs.spomky-labs.com/otphp/) | OTPHP |
+| [`/pki/`](https://docs.spomky-labs.com/pki/) | PKI Framework |
+| [`/pwa/`](https://docs.spomky-labs.com/pwa/) | PWA Bundle |
+| [`/web-push/`](https://docs.spomky-labs.com/web-push/) | Web Push Framework |
+| [`/webauthn/`](https://docs.spomky-labs.com/webauthn/) | WebAuthn Framework |
 
 ## Writing
 
 ```bash
-make install   # the toolchain, in .venv, from requirements.txt
-make serve     # http://127.0.0.1:8000, rebuilt as you save
-make check     # the strict build continuous integration runs
+make install                 # the toolchain, in .venv, from requirements.txt
+make projects                # what can be served
+make serve p=jwt v=4.3       # that version, on http://127.0.0.1:8000
+make serve                   # the hub
+make check                   # the strict build continuous integration runs
 ```
+
+`make check` is the gate, and it builds **everything**: a broken internal link, an anchor that does not
+exist, a page absent from the navigation or a navigation entry without a page fails the build, in any
+version of any project.
 
 ## Where things are
 
 | Path | What it is |
 |---|---|
-| `docs/index.md` | The list of the libraries and of their documentation |
-| `docs/legal-notice.md`, `docs/privacy.md`, `docs/contact.md` | The pages every documentation site links to from its footer |
-| `docs/assets/stylesheets/` | The look: `slabs-tokens.css`, copied as it is from the Slabs design kit, and `slabs.css`, which applies the guidelines to the theme |
-| `docs/assets/brand/`, `docs/assets/fonts/` | The logotype, the signature, the favicons and the share image of the design kit, and its typefaces (SIL Open Font License) |
-| `docs/CNAME` | The domain of the site |
-| `MIGRATING.md` | How a documentation leaves GitBook: the decisions, the steps, the traps already met. Not published |
+| `mkdocs.yml`, `docs/` | The hub: the home page, the legal notice, the privacy policy, the contact page |
+| `projects/<project>/<version>/` | One documentation, one version: its `mkdocs.yml`, its pages, its project mark, its logo partial |
+| `shared/` | What every one of them has in common: the fonts, the stylesheets, the shared brand files and three templates. Copied in before each build; the copies are in `.gitignore` |
+| `overrides/` | The templates of the hub |
+| `tools/build.py` | The build: the hub, then every version, then the `versions.json` and the redirection of each project |
+| `site-root/` | `CNAME` and the `404.html` of the whole site |
+| `requirements.txt` | The toolchain, pinned. Continuous integration installs exactly this |
 | `.github/workflows/check.yml` | The strict build, on every pull request |
-| `.github/workflows/pages.yml` | The publication of main to gh-pages |
+| `.github/workflows/pages.yml` | The publication, on a push to `main` |
+
+## Adding a version
+
+Copy the current one and point it at itself:
+
+```bash
+cp -R projects/jwt/4.3 projects/jwt/4.4
+# in projects/jwt/4.4/mkdocs.yml, set site_url and edit_uri to 4.4
+```
+
+The newest version of a project, by version order, takes the `latest` alias and is what `/jwt/` redirects
+to. `tools/build.py` works it out; there is nothing else to declare.
+
+A new project is the same, one directory down: `projects/<prefix>/<version>/`, with its mark in
+`docs/assets/brand/` and its `overrides/partials/logo.html`. Add its card to `docs/index.md`.
+
+## How this came about
+
+Nine repositories and nine domains became one site, then one repository.
+[CONSOLIDATING.md](CONSOLIDATING.md) is the record: what was decided, what it cost, and the traps.
+[MIGRATING.md](MIGRATING.md) covers the move off GitBook that came before.
 
 ## Licence
 
-MIT, as the libraries it documents.
+The pages describe packages released under the MIT licence. This repository has no licence file of its
+own beyond the one it ships.

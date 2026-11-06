@@ -1,5 +1,5 @@
-# The central documentation site of Slabs. "make install" once, "make serve" to write, "make check"
-# before a pull request. Every target runs in .venv, created from requirements.txt, with uv when it is installed.
+# The documentation of Slabs: the hub at the root of the site, one directory per project and per version.
+# "make install" once, "make serve p=<project> v=<version>" to write, "make check" before a pull request.
 
 VENV := .venv
 BIN := $(VENV)/bin
@@ -10,7 +10,7 @@ export NO_MKDOCS_2_WARNING := true
 export DISABLE_MKDOCS_2_WARNING := true
 
 .DEFAULT_GOAL := help
-.PHONY: help install serve build check front-matter clean
+.PHONY: help install serve build check projects clean
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -28,19 +28,23 @@ endif
 
 install: $(BIN)/mkdocs ## Install the toolchain in .venv
 
-serve: install ## Serve the site on http://127.0.0.1:8000, rebuilt as you save
-	$(BIN)/mkdocs serve
+projects: ## List what can be served
+	@ls -d projects/*/*/ | sed 's|projects/||;s|/$$||;s|/| |' | awk '{printf "  p=%-10s v=%s\n", $$1, $$2}'
 
-build: install ## Build the site into site/
-	$(BIN)/mkdocs build
+# Without p= and v=, the hub. With them, that version of that project, on its own.
+serve: install ## Serve on http://127.0.0.1:8000 — make serve p=jwt v=4.3
+	$(BIN)/python -I tools/build.py --sync-shared
+ifdef p
+	$(BIN)/mkdocs serve -f projects/$(p)/$(v)/mkdocs.yml
+else
+	$(BIN)/mkdocs serve -f mkdocs.yml
+endif
 
-check: install front-matter ## Build strictly: a broken link, a missing anchor or a page outside the navigation fails
-	$(BIN)/mkdocs build --strict
+build: install ## Build the whole site into site/
+	$(BIN)/python -I tools/build.py
 
-# A description holding ": " or a backslash is not a plain YAML scalar: the front matter is then rendered
-# as the content of the page, and --strict does not notice.
-front-matter: install ## Check that the front matter of every page parses as YAML
-	$(BIN)/python -I tools/front-matter.py docs
+check: install ## Build the whole site strictly: a broken link or a page outside the navigation fails
+	$(BIN)/python -I tools/build.py --strict
 
 clean: ## Remove the build and the virtual environment
 	rm -rf site $(VENV)

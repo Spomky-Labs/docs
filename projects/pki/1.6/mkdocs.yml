@@ -1,0 +1,225 @@
+site_name: PKI Framework
+site_description: X.509 certificates, ASN.1 and public key infrastructure for PHP. Certificates, attribute certificates, certification requests and certification path validation, after RFC 5280 and X.690.
+site_url: https://docs.spomky-labs.com/pki/1.6/
+site_author: Spomky-Labs
+repo_url: https://github.com/Spomky-Labs/pki-framework
+repo_name: spomky-labs/pki-framework
+edit_uri: https://github.com/Spomky-Labs/docs/edit/main/projects/pki/1.6/docs/
+
+docs_dir: docs
+site_dir: site
+
+
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  # Space Grotesk and IBM Plex Mono are served from assets/fonts, declared in slabs.css: the theme loads
+  # no font of its own.
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil-outline
+    annotation: material/plus-circle
+  favicon: assets/brand/favicon.svg
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Follow the system theme
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to the dark theme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to the light theme
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+
+# The tokens of the Slabs design kit, as they are, then the rules that apply them.
+extra_css:
+  - assets/stylesheets/slabs-tokens.css
+  - assets/stylesheets/slabs.css
+
+plugins:
+  - search
+  # Every asset is served from this site. Should a page ever reference an external one, it is downloaded
+  # at build time: nothing a reader loads reaches a third party.
+  - privacy
+  - git-revision-date-localized:
+      enable_creation_date: false
+      type: date
+      fallback_to_build_date: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      title: On this page
+      permalink: true
+      permalink_title: Link to this section
+      toc_depth: 3
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      # A PHP block of these pages starts without "<?php", which Pygments needs before it colours anything.
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+      line_spans: __span
+      # The number of a line is written at the start of the line itself, so it cannot drift from it.
+      linenums_style: pymdownx-inline
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tilde
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+  nav:
+    omitted_files: warn
+
+extra:
+  status:
+    draft: This page is a stub, the section it belongs to is not written yet
+    new: Added in this version
+  version:
+    provider: mike
+    alias: true
+    default: latest
+  # The footer of the Slabs guidelines (p. 31): links in Calcaire, then the legal line in Béton.
+  slabs:
+    website: https://spomky-labs.com/
+    links:
+      - name: All documentation
+        link: https://docs.spomky-labs.com/
+      - name: PKI Framework on GitHub
+        link: https://github.com/Spomky-Labs/pki-framework
+      - name: Packagist
+        link: https://packagist.org/packages/spomky-labs/pki-framework
+      - name: Security
+        link: https://github.com/Spomky-Labs/pki-framework/security/policy
+      - name: Sponsor
+        link: https://github.com/sponsors/Spomky
+    legal: SPOMKY-LABS · Florent Morselli EI
+    # The legal notice, the privacy policy and the contact page are shared by every documentation site,
+    # on the central one.
+    legal_links:
+      - name: Legal notice
+        link: https://docs.spomky-labs.com/legal-notice/
+      - name: Privacy
+        link: https://docs.spomky-labs.com/privacy/
+      - name: Contact
+        link: https://docs.spomky-labs.com/contact/
+
+# The title of each page is its first heading.
+nav:
+  - README.md
+  - "Introduction":
+      - introduction/provided-features.md
+      - introduction/pre-requisite.md
+      - introduction/installation.md
+      - introduction/security-recommendations.md
+      - introduction/contributing.md
+  - "ASN.1 and DER":
+      - asn1/README.md
+      - asn1/the-types.md
+      - asn1/encoding-and-decoding.md
+      - asn1/tagging.md
+      - asn1/untrusted-input.md
+  - "Textual encoding (PEM)":
+      - pem/README.md
+  - "Keys, algorithms and signatures":
+      - keys/README.md
+      - keys/private-keys.md
+      - keys/public-keys.md
+      - keys/algorithm-identifiers.md
+      - keys/signatures.md
+      - keys/the-crypto-engine.md
+  - "Names and attributes":
+      - names/README.md
+      - names/distinguished-names.md
+      - names/attributes.md
+      - names/general-names.md
+      - names/comparing-names.md
+  - "Certificates":
+      - certificates/README.md
+      - certificates/reading-a-certificate.md
+      - certificates/issuing-a-certificate.md
+      - certificates/extensions.md
+      - certificates/bundles-and-chains.md
+  - "Certification requests":
+      - certification-requests/README.md
+      - certification-requests/creating-a-request.md
+      - certification-requests/issuing-from-a-request.md
+  - "Certification paths":
+      - certification-paths/README.md
+      - certification-paths/building-a-path.md
+      - certification-paths/validating-a-path.md
+      - certification-paths/configuration.md
+      - certification-paths/what-validation-does-not-do.md
+  - "Attribute certificates":
+      - attribute-certificates/README.md
+      - attribute-certificates/issuing-an-attribute-certificate.md
+      - attribute-certificates/validating-an-attribute-certificate.md
+  - "Examples":
+      - examples/README.md
+      - examples/a-self-signed-certificate.md
+      - examples/a-small-certificate-authority.md
+      - examples/verifying-a-tls-chain.md
+  - "Migration":
+      - migration/from-the-sop-libraries.md
+      - migration/license.md

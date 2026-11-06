@@ -9,9 +9,6 @@ edit_uri: https://github.com/Spomky-Labs/docs/edit/main/docs/
 docs_dir: docs
 site_dir: site
 
-# custom_dir lives inside docs_dir, so its templates would be copied to the site as files.
-exclude_docs: |
-  overrides/
 
 # The legal notice, the privacy policy and the contact page are linked from the footer of this site and
 # of every documentation site, not from the navigation.
@@ -22,7 +19,7 @@ not_in_nav: |
 
 theme:
   name: material
-  custom_dir: docs/overrides
+  custom_dir: overrides
   language: en
   # Space Grotesk and IBM Plex Mono are served from assets/fonts, declared in slabs.css: the theme loads
   # no font of its own.

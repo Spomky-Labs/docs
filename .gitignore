@@ -4,3 +4,25 @@
 __pycache__/
 .idea/
 .claude/
+
+# shared/ is copied into every project before a build: those copies are not sources.
+/projects/*/*/docs/assets/brand/apple-touch-icon.png
+/projects/*/*/docs/assets/brand/favicon.ico
+/projects/*/*/docs/assets/brand/favicon.svg
+/projects/*/*/docs/assets/brand/og-slabs-1200x630.png
+/projects/*/*/docs/assets/brand/slabs-logotype-signature-inverse.svg
+/projects/*/*/docs/assets/fonts/
+/projects/*/*/docs/assets/stylesheets/
+/projects/*/*/overrides/main.html
+/projects/*/*/overrides/partials/copyright.html
+/projects/*/*/overrides/partials/source.html
+/docs/assets/brand/apple-touch-icon.png
+/docs/assets/brand/favicon.ico
+/docs/assets/brand/favicon.svg
+/docs/assets/brand/og-slabs-1200x630.png
+/docs/assets/brand/slabs-logotype-signature-inverse.svg
+/docs/assets/fonts/
+/docs/assets/stylesheets/
+/overrides/main.html
+/overrides/partials/copyright.html
+/overrides/partials/source.html
