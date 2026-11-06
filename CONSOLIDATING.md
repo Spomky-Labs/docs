@@ -27,22 +27,19 @@ and `-doc` named a repository, not a documentation.
 
 | Project | Repository | Prefix | Branches to move | State |
 |---|---|---|---|---|
-| OTPHP | `Spomky-Labs/otphp-doc` | `/otphp/` | `11.6.x` | **Moved.** Redirection pending |
-| Access Control Framework | `Spomky-Labs/access-control-doc` | `/acf/` | `1.0` | Pull request open |
-| PKI Framework | `Spomky-Labs/pki-framework-doc` | `/pki/` | `1.6.x` | Pull request open |
-| Web Push Framework | `Spomky-Labs/web-push-doc` | `/web-push/` | `3.2.x` | Pull request open |
-| COSE | `web-auth/cose-doc` | `/cose/` | `4.9.x` | Pull request open |
-| CBOR PHP | `Spomky-Labs/cbor-php-doc` | `/cbor/` | `3.3.x`, `3.4.x` | Pull request open |
-| PWA Bundle | `Spomky-Labs/phpwa-doc` | `/pwa/` | `1.4`, `1.5`, `1.6` | Pull request open |
-| WebAuthn Framework | `web-auth/doc` | `/webauthn/` | `5.2`, `5.3`, `5.4` | Pull request open |
-| JWT Framework | `web-token/jwt-doc` | `/jwt/` | `4.0`, `4.1`, `4.2`, `4.3` | Pull request open |
+| OTPHP | `Spomky-Labs/otphp-doc` | `/otphp/` | `11.6.x` | **Moved** |
+| Access Control Framework | `Spomky-Labs/access-control-doc` | `/acf/` | `1.0` | **Moved** |
+| PKI Framework | `Spomky-Labs/pki-framework-doc` | `/pki/` | `1.6.x` | **Moved** |
+| Web Push Framework | `Spomky-Labs/web-push-doc` | `/web-push/` | `3.2.x` | **Moved** |
+| COSE | `web-auth/cose-doc` | `/cose/` | `4.9.x` | **Moved** |
+| CBOR PHP | `Spomky-Labs/cbor-php-doc` | `/cbor/` | `3.3.x`, `3.4.x` | **Moved** |
+| PWA Bundle | `Spomky-Labs/phpwa-doc` | `/pwa/` | `1.4`, `1.5`, `1.6` | **Moved** |
+| WebAuthn Framework | `web-auth/doc` | `/webauthn/` | `5.2`, `5.3`, `5.4` | **Moved** |
+| JWT Framework | `web-token/jwt-doc` | `/jwt/` | `4.0`, `4.1`, `4.2`, `4.3` | **Moved** |
 
-Sixteen branches, one pull request each, all open and green. **A branch is in this table only if
-`versions.json` of the live site publishes it.** Several repositories hold version-looking branches that publish nothing — `phpwa-doc` has `1.x`,
+**Every documentation is on the site**, each publishing exactly the versions it published before. **A
+branch is in this table only if `versions.json` of the live site publishes it.** Several repositories hold version-looking branches that publish nothing — `phpwa-doc` has `1.x`,
 `1.1`, `1.2` and `1.3`, `web-push-doc` has `3.1.x` — and they stay as they are.
-
-Take the easy ones first: the four projects with a single branch prove the recipe copies, before the ones
-with four.
 
 **The reference implementation is [Spomky-Labs/otphp-doc](https://github.com/Spomky-Labs/otphp-doc),
 branch `11.6.x`.** Its `pages.yml`, its `mkdocs.yml` and its `main.html` are what the others copy.
@@ -205,6 +202,11 @@ Each of these cost something.
   `github-actions[bot]` and is refused: "Permission to Spomky-Labs/docs.git denied". The token is set and
   correct; it is simply never used. `persist-credentials: false` keeps the header out, and a public
   repository needs nothing from it afterwards. It cost the first publication of OTPHP.
+- **A queued run is cancelled by a newer one in its group, whatever `cancel-in-progress` says.** That flag
+  protects the run that is *in progress*, not the one waiting behind it. `jwt-doc` 4.2 was cancelled by 4.3
+  twice, a fortnight apart: once when leaving GitBook, once moving into this site. Check `versions.json` of
+  every prefix after a batch of merges, and `gh workflow run pages.yml --repo <repo> --ref <branch>` on
+  whatever is missing.
 - **A push refused for want of a right is not a race.** A retry loop must tell the two apart, or a 403 is
   tried five times over a minute and reported as contention.
 - **mike needs a local `gh-pages` seeded from the site.** Without `git fetch site gh-pages` and
