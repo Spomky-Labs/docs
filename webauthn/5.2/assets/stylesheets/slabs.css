@@ -394,22 +394,36 @@ body {
   text-underline-offset: 0.35em;
 }
 
-/* A section title is a label: Plex Mono SemiBold capitals, 12 px, tracked, in the secondary colour. */
-.md-nav--primary .md-nav__item--section > .md-nav__link,
-.md-nav--primary .md-nav__item--section > .md-nav__container > .md-nav__link {
+/* A section is a label that folds its pages away: Plex Mono SemiBold capitals, 12 px, tracked, in the
+   secondary colour, with the chevron of the theme at its right. The section of the open page is unfolded,
+   and a click turns it over. */
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > label.md-nav__link,
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container,
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container > .md-nav__link {
   color: var(--doc-text-secondary);
-  cursor: default;
   font-family: var(--md-code-font-family);
   font-size: var(--slabs-caption);
   font-weight: 600;
   letter-spacing: var(--slabs-label-tracking);
-  margin-top: calc(var(--slabs-space-base) * 6);
   text-decoration: none;
   text-transform: uppercase;
 }
 
-.md-nav--primary .md-nav__item--section > .md-nav__link .md-nav__icon {
-  display: none;
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > label.md-nav__link,
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container {
+  margin-top: calc(var(--slabs-space-base) * 6);
+}
+
+/* A section that has a page of its own holds three elements that are all .md-nav__link: the container, the
+   link and the label carrying the chevron. The spacing is the container's, so the two inside it take none
+   of their own and the title keeps the line of the sections beside it. */
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__container > .md-nav__link {
+  margin-top: 0;
+}
+
+/* The pages of an unfolded section, under its label. */
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav > .md-nav__list {
+  padding-bottom: calc(var(--slabs-space-base) * 2);
 }
 
 @media screen and (min-width: 76.25em) {
@@ -988,6 +1002,41 @@ body {
   bottom: calc(var(--slabs-space-base) * 1);
   left: calc(var(--slabs-space-base) * 4);
   right: calc(var(--slabs-space-base) * 8);
+}
+
+/* The last rank of a page: the same card, with the category dropped, the title one step down and the
+   padding of a dense block. Its columns are narrower too, so a building block never takes the width of a
+   framework. */
+.md-typeset .sl-cards--compact {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  margin: calc(var(--slabs-space-base) * 4) 0 calc(var(--slabs-space-base) * 6);
+}
+
+.md-typeset a.sl-card--compact {
+  gap: var(--slabs-space-base);
+  padding: calc(var(--slabs-space-base) * 3) calc(var(--slabs-space-base) * 4);
+}
+
+.md-typeset .sl-card--compact .sl-card__title {
+  font-size: var(--slabs-body);
+  line-height: var(--slabs-lh-ui);
+}
+
+.md-typeset .sl-card--compact .sl-card__excerpt {
+  color: var(--doc-text-secondary);
+  font-size: var(--slabs-caption);
+}
+
+.md-typeset .sl-card--compact .sl-card__meta {
+  padding-top: var(--slabs-space-base);
+}
+
+/* The sentence under a section heading: it says what rank the cards below hold, in Béton and over the
+   width of a reading line, so it is read as a caption and not as the body of the page. */
+.md-typeset .sl-lead {
+  color: var(--doc-text-secondary);
+  margin-bottom: 0;
+  max-width: 68ch;
 }
 
 /* ---------------------------------------------------------------- Footer (p. 31) */
