@@ -28,17 +28,17 @@ and `-doc` named a repository, not a documentation.
 | Project | Repository | Prefix | Branches to move | State |
 |---|---|---|---|---|
 | OTPHP | `Spomky-Labs/otphp-doc` | `/otphp/` | `11.6.x` | **Moved.** Redirection pending |
-| Access Control Framework | `Spomky-Labs/access-control-doc` | `/acf/` | `1.0` | To do |
-| PKI Framework | `Spomky-Labs/pki-framework-doc` | `/pki/` | `1.6.x` | To do |
-| Web Push Framework | `Spomky-Labs/web-push-doc` | `/web-push/` | `3.2.x` | To do |
-| COSE | `web-auth/cose-doc` | `/cose/` | `4.9.x` | To do |
-| CBOR PHP | `Spomky-Labs/cbor-php-doc` | `/cbor/` | `3.3.x`, `3.4.x` | To do |
-| PWA Bundle | `Spomky-Labs/phpwa-doc` | `/pwa/` | `1.4`, `1.5`, `1.6` | To do |
-| WebAuthn Framework | `web-auth/doc` | `/webauthn/` | `5.2`, `5.3`, `5.4` | To do |
-| JWT Framework | `web-token/jwt-doc` | `/jwt/` | `4.0`, `4.1`, `4.2`, `4.3` | To do |
+| Access Control Framework | `Spomky-Labs/access-control-doc` | `/acf/` | `1.0` | Pull request open |
+| PKI Framework | `Spomky-Labs/pki-framework-doc` | `/pki/` | `1.6.x` | Pull request open |
+| Web Push Framework | `Spomky-Labs/web-push-doc` | `/web-push/` | `3.2.x` | Pull request open |
+| COSE | `web-auth/cose-doc` | `/cose/` | `4.9.x` | Pull request open |
+| CBOR PHP | `Spomky-Labs/cbor-php-doc` | `/cbor/` | `3.3.x`, `3.4.x` | Pull request open |
+| PWA Bundle | `Spomky-Labs/phpwa-doc` | `/pwa/` | `1.4`, `1.5`, `1.6` | Pull request open |
+| WebAuthn Framework | `web-auth/doc` | `/webauthn/` | `5.2`, `5.3`, `5.4` | Pull request open |
+| JWT Framework | `web-token/jwt-doc` | `/jwt/` | `4.0`, `4.1`, `4.2`, `4.3` | Pull request open |
 
-Sixteen branches are left. **A branch is in this table only if `versions.json` of the live site publishes
-it.** Several repositories hold version-looking branches that publish nothing — `phpwa-doc` has `1.x`,
+Sixteen branches, one pull request each, all open and green. **A branch is in this table only if
+`versions.json` of the live site publishes it.** Several repositories hold version-looking branches that publish nothing — `phpwa-doc` has `1.x`,
 `1.1`, `1.2` and `1.3`, `web-push-doc` has `3.1.x` — and they stay as they are.
 
 Take the easy ones first: the four projects with a single branch prove the recipe copies, before the ones
@@ -79,7 +79,11 @@ A fine-grained token expires, and the day it does the publications stop, all of 
 
 ## Moving one project
 
-On each branch of the table, **oldest first, merged forward**. One pull request per branch.
+On each branch of the table, **one pull request per branch, and they are independent**: the edits are the
+same on every branch of a repository, so a branch does not have to wait for the one below it and they can
+be merged in any order. This is the one place where the rule of MIGRATING.md — oldest first, merged
+forward — does not apply: that rule exists for content, which propagates, and these six edits do not.
+A later merge between two version branches sees the same new content on both sides and resolves itself.
 
 ```bash
 git switch -c chore/one-site-many-projects <version branch>
