@@ -44,13 +44,13 @@ expected of everyone taking part is in
 
 ## This documentation
 
-The pages of this site live in their own repository,
-[Spomky-Labs/cbor-php-doc](https://github.com/Spomky-Labs/cbor-php-doc), one branch per version of the
-library. Every page carries an "Edit this page" link at the top: it opens the source of that page, on the
-branch of the version you are reading.
+Every documentation of Slabs lives in one repository,
+[Spomky-Labs/docs](https://github.com/Spomky-Labs/docs), under `projects/<project>/<version>/`. These
+pages are in `projects/cbor/3.3/`. Every page carries an "Edit this page" link at the top: it opens the
+source of that page.
 
-A correction that applies to every version is best made on the oldest branch — it is merged forward from
-there. `make check` builds the site strictly, and is what the pull request will be checked by.
+A correction that applies to every version is made in each of them: the versions are directories, not
+branches. `make check` builds the whole site strictly, and is what the pull request will be checked by.
 
 ## Supporting the project
 
