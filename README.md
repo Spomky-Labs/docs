@@ -40,7 +40,7 @@ version of any project.
 | `shared/` | What every one of them has in common: the fonts, the stylesheets, the shared brand files and three templates. Copied in before each build; the copies are in `.gitignore` |
 | `overrides/` | The templates of the hub |
 | `tools/build.py` | The build: the hub, then every version, then the `versions.json` and the redirection of each project |
-| `site-root/` | `CNAME` and the `404.html` of the whole site |
+| `site-root/` | The `404.html` of the whole site, copied over the build. The `CNAME` is a page of the hub, in `docs/` |
 | `requirements.txt` | The toolchain, pinned. Continuous integration installs exactly this |
 | `.github/workflows/check.yml` | The strict build, on every pull request |
 | `.github/workflows/pages.yml` | The publication, on a push to `main` |

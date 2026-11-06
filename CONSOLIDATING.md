@@ -11,8 +11,11 @@ shared/                    what all of them have in common
 tools/build.py             builds the lot
 ```
 
-This file is the record of how it was done and what it cost. [MIGRATING.md](MIGRATING.md) covers the move
-off GitBook that came before; [README.md](README.md) says how to work on the pages today.
+This file is the record of how it was done and what it cost. **The nine repositories it names no longer
+exist**, so what reads here as an instruction is an account of what was done, not something left to do;
+the traps at the end are kept for what they taught, and say so when the thing they bit is gone.
+[MIGRATING.md](MIGRATING.md) covers the move off GitBook that came before; [README.md](README.md) says how
+to work on the pages today.
 
 ## It happened in two steps
 
@@ -60,9 +63,10 @@ theme were published beside the pages, `custom_dir` living inside `docs_dir`. Th
 
 ## What becomes of the former domain
 
-Three were deleted outright — `acf`, `pwa` and `web-push` no longer resolve. A domain that served under
-GitBook before it served here carries addresses published elsewhere, and two were kept for that:
-`web-token.spomky-labs.com` and `webauthn-doc.spomky-labs.com`.
+Seven were deleted outright — `acf`, `cbor`, `cose`, `otphp`, `pki`, `pwa` and `web-push` answer nothing
+at all. A domain that served under GitBook before it served here carries addresses published elsewhere,
+and two were kept for that: `web-token.spomky-labs.com` and `webauthn-doc.spomky-labs.com`, which answer
+`301` to `/jwt/` and `/webauthn/` with the path kept.
 
 **What matters for a documentation is the path, not the status code.** A reader following a link to one
 page who lands on a home page has lost the page *and* the version, and has to search for both. Three ways
@@ -105,15 +109,16 @@ This is what answers today for the two domains kept. The rules live on a hosting
 **nothing in git will tell you if they break** — a site rebuilt, a hosting migrated, a `.htaccess`
 overwritten. It is the only link of the chain that is not versioned.
 
-## Retiring a repository
+## How a repository was retired
 
-In this order, and never before the previous step is checked:
+Nothing is left to retire. Each of the nine went this way, and no step was taken before the one above it
+was checked:
 
-1. The pages are imported under `projects/<prefix>/<version>/` and the site is built strictly.
-2. The sitemap of every version is compared, address for address, with the site as it stands.
-3. The pull request is merged and the published site is checked in a browser.
-4. The open issues are carried over — see what the move cost, above.
-5. Only then does the repository go, with its custom domain in its Pages settings and its `gh-pages`.
+1. The pages were imported under `projects/<prefix>/<version>/` and the site was built strictly.
+2. The sitemap of every version was compared, address for address, with the site as it stood.
+3. The pull request was merged and the published site was checked in a browser.
+4. The open issues were carried over — see what the move cost, above.
+5. Only then did the repository go, with its custom domain in its Pages settings and its `gh-pages`.
 
 ## Traps
 
@@ -125,23 +130,29 @@ Each of these cost something.
   it in one go impossible: commit first.
 - **`actions/checkout` persists the `GITHUB_TOKEN` of its own repository** into
   `http.https://github.com/.extraheader`. That header applies to every github.com URL and takes precedence
-  over the credentials carried by the URL of a remote, so the push to the site leaves as
-  `github-actions[bot]` and is refused: "Permission to Spomky-Labs/docs.git denied". The token is set and
-  correct; it is simply never used. `persist-credentials: false` keeps the header out, and a public
-  repository needs nothing from it afterwards. It cost the first publication of OTPHP.
+  over the credentials carried by the URL of a remote, so the push to the site left as
+  `github-actions[bot]` and was refused: "Permission to Spomky-Labs/docs.git denied". The token was set and
+  correct; it was simply never used. `persist-credentials: false` keeps the header out, and a public
+  repository needs nothing from it afterwards. It cost the first publication of OTPHP. Nothing crosses
+  repositories now: `pages.yml` writes the `gh-pages` of its own repository with the token it is given.
 - **A queued run is cancelled by a newer one in its group, whatever `cancel-in-progress` says.** That flag
   protects the run that is *in progress*, not the one waiting behind it. `jwt-doc` 4.2 was cancelled by 4.3
-  twice, a fortnight apart: once when leaving GitBook, once moving into this site. Check `versions.json` of
-  every prefix after a batch of merges, and `gh workflow run pages.yml --repo <repo> --ref <branch>` on
-  whatever is missing.
+  twice, a fortnight apart: once when leaving GitBook, once moving into this site. One build publishes the
+  whole site now and its group no longer cancels, so a run lost costs a publication and not a version;
+  `gh workflow run pages.yml --ref main` does it again.
 - **A push refused for want of a right is not a race.** A retry loop must tell the two apart, or a 403 is
-  tried five times over a minute and reported as contention.
-- **mike needs a local `gh-pages` seeded from the site.** Without `git fetch site gh-pages` and
-  `git branch -f gh-pages FETCH_HEAD`, mike builds a branch of its own and the push is refused as a
-  non-fast-forward, with a message about "work that you do not have locally".
-- **Ten repositories write one branch.** A concurrency group only serialises the runs of one repository.
-- **`og:image` was a 404 on every site**, and still is on the eight that have not moved.
-- **The templates of the theme were published beside the pages**, and still are on the eight.
+  tried five times over a minute and reported as contention. The loop went with the ten repositories; what
+  it taught did not.
+- **mike needed a local `gh-pages` seeded from the site.** Without `git fetch site gh-pages` and
+  `git branch -f gh-pages FETCH_HEAD`, mike built a branch of its own and the push was refused as a
+  non-fast-forward, with a message about "work that you do not have locally". mike went with the nine
+  repositories: `tools/build.py` writes every `versions.json` itself.
+- **Ten repositories wrote one branch**, and a concurrency group only serialises the runs of one
+  repository. One writes it now, so the group does what it says.
+- **`og:image` was a 404 on every site**: `site_url` came out of mike without a trailing slash and
+  `main.html` concatenated it. Fixed here, for all of them.
+- **The templates of the theme were published beside the pages**, `custom_dir` living inside `docs_dir`.
+  They sit outside it now, in `overrides/` and `shared/overrides/`.
 - **A project directory is matched by its `versions.json`**, not by a list: nothing to maintain here when
   a project arrives or leaves.
 - **`git switch -c` then committing in a later step is not safe** when another session works in the same
@@ -151,6 +162,3 @@ Each of these cost something.
   "use '--' to separate paths from revisions" on a branch called `docs/...` in a repository that has a
   `docs/` directory. Pass `--title` and `--body`.
 - **`gh pr create` takes the current branch as its head**, not the one just pushed. Pass `--head`.
-- **Two default branches are behind their latest version**: `web-token/jwt-doc` is on `4.2` while `4.3` is
-  published, `web-auth/doc` is on `5.3` while `5.4` is. `default-branch.yml` needs a
-  `DEFAULT_BRANCH_TOKEN` that has never been created. Set them by hand while moving those two.
