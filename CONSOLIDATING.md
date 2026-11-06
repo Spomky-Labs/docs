@@ -164,33 +164,39 @@ does not follow them.
 Check the version selector of a project that publishes several versions: it must list that project's
 versions and no other.
 
-## The redirection
+## What becomes of the former domain
 
-Only once the above is checked, and once the card of `docs/index.md` leads to `/<prefix>/`.
+Three of them were deleted outright — `acf`, `pwa` and `web-push` no longer resolve. A domain that served
+under GitBook before it served here carries addresses published elsewhere, and two were kept for that:
+`web-token.spomky-labs.com` and `webauthn-doc.spomky-labs.com`.
 
-At the registrar, a **301 preserving the path**:
+**A kept domain cannot answer with a 301**: GitHub Pages does not issue one. What it can do is answer
+everything with a page that redirects. The `gh-pages` of the former repository is emptied of its site and
+given two pages by [`tools/domain-shell.py`](tools/domain-shell.py):
 
-```text
-<old domain>/*   →   docs.spomky-labs.com/<prefix>/*
+```bash
+git clone --branch gh-pages --single-branch git@github.com:web-token/jwt-doc.git
+cd jwt-doc && git rm -rq .
+python3 -I ~/Projects/docs/tools/domain-shell.py . web-token.spomky-labs.com jwt "JWT Framework"
+git add -A && git commit && git push origin gh-pages
 ```
 
-The addresses of the old site already carry their version — `/latest/…`, `/11.6/…` — so they land directly
-on a page. An address without a version lands on the 404 of the site, which sends it to `latest`.
+`index.html` sends the root to the project. `404.html`, which GitHub Pages serves for every other address,
+prefixes the path it was asked for: `/4.3/the-components/claim-checker/` becomes
+`/jwt/4.3/the-components/claim-checker/`. The versions were already in those addresses, so they land on a
+page rather than on a home page — checked on both domains, for the newest version and for the oldest.
 
-Check, in a browser, `<old domain>/latest/` and a deep page such as
-`<old domain>/latest/<section>/<page>/`. Then an address of the old sitemap, taken at random.
+The repository keeps publishing into the site from its version branches; only its own `gh-pages` changed.
 
-If the registrar cannot preserve the path, the fallback is a shell on GitHub Pages: the old repository
-keeps a `gh-pages` reduced to a page that redirects in JavaScript. It is not a 301 and the old
-configurations stay, but nothing else in this file changes.
+**This is not a 301**, and a reader without JavaScript sees the page rather than being sent on. A
+redirection at the registrar would be better, and would let the branch, the Pages configuration and the
+domain go altogether.
 
 ## Removing the old site
 
-Last, and only after the redirection answers:
-
-1. Remove the custom domain in the Pages settings of the old repository.
-2. Delete its `gh-pages`.
-3. The repository itself stays: it is where the documentation is written.
+For a domain that is deleted rather than kept: remove the custom domain in the Pages settings of the old
+repository, delete its `gh-pages`, then the DNS record. The repository itself stays — it is where the
+documentation is written, and it still publishes into the site.
 
 ## Traps
 
