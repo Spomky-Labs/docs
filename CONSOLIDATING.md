@@ -83,7 +83,16 @@ On each branch of the table, **oldest first, merged forward**. One pull request 
 
 ```bash
 git switch -c chore/one-site-many-projects <version branch>
+python3 -I ~/Projects/docs/tools/into-the-site.py . <prefix>
 ```
+
+[`tools/into-the-site.py`](tools/into-the-site.py) makes the six edits below, prints what it changed and
+what it left for a human, and changes nothing on a second run. It was written by replaying the move of
+OTPHP: on that branch before the move it produces the `mkdocs.yml`, the `main.html` and the `pages.yml`
+that were written by hand, to the byte. Read its diff anyway; the README of a repository is prose and it
+only does what is certain there.
+
+What it does, and what to check if you do it by hand:
 
 **1. `mkdocs.yml`** — the site is one directory of the central one, and the templates of the theme are not
 pages:
