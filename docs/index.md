@@ -19,6 +19,12 @@ where to ask about it.
 <span class="sl-card__excerpt">Authorization for PHP and Symfony: decides whether a requester is allowed to perform an action on a subject.</span>
 <span class="sl-card__meta">spomky-labs/access-control-lib</span>
 </a>
+<a class="sl-card" href="https://cbor.spomky-labs.com/">
+<span class="sl-card__label">Encoding</span>
+<span class="sl-card__title">CBOR PHP</span>
+<span class="sl-card__excerpt">CBOR encoding and decoding, after RFC 8949.</span>
+<span class="sl-card__meta">spomky-labs/cbor-php</span>
+</a>
 <a class="sl-card" href="https://web-token.spomky-labs.com/">
 <span class="sl-card__label">Tokens</span>
 <span class="sl-card__title">JWT Framework</span>
@@ -59,12 +65,6 @@ where to ask about it.
 <span class="sl-card__title">OTPHP</span>
 <span class="sl-card__excerpt">TOTP and HOTP one-time passwords, after RFC 6238 and RFC 4226.</span>
 <span class="sl-card__meta">spomky-labs/otphp</span>
-</a>
-<a class="sl-card" href="https://github.com/Spomky-Labs/cbor-php/tree/HEAD/doc">
-<span class="sl-card__label">Encoding</span>
-<span class="sl-card__title">CBOR PHP</span>
-<span class="sl-card__excerpt">CBOR encoding and decoding.</span>
-<span class="sl-card__meta">spomky-labs/cbor-php</span>
 </a>
 <a class="sl-card" href="https://github.com/web-auth/cose-lib/tree/HEAD/doc">
 <span class="sl-card__label">Signature and encryption</span>

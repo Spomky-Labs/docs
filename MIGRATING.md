@@ -23,6 +23,7 @@ and **a mark of the design kit is copied for the web by [`tools/web-svg.py`](too
 | WebAuthn Framework | `web-auth/doc` | `webauthn-doc.spomky-labs.com` | Migrated; last pull requests open (web-auth/doc#64 to #66) |
 | PWA Bundle | `Spomky-Labs/phpwa-doc` | `pwa.spomky-labs.com` | Migrated; last pull requests open (Spomky-Labs/phpwa-doc#23 to #25) |
 | PKI Framework | `Spomky-Labs/pki-framework-doc` | `pki.spomky-labs.com` | Written from scratch, never published by GitBook: the library was documented in its README |
+| CBOR PHP | `Spomky-Labs/cbor-php-doc` | `cbor.spomky-labs.com` | Written from the doc/ directory of the library, never published by GitBook |
 | Central site | `Spomky-Labs/docs` | `docs.spomky-labs.com` | Published |
 
 Every documentation is migrated. What is left, for each one: remove the domain from its GitBook space, then
