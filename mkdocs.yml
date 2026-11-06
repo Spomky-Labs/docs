@@ -156,13 +156,15 @@ extra:
       - name: Sponsor
         link: https://github.com/sponsors/Spomky
     legal: SPOMKY-LABS · Florent Morselli EI
+    # The partial of the footer reads link, as it does for the links above: a legal link written as page
+    # renders an empty href. They are written from the root of the site, which is this very site.
     legal_links:
       - name: Legal notice
-        page: legal-notice/
+        link: /legal-notice/
       - name: Privacy
-        page: privacy/
+        link: /privacy/
       - name: Contact
-        page: contact/
+        link: /contact/
 
 
 nav:
