@@ -37,6 +37,96 @@ that every documentation site links to from its footer. OTPHP was the last libra
 repository, so `docs/index.md` now holds a single group of cards: a new library is added to it, and the
 second group comes back only if one is ever documented in its repository again.
 
+## One site, one directory per project
+
+Nine documentations meant nine domains, nine Pages configurations, nine certificates and nine DNS records.
+They are becoming one site, `docs.spomky-labs.com`, which holds the hub at its root and one directory per
+project. **The repositories do not move**: each keeps its branches, one per version, its `mkdocs.yml` and
+its continuous integration, and deploys into the `gh-pages` of this repository under its own prefix.
+
+```text
+/                      the hub, the legal notice, the privacy policy, the contact page
+/otphp/11.6/           a version, deployed from Spomky-Labs/otphp-doc branch 11.6.x
+/otphp/latest/         the alias /otphp/ redirects to
+/otphp/versions.json   what that project publishes
+```
+
+`mike deploy --deploy-prefix <project>` writes a `versions.json` per directory, so **every project keeps
+its own version axis, its own version selector and its own search index**. Nothing is merged: a 949 KB
+search index stays with the project it belongs to.
+
+| Former domain | Prefix | Repository |
+|---|---|---|
+| `acf.spomky-labs.com` | `/acf/` | `Spomky-Labs/access-control-doc` |
+| `cbor.spomky-labs.com` | `/cbor/` | `Spomky-Labs/cbor-php-doc` |
+| `cose.spomky-labs.com` | `/cose/` | `web-auth/cose-doc` |
+| `otphp.spomky-labs.com` | `/otphp/` | `Spomky-Labs/otphp-doc` |
+| `pki.spomky-labs.com` | `/pki/` | `Spomky-Labs/pki-framework-doc` |
+| `pwa.spomky-labs.com` | `/pwa/` | `Spomky-Labs/phpwa-doc` |
+| `web-push.spomky-labs.com` | `/web-push/` | `Spomky-Labs/web-push-doc` |
+| `web-token.spomky-labs.com` | `/jwt/` | `web-token/jwt-doc` |
+| `webauthn-doc.spomky-labs.com` | `/webauthn/` | `web-auth/doc` |
+
+A prefix is the label of the former subdomain, so every redirection is one rule and no path changes.
+`web-token` and `webauthn-doc` are the two exceptions: the project is JWT Framework, not its organization,
+and `-doc` named a repository, not a documentation.
+
+**The reference implementation is [Spomky-Labs/otphp-doc](https://github.com/Spomky-Labs/otphp-doc),
+branch `11.6.x`.** Its `pages.yml`, its `mkdocs.yml` and its `main.html` are what the others copy.
+
+### What changes in a project repository
+
+1. `site_url` becomes `https://docs.spomky-labs.com/<prefix>/`.
+2. `pages.yml` deploys into this repository instead of its own `gh-pages`, under `--deploy-prefix`.
+3. `site-root/` goes: the domain goes with it. Removing it does not touch the `gh-pages` that repository
+   already published, which keeps serving the old domain until its DNS moves.
+4. The two faults below are fixed at the same time.
+
+The token: **a fine-grained token with `contents: write` on `Spomky-Labs/docs` and nothing else**, as the
+secret `DOCS_PAGES_TOKEN`. The `GITHUB_TOKEN` of a repository cannot write another one. An organization
+secret covers the seven repositories of `Spomky-Labs`; `web-auth/doc` and `web-token/jwt-doc` need it set
+on themselves, or on their own organization.
+
+### What changes here
+
+This repository owns the root of the branch and nothing else. `mkdocs gh-deploy --force` replaced the
+whole branch and would have erased every project at each publication of the hub: `pages.yml` now replaces
+the root entries that are **not** a project, a project being a directory that holds a `versions.json`.
+
+`site-root/404.html` replaces the one of the theme and is the only 404 of the site. A first segment holding
+a `versions.json` is a project; an address inside it that does not name a published version is an address
+of that project's former domain and is sent to the same page of its latest version, or to its home page
+when the page is gone. An address inside a published version, and a first segment that is not a project,
+stay and say so.
+
+### The order
+
+Do one project at a time, and finish it before starting the next.
+
+1. This repository first, or the next publication of the hub erases what a project just deployed.
+2. The project repository, on every branch it publishes, oldest first, merged forward.
+3. Check `https://docs.spomky-labs.com/<prefix>/` and a deep page of each version.
+4. Move the card of `docs/index.md` to the new address.
+5. **Then** the redirection at Infomaniak: `<old domain>/*` to `docs.spomky-labs.com/<prefix>/*`,
+   path preserved, 301. Check an address of the old sitemap before going on.
+6. Remove the custom domain from the old repository's Pages settings, then its `gh-pages`.
+
+### Traps
+
+- **mike needs a local `gh-pages` seeded from the site.** Without `git fetch site gh-pages` and
+  `git branch -f gh-pages FETCH_HEAD`, mike builds a branch of its own and the push is refused as a
+  non-fast-forward, with a message about "work that you do not have locally".
+- **Ten repositories write one branch.** A concurrency group only serialises the runs of one repository.
+  Every publication retries, re-fetching the branch between attempts.
+- **`og:image` was a 404 on every site.** mike rewrites `site_url` per version and leaves no trailing
+  slash on it, and `main.html` concatenated it with the path of the share image:
+  `https://otphp.spomky-labs.com/11.6assets/...`. The template adds the slash when it is missing.
+- **The templates of the theme were published beside the pages.** `custom_dir` is `docs/overrides`, inside
+  `docs_dir`, so MkDocs copied `main.html` and `partials/` to the site as files. `exclude_docs` keeps them
+  out.
+- **A project directory is matched by its `versions.json`**, not by a list: nothing to maintain when a
+  project arrives or leaves.
+
 ## What was decided
 
 - **The sources are converted to the syntax of Material for MkDocs.** No GitBook syntax stays in a
