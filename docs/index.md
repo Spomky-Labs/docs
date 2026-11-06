@@ -25,6 +25,12 @@ where to ask about it.
 <span class="sl-card__excerpt">JSON Web Tokens for PHP and Symfony: signature (JWS), encryption (JWE) and keys (JWK).</span>
 <span class="sl-card__meta">web-token/jwt-framework</span>
 </a>
+<a class="sl-card" href="https://pki.spomky-labs.com/">
+<span class="sl-card__label">Certificates</span>
+<span class="sl-card__title">PKI Framework</span>
+<span class="sl-card__excerpt">X.509 certificates, ASN.1 and public key infrastructure.</span>
+<span class="sl-card__meta">spomky-labs/pki-framework</span>
+</a>
 <a class="sl-card" href="https://webauthn-doc.spomky-labs.com/">
 <span class="sl-card__label">Authentication</span>
 <span class="sl-card__title">WebAuthn Framework</span>
@@ -65,11 +71,5 @@ where to ask about it.
 <span class="sl-card__title">COSE</span>
 <span class="sl-card__excerpt">COSE signing, encryption and key management.</span>
 <span class="sl-card__meta">web-auth/cose-lib</span>
-</a>
-<a class="sl-card" href="https://github.com/Spomky-Labs/pki-framework#readme">
-<span class="sl-card__label">Certificates</span>
-<span class="sl-card__title">PKI Framework</span>
-<span class="sl-card__excerpt">X.509 certificates, ASN.1 and public key infrastructure.</span>
-<span class="sl-card__meta">spomky-labs/pki-framework</span>
 </a>
 </div>
