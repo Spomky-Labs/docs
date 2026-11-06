@@ -2301,19 +2301,19 @@ the same rules, and the
 <a href="https://github.com/Spomky-Labs/pki-framework/blob/HEAD/CODE_OF_CONDUCT.md">code of conduct</a> applies to
 every exchange.</p>
 <h2 id="this-documentation">This documentation<a class="headerlink" href="#this-documentation" title="Link to this section">&para;</a></h2>
-<p>The pages live in their own repository,
-<a href="https://github.com/Spomky-Labs/pki-framework-doc">Spomky-Labs/pki-framework-doc</a>. The pencil at the top
-right of a page opens it for editing on the branch of the version you are reading.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Spomky-Labs/pki-framework-doc.git
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>pki-framework-doc
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>make<span class="w"> </span>install<span class="w">   </span><span class="c1"># the toolchain, in .venv</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>make<span class="w"> </span>serve<span class="w">     </span><span class="c1"># http://127.0.0.1:8000, rebuilt as you save</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>make<span class="w"> </span>check<span class="w">     </span><span class="c1"># the strict build continuous integration runs</span>
+<p>Every documentation of Slabs lives in one repository,
+<a href="https://github.com/Spomky-Labs/docs">Spomky-Labs/docs</a>, under <code>projects/&lt;project&gt;/&lt;version&gt;/</code>. These
+pages are in <code>projects/pki/1.6/</code>. The pencil at the top right of a page opens its source there.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Spomky-Labs/docs.git
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>docs
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>make<span class="w"> </span>install<span class="w">                 </span><span class="c1"># the toolchain, in .venv</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>make<span class="w"> </span>serve<span class="w"> </span><span class="nv">p</span><span class="o">=</span>pki<span class="w"> </span><span class="nv">v</span><span class="o">=</span><span class="m">1</span>.6<span class="w">   </span><span class="c1"># http://127.0.0.1:8000, rebuilt as you save</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>make<span class="w"> </span>check<span class="w">                   </span><span class="c1"># the strict build continuous integration runs</span>
 </span></code></pre></div>
 <p><code>make check</code> is the gate: a broken internal link, an anchor that does not exist, a page absent from the
 navigation or a navigation entry without a page fails the build.</p>
-<p>One branch of that repository is one version of the library, named like its maintenance branch. A
-correction that applies to every version is made on the oldest maintained branch and merged forward.</p>
+<p>One directory of that repository is one version of the library. A correction that applies to every
+version is made in each of them: the versions are directories, not branches.</p>
 <p>Titles are in sentence case; names keep their capitals. Every code block is expected to run against the
 version the page documents.</p>
 
@@ -2336,7 +2336,7 @@ version the page documents.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:36:43 UTC">November 6, 2026</span>
   </span>
 
     
