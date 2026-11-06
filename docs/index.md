@@ -37,6 +37,12 @@ where to ask about it.
 <span class="sl-card__excerpt">JSON Web Tokens for PHP and Symfony: signature (JWS), encryption (JWE) and keys (JWK).</span>
 <span class="sl-card__meta">web-token/jwt-framework</span>
 </a>
+<a class="sl-card" href="https://otphp.spomky-labs.com/">
+<span class="sl-card__label">One-time passwords</span>
+<span class="sl-card__title">OTPHP</span>
+<span class="sl-card__excerpt">TOTP and HOTP one-time passwords, after RFC 6238 and RFC 4226.</span>
+<span class="sl-card__meta">spomky-labs/otphp</span>
+</a>
 <a class="sl-card" href="https://pki.spomky-labs.com/">
 <span class="sl-card__label">Certificates</span>
 <span class="sl-card__title">PKI Framework</span>
@@ -60,16 +66,5 @@ where to ask about it.
 <span class="sl-card__title">Web Push Framework</span>
 <span class="sl-card__excerpt">Web push notifications for PHP and Symfony.</span>
 <span class="sl-card__meta">spomky-labs/web-push-lib</span>
-</a>
-</div>
-
-## Documented in their repository
-
-<div class="sl-cards">
-<a class="sl-card" href="https://github.com/Spomky-Labs/otphp/tree/HEAD/doc">
-<span class="sl-card__label">One-time passwords</span>
-<span class="sl-card__title">OTPHP</span>
-<span class="sl-card__excerpt">TOTP and HOTP one-time passwords, after RFC 6238 and RFC 4226.</span>
-<span class="sl-card__meta">spomky-labs/otphp</span>
 </a>
 </div>
