@@ -1004,6 +1004,74 @@ body {
   right: calc(var(--slabs-space-base) * 8);
 }
 
+/* ---------------------------------------------------------------- Cards (p. 32) */
+
+/* A card: Calcaire clair, a 1 px Plâtre border, the radius of a card. The category written as a label,
+   the title, an excerpt of two lines at most, then the package in Plex Mono. No coloured edge, no slab.
+   The whole card is the link; under the pointer the border takes the colour of the text and the title its
+   orange underline. */
+.md-typeset .sl-cards {
+  display: grid;
+  gap: var(--slabs-gutter);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  margin: calc(var(--slabs-space-base) * 6) 0;
+}
+
+.md-typeset a.sl-card {
+  background-color: var(--doc-raised);
+  border: 1px solid var(--doc-rule);
+  border-radius: var(--slabs-radius-card);
+  color: var(--doc-text);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--slabs-space-base) * 2);
+  padding: calc(var(--slabs-space-base) * 5) calc(var(--slabs-space-base) * 6);
+  text-decoration: none;
+  transition: border-color 150ms;
+}
+
+.md-typeset a.sl-card:is(:hover, :focus-visible) {
+  border-color: var(--doc-rule-strong);
+  color: var(--doc-text);
+}
+
+.md-typeset .sl-card__label,
+.md-typeset .sl-card__meta {
+  color: var(--doc-text-secondary);
+  font-family: var(--md-code-font-family);
+  font-size: var(--slabs-caption);
+  line-height: var(--slabs-lh-ui);
+}
+
+.md-typeset .sl-card__label {
+  font-weight: 600;
+  letter-spacing: var(--slabs-label-tracking);
+  text-transform: uppercase;
+}
+
+.md-typeset .sl-card__title {
+  font-size: var(--slabs-h4);
+  font-weight: 600;
+  line-height: var(--slabs-h4-lh);
+  text-decoration: underline 2px transparent;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 150ms;
+}
+
+.md-typeset a.sl-card:is(:hover, :focus-visible) .sl-card__title {
+  text-decoration-color: var(--slabs-orange);
+}
+
+.md-typeset .sl-card__excerpt {
+  font-size: var(--slabs-body);
+  line-height: var(--slabs-lh-ui);
+}
+
+.md-typeset .sl-card__meta {
+  margin-top: auto;
+  padding-top: calc(var(--slabs-space-base) * 2);
+}
+
 /* The last rank of a page: the same card, with the category dropped, the title one step down and the
    padding of a dense block. Its columns are narrower too, so a building block never takes the width of a
    framework. */
