@@ -1043,6 +1043,41 @@ body {
   padding-top: calc(var(--slabs-space-base) * 2);
 }
 
+/* The last rank of a page: the same card, with the category dropped, the title one step down and the
+   padding of a dense block. Its columns are narrower too, so a building block never takes the width of a
+   framework. */
+.md-typeset .sl-cards--compact {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  margin: calc(var(--slabs-space-base) * 4) 0 calc(var(--slabs-space-base) * 6);
+}
+
+.md-typeset a.sl-card--compact {
+  gap: var(--slabs-space-base);
+  padding: calc(var(--slabs-space-base) * 3) calc(var(--slabs-space-base) * 4);
+}
+
+.md-typeset .sl-card--compact .sl-card__title {
+  font-size: var(--slabs-body);
+  line-height: var(--slabs-lh-ui);
+}
+
+.md-typeset .sl-card--compact .sl-card__excerpt {
+  color: var(--doc-text-secondary);
+  font-size: var(--slabs-caption);
+}
+
+.md-typeset .sl-card--compact .sl-card__meta {
+  padding-top: var(--slabs-space-base);
+}
+
+/* The sentence under a section heading: it says what rank the cards below hold, in Béton and over the
+   width of a reading line, so it is read as a caption and not as the body of the page. */
+.md-typeset .sl-lead {
+  color: var(--doc-text-secondary);
+  margin-bottom: 0;
+  max-width: 68ch;
+}
+
 /* ---------------------------------------------------------------- Footer (p. 31) */
 
 /* Anthracite, whatever the scheme: the previous and next pages, then the reversed signature, the links in

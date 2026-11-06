@@ -10,26 +10,18 @@ hide:
 The documentation of each library: what it does, the specifications it implements, how to install it and
 where to ask about it.
 
-## Documentation sites
+## The frameworks
+
+What an application installs for what it does: who the user is, what they may do, and the tokens and
+certificates that carry the answer.
+{ .sl-lead }
 
 <div class="sl-cards">
-<a class="sl-card" href="https://acf.spomky-labs.com/">
-<span class="sl-card__label">Authorization</span>
-<span class="sl-card__title">Access Control Framework</span>
-<span class="sl-card__excerpt">Authorization for PHP and Symfony: decides whether a requester is allowed to perform an action on a subject.</span>
-<span class="sl-card__meta">spomky-labs/access-control-lib</span>
-</a>
-<a class="sl-card" href="https://cbor.spomky-labs.com/">
-<span class="sl-card__label">Encoding</span>
-<span class="sl-card__title">CBOR PHP</span>
-<span class="sl-card__excerpt">CBOR encoding and decoding, after RFC 8949.</span>
-<span class="sl-card__meta">spomky-labs/cbor-php</span>
-</a>
-<a class="sl-card" href="https://cose.spomky-labs.com/">
-<span class="sl-card__label">Signature and encryption</span>
-<span class="sl-card__title">COSE</span>
-<span class="sl-card__excerpt">COSE signing, encryption and key management, after RFC 9052 and RFC 9053.</span>
-<span class="sl-card__meta">web-auth/cose-lib</span>
+<a class="sl-card" href="https://webauthn-doc.spomky-labs.com/">
+<span class="sl-card__label">Authentication</span>
+<span class="sl-card__title">WebAuthn Framework</span>
+<span class="sl-card__excerpt">WebAuthn and passkeys for PHP and Symfony.</span>
+<span class="sl-card__meta">web-auth/webauthn-lib</span>
 </a>
 <a class="sl-card" href="https://web-token.spomky-labs.com/">
 <span class="sl-card__label">Tokens</span>
@@ -43,18 +35,26 @@ where to ask about it.
 <span class="sl-card__excerpt">TOTP and HOTP one-time passwords, after RFC 6238 and RFC 4226.</span>
 <span class="sl-card__meta">spomky-labs/otphp</span>
 </a>
+<a class="sl-card" href="https://acf.spomky-labs.com/">
+<span class="sl-card__label">Authorization</span>
+<span class="sl-card__title">Access Control Framework</span>
+<span class="sl-card__excerpt">Authorization for PHP and Symfony: decides whether a requester is allowed to perform an action on a subject.</span>
+<span class="sl-card__meta">spomky-labs/access-control-lib</span>
+</a>
 <a class="sl-card" href="https://pki.spomky-labs.com/">
 <span class="sl-card__label">Certificates</span>
 <span class="sl-card__title">PKI Framework</span>
 <span class="sl-card__excerpt">X.509 certificates, ASN.1 and public key infrastructure.</span>
 <span class="sl-card__meta">spomky-labs/pki-framework</span>
 </a>
-<a class="sl-card" href="https://webauthn-doc.spomky-labs.com/">
-<span class="sl-card__label">Authentication</span>
-<span class="sl-card__title">WebAuthn Framework</span>
-<span class="sl-card__excerpt">WebAuthn and passkeys for PHP and Symfony.</span>
-<span class="sl-card__meta">web-auth/webauthn-lib</span>
-</a>
+</div>
+
+## For Symfony applications
+
+Bundles that hand an application a capability of the web platform, configured rather than written.
+{ .sl-lead }
+
+<div class="sl-cards">
 <a class="sl-card" href="https://pwa.spomky-labs.com/">
 <span class="sl-card__label">Progressive web apps</span>
 <span class="sl-card__title">PWA Bundle</span>
@@ -66,5 +66,24 @@ where to ask about it.
 <span class="sl-card__title">Web Push Framework</span>
 <span class="sl-card__excerpt">Web push notifications for PHP and Symfony.</span>
 <span class="sl-card__meta">spomky-labs/web-push-lib</span>
+</a>
+</div>
+
+## The building blocks
+
+The encoding and the cryptography the frameworks above stand on. Composer installs them for you; their
+documentation is here for the day you read a stack trace or write a layer of your own.
+{ .sl-lead }
+
+<div class="sl-cards sl-cards--compact">
+<a class="sl-card sl-card--compact" href="https://cbor.spomky-labs.com/">
+<span class="sl-card__title">CBOR PHP</span>
+<span class="sl-card__excerpt">CBOR encoding and decoding, after RFC 8949.</span>
+<span class="sl-card__meta">spomky-labs/cbor-php</span>
+</a>
+<a class="sl-card sl-card--compact" href="https://cose.spomky-labs.com/">
+<span class="sl-card__title">COSE</span>
+<span class="sl-card__excerpt">COSE signing, encryption and key management, after RFC 9052 and RFC 9053.</span>
+<span class="sl-card__meta">web-auth/cose-lib</span>
 </a>
 </div>
