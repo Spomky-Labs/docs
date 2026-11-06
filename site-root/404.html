@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Page not found · Slabs documentation</title>
+  <script>
+    // GitHub Pages answers every missing path of docs.spomky-labs.com with this page. The site holds the
+    // hub at its root and one directory per project, each deployed by mike with its own versions.json:
+    //
+    //     /                     the hub, the legal notice, the privacy policy, the contact page
+    //     /otphp/11.6/          a version of a project
+    //     /otphp/latest/        the alias the project's root redirects to
+    //     /otphp/versions.json  what that project publishes
+    //
+    // A path whose first segment holds a versions.json is a project. Inside one, an address that does not
+    // name a published version is an address of the former per-project domain, which had no project in its
+    // URLs: it is sent to the same page of that project's latest version, or to its home page when the page
+    // does not exist there any more. An address inside a published version stays here and says so. A first
+    // segment that is not a project is a page of the hub that does not exist.
+    (function () {
+      var path = location.pathname.replace(/\/+$/, '');
+      var first = path.split('/')[1] || '';
+
+      function go(target) {
+        location.replace(target + location.search + location.hash);
+      }
+
+      function stay(which) {
+        document.documentElement.className = which;
+      }
+
+      // The same page in a version, if that version has it; its home page otherwise. GitHub Pages answers a
+      // missing page with the status 404, a redirect left by the site with 200.
+      function goTo(project, rest) {
+        var home = '/' + project + '/latest/';
+        var target = home.slice(0, -1) + rest + '/';
+        if (!rest) {
+          return go(home);
+        }
+        fetch(target, { method: 'HEAD' })
+          .then(function (response) { go(response.ok ? target : home); })
+          .catch(function () { go(target); });
+      }
+
+      if (!first) {
+        return stay('hub');
+      }
+
+      fetch('/' + first + '/versions.json')
+        .then(function (response) { return response.ok ? response.json() : null; })
+        .catch(function () { return null; })
+        .then(function (versions) {
+          if (!versions) {
+            // Not a project: a page of the hub that does not exist.
+            return stay('hub');
+          }
+          var published = ['latest'];
+          versions.forEach(function (v) { published.push(v.version); published = published.concat(v.aliases || []); });
+
+          var rest = path.slice(first.length + 1);
+          var second = rest.split('/')[1] || '';
+          if (published.indexOf(second) !== -1) {
+            // Inside a published version: the page really does not exist.
+            document.getElementById('project').textContent = first;
+            document.getElementById('project-home').href = '/' + first + '/latest/';
+            document.getElementById('project-search').action = '/' + first + '/latest/';
+            return stay('project');
+          }
+          goTo(first, rest);
+        });
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/stylesheets/slabs-tokens.css">
+  <style>
+    /* The not found page of the Slabs guidelines (p. 32): the page title, one sentence, a search field and
+       three useful links. Its tokens and typefaces are those of the hub. */
+    @font-face { font-family: "Space Grotesk"; font-weight: 300 700; font-display: swap;
+                 src: url("/assets/fonts/SpaceGrotesk-Variable.woff2") format("woff2"); }
+    :root { color-scheme: light; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--slabs-calcaire);
+           color: var(--slabs-anthracite); font: 400 var(--slabs-body)/var(--slabs-lh-ui) var(--slabs-font-sans); }
+    main { box-sizing: border-box; max-width: 480px; padding: 0 var(--slabs-gutter-mobile); width: 100%; }
+    img { display: block; height: auto; margin-bottom: 48px; max-width: 100%; width: 89px; }
+    h1 { font-size: var(--slabs-h3); font-weight: 600; line-height: var(--slabs-h3-lh); margin: 0 0 12px; }
+    h1::after { background: var(--slabs-orange); content: ""; display: block; height: calc(var(--slabs-h3) / 4);
+                margin-top: 12px; width: calc(var(--slabs-h3) * 1.2); }
+    p { margin: 0 0 16px; }
+    form { margin: 0 0 16px; }
+    label { display: block; font-weight: 500; margin-bottom: 4px; }
+    input { background: #ffffff; border: var(--slabs-field-border) solid var(--slabs-schiste);
+            border-radius: var(--slabs-radius-control); box-sizing: border-box; color: var(--slabs-anthracite);
+            font: inherit; padding: 8px 12px; width: 100%; }
+    :focus-visible { outline: var(--slabs-focus-width) solid var(--slabs-anthracite); outline-offset: var(--slabs-focus-offset); }
+    ul { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; }
+    a { color: var(--slabs-anthracite); text-decoration: underline var(--slabs-link-underline) var(--slabs-schiste);
+        text-underline-offset: 0.2em; }
+    a:hover, a:active { text-decoration-color: var(--slabs-orange); text-decoration-thickness: 2px; }
+    code { font-family: var(--slabs-font-mono); }
+    .found { display: none; }
+    html.hub .hub-found, html.project .project-found { display: block; }
+    html.hub .moving, html.project .moving { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="moving">Looking for this page in the latest version…</p>
+
+    <div class="found hub-found">
+      <a href="/" aria-label="Slabs documentation, home"><img src="/assets/brand/slabs-logotype-couleur.svg" alt="" width="89" height="40"></a>
+      <h1>Page not found</h1>
+      <p>This page has moved or never existed. Start from one of these:</p>
+      <ul>
+        <li><a href="/">All documentation</a></li>
+        <li><a href="https://github.com/Spomky-Labs">GitHub</a></li>
+        <li><a href="https://packagist.org/packages/spomky-labs/">Packagist</a></li>
+      </ul>
+    </div>
+
+    <div class="found project-found">
+      <a href="/" aria-label="Slabs documentation, home"><img src="/assets/brand/slabs-logotype-couleur.svg" alt="" width="89" height="40"></a>
+      <h1>Page not found</h1>
+      <p>This page does not exist in this version of <code id="project"></code>. Search, or start from one of these:</p>
+      <form id="project-search" action="/" method="get" role="search">
+        <label for="q">Search the documentation</label>
+        <input id="q" name="q" type="search" autocomplete="off">
+      </form>
+      <ul>
+        <li><a id="project-home" href="/">That project's home</a></li>
+        <li><a href="/">All documentation</a></li>
+        <li><a href="https://github.com/Spomky-Labs">GitHub</a></li>
+      </ul>
+    </div>
+  </main>
+</body>
+</html>
