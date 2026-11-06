@@ -37,7 +37,7 @@ where to ask about it.
 <span class="sl-card__excerpt">JSON Web Tokens for PHP and Symfony: signature (JWS), encryption (JWE) and keys (JWK).</span>
 <span class="sl-card__meta">web-token/jwt-framework</span>
 </a>
-<a class="sl-card" href="https://otphp.spomky-labs.com/">
+<a class="sl-card" href="/otphp/">
 <span class="sl-card__label">One-time passwords</span>
 <span class="sl-card__title">OTPHP</span>
 <span class="sl-card__excerpt">TOTP and HOTP one-time passwords, after RFC 6238 and RFC 4226.</span>
