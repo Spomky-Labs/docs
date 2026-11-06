@@ -23,4 +23,27 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Slabs. Security you can build on.">
   <meta name="twitter:card" content="summary_large_image">
+
+  {#-
+    Material keys everything it stores on the path of the site that stored it, and this domain carries
+    eighteen of them: the hub, and one per version of every project. A reader who picks the dark theme on
+    the hub is back to "follow the system" on /web-push/latest/, which has never been asked anything.
+
+    The palette, and the palette alone, is keyed on the domain instead. Everything else keeps its own
+    scope: the search index above all, which is stored per site and would otherwise be read from the
+    wrong version. No cookie: the privacy page says this domain sets none, and a preference of this kind
+    belongs in local storage, where that page already says it is kept.
+  -#}
+  <script>
+    (function () {
+      var domain = new URL("/", location);
+      var get = window.__md_get, set = window.__md_set;
+      window.__md_get = function (key, storage, scope) {
+        return get(key, storage, key === "__palette" ? domain : scope);
+      };
+      window.__md_set = function (key, value, storage, scope) {
+        return set(key, value, storage, key === "__palette" ? domain : scope);
+      };
+    })();
+  </script>
 {% endblock %}
