@@ -6,6 +6,8 @@ Two algorithms move to their own packages. If your application enables `none` or
 
 Coming from an earlier version, read the previous guides first: [From v4.1 to v4.2](from-v4.1-to-v4.2.md), then [From v4.0 to v4.1](from-v4.0-to-v4.1.md).
 
+Version 4.3 also contains every fix of the 4.2 patch releases, up to 4.2.7. Some of them refuse keys or tokens that an earlier 4.2 release accepted: if you upgrade from a release before 4.2.7, read [Changes in the patch releases](from-v4.1-to-v4.2.md#changes-in-the-patch-releases) too.
+
 ## New features
 
 ### Every service has an interface
@@ -358,6 +360,28 @@ The fetching code moved to an internal trait the two factories use, so **they no
 
 `enabledCache()`, deprecated by annotation since 4.1, raises the notice now and states its replacement: an HTTP client that caches the responses, which honours the cache directives of the endpoint where the fixed lifetime of a cache pool ignores them.
 
+### A redirect policy for JKUFactory and X5UFactory
+
+`JKUFactory` and `X5UFactory` followed the redirects of the endpoint as their HTTP client does: up to 20, to any host, the last response giving the key set. Their constructor takes a redirect policy as a second argument: `false` refuses the redirects, `true` follows them. Without it, a key set fetched through a redirect raises a deprecation notice, and 5.0 refuses the redirects by default. With the Symfony bundle, set the `jose.jku_factory.follow_redirects` option.
+
+```php
+$jkuFactory = new JKUFactory($httpClient, false);
+```
+
+See [Redirects](../the-components/key-jwk-and-key-set-jwkset/key-set-management.md#redirects).
+
+### A maximum number of signatures and recipients
+
+Since 4.2.6, `JWSLoader` and `JWELoader` take the maximum number of signatures or recipients of a token as a fourth argument. In 4.3, the loader factories take it as the fourth argument of `create()`, and the bundle as the `max_signatures` and `max_recipients` options of a loader.
+
+Without a maximum, loading a token with more than 10 signatures or recipients is deprecated: 5.0 sets 10 by default. Only the JSON General serialization carries more than one. See [JWS loading](../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures) and [JWE loading](../the-components/encrypted-tokens-jwe/jwe-loading.md#maximum-number-of-recipients).
+
+### The place of `cty` in a nested token
+
+A JWE carries a nested token when its `cty` header parameter is `JWT`. In the JSON serializations, the loader also found it in the unprotected headers, which no authentication tag covers. Loading such a token is deprecated, and 5.0 refuses it by default. A third argument of `NestedTokenLoader` sets the policy now: `false` refuses these tokens, `true` loads them without notice. `NestedTokenLoaderFactory::create()` takes the value as its seventh argument, and the bundle as the `allow_unprotected_content_type` option of a loader. Tokens whose `cty` is in the protected header, every compact token among them, are not concerned.
+
+See [The cty header parameter](../advanced-topics/nested-tokens.md#the-cty-header-parameter).
+
 ## Announced for 5.0
 
 Some interfaces of the library are implemented by third-party code, so they cannot change without breaking it. 4.3 is the last release able to give notice, so it documents the signature they will have in 5.0 and **ships the objects they will return**, ready to be used.
@@ -422,10 +446,14 @@ A support given a token it does not handle returns an object carrying two empty 
 
 ## Behaviour changes
 
-Nothing that requires a change in your code. Two points are worth knowing:
+Nothing that requires a change in your code, unless you exchange AES-CBC-HMAC tokens with an AAD: upgrade the applications that decrypt them first. The points worth knowing:
 
 * **`JWEDecrypter::decrypt()` does not modify the JWE it receives.** The deprecated `decryptUsingKey()`/`decryptUsingKeySet()` still write the payload into the object passed by reference, so both behaviours coexist until 5.0.
 * **The builders no longer depend on the order of the calls.** Sequences that used to fail — adding a recipient before the shared protected header carrying its `alg`, or reusing a shared builder service after a `b64` build — now succeed. Nothing that worked before stops working.
+* **AES-CBC-HMAC tokens with an AAD follow RFC 7518.** The authentication tag of `A128CBC-HS256`, `A192CBC-HS384` and `A256CBC-HS512` covers the length of the whole authenticated data, where earlier versions counted the protected header only. Other implementations accept the tokens of 4.3, and 4.3 accepts theirs. The tokens issued by earlier versions still decrypt, with a deprecation notice, but earlier versions cannot decrypt the tokens issued by 4.3. Only the JSON serializations with an `aad` member are concerned. See [AES-CBC-HMAC tokens with an AAD](../advanced-topics/encrypted-tokens/additional-authentication-data-aad.md#aes-cbc-hmac-tokens-with-an-aad).
+* **The key agreement algorithms accept `deriveKey` and `deriveBits`.** A key whose `key_ops` lists either operation can be used by the `ECDH-*` algorithms to build and to decrypt, as WebCrypto exports such keys with either. See [Key operations](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#key-operations-key_ops).
+* **The RSA public key operation is computed by OpenSSL.** Encrypting with `RSA-OAEP`, `RSA-OAEP-256` and `RSA1_5`, and verifying `PS*` signatures, no longer depend on the GMP or BCMath extension for their speed. Decryption still does: GMP remains recommended.
+* **The size of a key wrapped with AES Key Wrap is checked before it is unwrapped.** No token changes outcome; a wrongly sized one fails with `Invalid encrypted key size`.
 
 An unrelated misconfiguration is now reported early: passing an algorithm that is neither a key encryption nor a content encryption algorithm to `JWEBuilder` or `JWEDecrypter` is deprecated, where it used to turn into a much later *algorithm not supported* error.
 
@@ -489,6 +517,9 @@ Everything below still works in 4.3 and is removed in 5.0.
 | `AlgorithmManager::add()` | `with()` |
 | `JWSSerializerManagerFactory::names()`, `JWESerializerManagerFactory::names()` | `aliases()` |
 | Passing a non-encryption algorithm to `JWEBuilder` or `JWEDecrypter` | Remove it from the algorithm manager |
+| Two different checkers of the same claim or header parameter in one `ClaimCheckerManager` or `HeaderCheckerManager` | One checker per [claim](../the-components/claim-checker.md#one-checker-per-claim) or [header parameter](../the-components/header-checker.md#one-checker-per-header-parameter): combine the rules in a single checker |
+| `JWSLoaderFactory` and `JWELoaderFactory`, of the library or of the bundle, without a header checker manager factory | A `HeaderCheckerManagerFactory` with the `JWSTokenSupport` or `JWETokenSupport` token type support; with the bundle, its factory services. See [JWS loading](../the-components/signed-tokens-jws/jws-loading.md#without-a-header-checker-manager-factory) |
+| Loading a token with more than 10 signatures or recipients without a maximum | A maximum: fourth argument of the loader or of `create()`, `max_signatures` or `max_recipients` with the bundle |
 
 ### Keys
 
@@ -498,6 +529,10 @@ Everything below still works in 4.3 and is removed in 5.0.
 | `JWKSet::sortKeys()` | None — it is an implementation detail of `selectKey()` |
 | `UrlKeySetFactory::enabledCache()` | An HTTP client that caches the responses |
 | Extending `UrlKeySetFactory` | `JKUFactory`, `X5UFactory`, or your own implementation |
+| `JKUFactory` and `X5UFactory` fetching a key set through a redirect without a redirect policy | The final URL, or `false` (refuse) or `true` (follow) as the second argument; `follow_redirects` with the bundle |
+| A `dir` key longer than the content encryption key | A key of exactly that size: its first bytes still decrypt the tokens already issued. See [Direct encryption](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#direct-encryption-dir) |
+| An AES key wrapping key longer than its algorithm key size | A key of exactly 128, 192 or 256 bits: its first bytes still decrypt the tokens already issued. See [AES key wrapping keys](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#aes-key-wrapping-keys) |
+| A `dir` key whose `key_ops` lacks `encrypt` (to build) or `decrypt` (to decrypt) | Add both operations, or remove `key_ops`. See [Key operations](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#key-operations-key_ops) |
 
 ### Tokens
 
@@ -507,6 +542,10 @@ Everything below still works in 4.3 and is removed in 5.0.
 | `JWE::withPayload()` called from outside the library | `JWEDecrypter` |
 | Extending `JWK`, `JWKSet`, `JWS`, `JWE` or `Signature` | Build the object with its constructor and keep your own state beside it |
 | `new Signature($sig, $decodedProtectedHeader, null, ...)` | Pass the encoded protected header — the decoded one is silently discarded without it, and this throws in 5.0 |
+| A `dir` JWE with neither a protected header nor an AAD | Put `alg` and `enc` in the shared protected header |
+| An `RSA-OAEP` or `RSA-OAEP-256` encrypted key shorter than the modulus | Nothing on the receiving side: conforming senders produce an encrypted key as long as the modulus. See [RSA keys](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#rsa-keys) |
+| An AES-CBC-HMAC token with an AAD whose tag was computed by a version before 4.3 | Encrypt it again with 4.3, once the applications that decrypt it are upgraded |
+| A nested token whose `cty` is outside the protected header of the JWE, without a policy | `cty` in the protected header on the issuing side; `false` or `true` as the third argument of `NestedTokenLoader`, or the `allow_unprotected_content_type` option of the bundle |
 
 ### Algorithms
 
@@ -523,5 +562,6 @@ Everything below still works in 4.3 and is removed in 5.0.
 | Deprecated | Replacement |
 | ---------- | ----------- |
 | The inheritance based event dispatching services | The decorators registered under the same service ids — no configuration change needed |
+| Two services tagged with the same alias (`jose.algorithm`, `jose.checker.header`, `jose.checker.claim`) | One alias per service; to replace a service of the bundle, redefine its id or decorate it. See [One service per alias](../the-symfony-bundle/header-and-claim-checker-management.md#one-service-per-alias) |
 
 The event dispatching verifier and decrypter of the bundle used to drop the callable the loaders pass to observe the discarded keys, so the reason of a failure was lost as soon as the bundle services were used. They forward it now, as the new decorators do.
