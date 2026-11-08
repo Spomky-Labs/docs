@@ -34,13 +34,13 @@ To instantiate the `NestedTokenBuilder`, you will need the following components:
 ```php
 use Jose\Component\NestedToken\NestedTokenBuilder;
 
-$nestedTokenBuilder = new NestedTokenBuilder($jweLoader, $jweSerializerManager, $jwsLoader, $jwsSerializerManager);
+$nestedTokenBuilder = new NestedTokenBuilder($jweBuilder, $jweSerializerManager, $jwsBuilder, $jwsSerializerManager);
 ```
 
 Its use is a bit more complicated than the loading as the nested token may be designed for several recipients or may have several signatures.
 
 ```php
-$token = $builder->create(
+$token = $nestedTokenBuilder->create(
     $payload,                                     // The payload to protect
     [[                                            // A list of signatures. 'key' is mandatory and at least one of 'protected_header'/'header' has to be set.
         'key'              => $signature_key,     // The key used to sign. Mandatory.
@@ -54,7 +54,7 @@ $token = $builder->create(
         'key'    => $encryption_key,              // The recipient key.
         'header' => ['bar' => 'foo'],             // The recipient unprotected header.
     ]],
-    'jwe_json_flattened'                          // The serialization mode for the JWE.
+    'jwe_json_flattened',                         // The serialization mode for the JWE.
     '1, 2, 3, 4'                                  // Additional Authenticated Data (AAD). Optional.
 );
 ```
@@ -78,8 +78,7 @@ jose:
         loaders:
             loader_1:
                 signature_algorithms: ['PS256']
-                key_encryption_algorithms: ['RSA-OAEP']
-                content_encryption_algorithms: ['A128GCM']
+                encryption_algorithms: ['RSA-OAEP', 'A128GCM']
                 jws_serializers: ['jws_compact']
                 jws_header_checkers: [...]
                 jwe_serializers: ['jwe_compact']
@@ -88,8 +87,7 @@ jose:
         builders:
             builder_1:
                 signature_algorithms: ['PS256']
-                key_encryption_algorithms: ['RSA-OAEP']
-                content_encryption_algorithms: ['A128GCM']
+                encryption_algorithms: ['RSA-OAEP', 'A128GCM']
                 jws_serializers: ['jws_compact']
                 jwe_serializers: ['jwe_compact']
                 is_public: true
@@ -113,8 +111,8 @@ class AcmeExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(ContainerBuilder $container)
     {
-        ConfigurationHelper::addNestedTokenLoader($container, 'loader_1', ['jwe_compact'], ['RSA-OAEP'], ['A128GCM'], [], ['jws_compact'], ['PS256'], [], true, []);
-        ConfigurationHelper::addNestedTokenBuilder($container, 'builder_1', ['jwe_compact'], ['RSA-OAEP'], ['A128GCM'], ['jws_compact'], ['PS256'], true, []);
+        ConfigurationHelper::addNestedTokenLoader($container, 'loader_1', ['jwe_compact'], ['RSA-OAEP', 'A128GCM'], [], ['jws_compact'], ['PS256'], [], true, []);
+        ConfigurationHelper::addNestedTokenBuilder($container, 'builder_1', ['jwe_compact'], ['RSA-OAEP', 'A128GCM'], ['jws_compact'], ['PS256'], true, []);
     }
 }
 ```
