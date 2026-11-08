@@ -203,6 +203,7 @@ $verified = $verifier->verifyWithKeyBinding($token, $issuerKeySet, 'https://veri
 
 $claims = $verified->getClaims();          // The Processed SD-JWT Payload
 $verified->getIssuerKey();                 // The key that verified the Issuer-signed JWT
+$verified->getIssuerSignedJwt();           // The Issuer-signed JWT, with the verified signature only
 $verified->getHolderKey();                 // The key of "cnf" that verified the Key Binding JWT, if any
 $verified->getSdJwt()->getDisclosures();   // The presented Disclosures
 ```
@@ -290,6 +291,12 @@ $serializerManager = new JWSSerializerManager([
 ```
 
 The Key Binding JWT is always in the compact serialization. In the general serialization, the Issuer-signed JWT is accepted once one of its signatures is verified, as the JWS loader does, and the algorithm of that signature must be a digital signature algorithm. The `sd_hash` is computed over the first signature, whichever one is verified.
+
+The Issuer-signed JWT of the result, `getIssuerSignedJwt()`, only has the verified signature, at index 0, whatever the serialization: the other signatures are not verified, and whoever holds the SD-JWT can add some. The SD-JWT as presented, with all its signatures, is returned by `getSdJwt()`.
+
+!!! warning
+
+    Only the protected header of the verified signature is authenticated. Its unprotected header can be changed by anyone, in the flattened serialization as in the general one, and even in an SD-JWT+KB, whose `sd_hash` does not cover it: read the header parameters the application relies on, such as `kid` or `x5c`, from the protected header.
 
 ## Disclosures
 
