@@ -16,6 +16,7 @@ __pycache__/
 /projects/*/*/overrides/main.html
 /projects/*/*/overrides/partials/copyright.html
 /projects/*/*/overrides/partials/source.html
+/projects/*/*/overrides/partials/javascripts/
 /docs/assets/brand/apple-touch-icon.png
 /docs/assets/brand/favicon.ico
 /docs/assets/brand/favicon.svg
@@ -26,3 +27,4 @@ __pycache__/
 /overrides/main.html
 /overrides/partials/copyright.html
 /overrides/partials/source.html
+/overrides/partials/javascripts/
