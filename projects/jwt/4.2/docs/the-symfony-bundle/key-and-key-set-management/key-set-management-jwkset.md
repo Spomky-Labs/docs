@@ -50,6 +50,7 @@ jose:
 
 * It is **highly recommended** to use a caching layer for your HTTP client and thus avoid unnecessary calls to the key set endpoint (e.g. Symfony's `CachingHttpClient`).
 * The **connection must be secured** and certificate verification should not be disabled.
+* When the endpoint picks the key set from a request header (see the `headers` option below), the caching layer must tell those requests apart: Symfony's `CachingHttpClient` separates the responses of one URL by the request headers that their `Vary` header names, so the endpoint must list that header in `Vary`.
 
 !!! warning
 
@@ -67,6 +68,8 @@ jose:
                 url: 'https://login.microsoftonline.com/common/discovery/keys'
 ```
 
+The `jku` and `x5u` methods accept a `headers` option: the headers added to the request, for instance `headers: { X-Api-Key: '%env(KEY_SET_API_KEY)%' }`.
+
 #### From a X5U (X509 certificates URL)
 
 The following example will allow you to load a key set from a distant URI. The key set must be a list of X509 certificates.
@@ -78,6 +81,12 @@ jose:
             x5u: # Method
                 url: 'https://www.googleapis.com/oauth2/v1/certs'
 ```
+
+Each entry of the document is a certificate, PEM encoded or as the base64 body of its PEM form. Since 4.2.7, an entry that starts with `file://` is never read as the path of a local file: it fails to load like any other invalid certificate.
+
+#### Redirects
+
+The factories follow the redirects of the HTTP client: Symfony's clients follow up to 20 redirects by default, to any host, and the body of the last response becomes the key set. To refuse redirects, point `client` to an HTTP client of your own whose `max_redirects` option is 0: a redirect then makes the loading of the key set fail.
 
 ## Shared key sets
 

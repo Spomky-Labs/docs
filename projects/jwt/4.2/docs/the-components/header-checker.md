@@ -79,7 +79,7 @@ The library provides several header checker classes you can instantiate and use 
 | IssuerChecker | `iss` | No |
 | NotBeforeChecker | `nbf` | **Yes** |
 | UnencodedPayloadChecker | `b64`<br>See [unencoded payload](../advanced-topics/signed-tokens/unencoded-payload.md) for more information. | No |
-| CallableChecker | Generic object that can execute a callable for checking a particular parameter | No |
+| CallableChecker | Generic object that can execute a callable for checking a particular parameter.<br>The value is accepted only when the callable returns `true`, see [the example](examples/validation.md#custom-claim-validation-with-callablechecker). | No |
 | IsEqualChecker | Generic object that can compare a particular parameter to a predefined value | No |
 
 ## Header checker manager factory

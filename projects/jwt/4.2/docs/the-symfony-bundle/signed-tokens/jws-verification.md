@@ -6,7 +6,7 @@ A `JWSVerifierFactory` is available as a service in your application container:
 
 ```php
 <?php
-use Jose\Component\Signature\JWSVerifierFactory;
+use Jose\Bundle\JoseFramework\Services\JWSVerifierFactory;
 
 $jwsVerifierFactory = $container->get(JWSVerifierFactory::class);
 ```
@@ -64,10 +64,14 @@ The [`JWSLoaderFactory`](../../the-components/signed-tokens-jws/jws-loading.md) 
 
 ```php
 <?php
-use Jose\Component\Signature\JWSLoaderFactory;
+use Jose\Bundle\JoseFramework\Services\JWSLoaderFactory;
 
 $jwsLoaderFactory = $container->get(JWSLoaderFactory::class);
 ```
+
+!!! warning
+
+    The factory services of the bundle are the classes of the `Jose\Bundle\JoseFramework\Services` namespace. Do not register the factories of the library, such as `Jose\Component\Signature\JWSLoaderFactory`, as services of your own: autowiring gives them no header checker manager factory, because the one of the bundle is another class, and the loaders they create check no header parameter. Since 4.2.7, they throw when header checkers are requested, see [Without a header checker manager factory](../../the-components/signed-tokens-jws/jws-loading.md#without-a-header-checker-manager-factory).
 
 You can also create `JWSLoader` objects as services using the configuration of the bundle.
 
@@ -91,3 +95,7 @@ use Jose\Bundle\JoseFramework\Helper\ConfigurationHelper;
 ...
 ConfigurationHelper::addJWSLoader($container, 'jws_loader1', ['jws_compact'], ['HS256'], ['alg'], true);
 ```
+
+!!! info
+
+    In 4.2, the loaders of the bundle do not limit the number of signatures of a token. If a loader accepts the JSON General serialization (`jws_json_general`) from senders you do not trust, create the loader yourself with a [maximum number of signatures](../../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures). The `max_signatures` option of the loaders comes with 4.3.

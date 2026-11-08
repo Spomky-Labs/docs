@@ -20,6 +20,8 @@ $jweBuilder
 
 **Note: when an unprotected header is set, the Compact Serialization mode is not available.**
 
+A token with several recipients can only be serialized in the JSON General serialization. On the receiving side, set the [maximum number of recipients](../../the-components/encrypted-tokens-jwe/jwe-loading.md#maximum-number-of-recipients) the loader accepts.
+
 ## Key management modes
 
 Each Key Encryption Algorithm has its own Key Management Mode.

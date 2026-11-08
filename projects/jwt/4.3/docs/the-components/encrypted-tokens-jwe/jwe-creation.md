@@ -78,7 +78,7 @@ The sender key does not add a recipient, so it may be set before or after `addRe
 
 !!! info
 
-    The decryption side needs both keys too, with the roles swapped. See [JWE Loading](jwe-loading.md#static-key-agreement).
+    The decryption side needs both keys too. See [JWE Loading](jwe-loading.md#static-key-agreement) for the order in which to pass them: since 4.2.7, both orders work.
 
 ## The builder is immutable
 

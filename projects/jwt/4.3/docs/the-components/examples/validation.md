@@ -91,6 +91,12 @@ $claimCheckerManager = new ClaimCheckerManager([
 $claimCheckerManager->check($payload, ['role']);
 ```
 
+!!! warning
+
+    The value is accepted only when the callable returns `true`. Any other result rejects it, truthy values such as `1`, a non-empty string or an array included. A callable built on a function that returns an integer must compare its result, for instance `preg_match('/^[a-z]+$/', $value) === 1`. From 4.1.8 to 4.2.6, truthy results were accepted by mistake; 4.2.7 restores the strict rule of the earlier versions.
+
+A manager holds one checker per claim. Do not give a `CallableChecker` a claim that another checker of the same manager already covers, such as `exp`: combine the rules in a single checker instead, see [One checker per claim](../claim-checker.md#one-checker-per-claim).
+
 ---
 
 ## Validate with IsEqualChecker

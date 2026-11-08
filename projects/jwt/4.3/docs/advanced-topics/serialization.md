@@ -204,6 +204,14 @@ $jwe  = $result->getJwe();
 $name = $result->getSerializerName(); // e.g. "jwe_json_flattened"
 ```
 
+## Bounded JSON decoding
+
+Since 4.2.6, the JWS and JWE serializers bound the JSON they decode before handing it to `json_decode()`. They count the brackets (`[`), braces (`{`) and commas (`,`) found outside the string literals of a document, which bounds the number of values and members it can hold. All the JSON documents of one token share a budget of **4,096**: the token itself in the JSON serializations, and each of its protected headers. A token beyond that budget is rejected before `json_decode()` runs on the document that exceeds it, with the same `Unsupported input.` error as any input that cannot be parsed, so the serializer manager and the loaders report it like any other token they cannot read.
+
+The content of the strings is not counted: a large payload, an unencoded (`b64: false`) payload or a long `x5c` chain costs nothing. A protected header usually holds a few dozen values, and a signature or recipient entry five to ten, so the budget leaves room for hundreds of signatures or recipients. To limit their number, set the maximum number of [signatures](../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures) or [recipients](../the-components/encrypted-tokens-jwe/jwe-loading.md#maximum-number-of-recipients) of the loader.
+
+The budget only applies to the documents of the tokens, and to those of an [SD-JWT](selective-disclosure.md), which share one budget with its Disclosures. The key sets loaded from a `jku` or `x5u` URL, and the claims your application decodes once the token is verified or decrypted, are not limited.
+
 ## Reading a token without knowing its mode
 
 `unserializeToken()` tries every serializer it holds and returns an `UnserializationResult` carrying both the token object and the name of the serializer that could read it. When none of them can, the exception thrown by the last one is chained as the previous exception, so the actual reason of the failure remains available.

@@ -124,6 +124,35 @@ public function decryptKey(JWK $key, string $encrypted_cek, array $header): stri
 
     The argument will be added to the interfaces and become **required** in 5.0. If you maintain a custom key encryption or key wrapping algorithm, start reading it now.
 
+## Keeping key material out of stack traces
+
+When an exception is created, PHP records the arguments of the pending calls in its trace, unless `zend.exception_ignore_args` is enabled, as `php.ini-production` does. Error pages, profilers and error trackers may then display or store them. Since 4.2.6, the parameters of the library that receive key material or decrypted data as a string carry the `#[\SensitiveParameter]` attribute, so that the trace holds a `SensitiveParameterValue` object instead of the value: the `$cek` of `decryptContent()`, the signing input (`$input`) of `verify()` and `hash()`, the shared secret of the key derivation.
+
+The attribute is not inherited from the interfaces. If you write an algorithm, or a class that overrides one of these methods, mark the same parameters, and those of your own helpers that receive a key or a secret as a string:
+
+```php
+<?php
+
+use SensitiveParameter;
+
+public function decryptContent(
+    string $data,
+    #[SensitiveParameter]
+    string $cek,
+    string $iv,
+    ?string $aad,
+    string $encoded_protected_header,
+    string $tag
+): string {
+    // ...
+}
+
+public function verify(JWK $key, #[SensitiveParameter] string $input, string $signature): bool
+{
+    // ...
+}
+```
+
 ## Preparing for 5.0
 
 The algorithm interfaces are implemented by third-party code, so they cannot change without breaking it. 4.3 documents the signature they will have in 5.0 and **ships the objects they will return**, so an implementation can be prepared today.

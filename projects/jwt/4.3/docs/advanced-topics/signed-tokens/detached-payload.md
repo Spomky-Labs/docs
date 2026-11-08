@@ -90,6 +90,17 @@ $token = 'eyJhbGciOiJIUzI1NiJ9..eycp9PTdgO4WA-68-AMoHPwsKDr68NhjIQKz4lUkiI0';
 $jws = $serializerManager->unserialize($token);
 
 // We verify the signature.
-// /!\ The third argument is the detached payload.
-$jwsVerifier->verifyWithKey($jws, $jwk, $payload);
+// /!\ The fourth argument is the detached payload. The third one is the index of the signature.
+$isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0, $payload);
 ```
+
+The detached payload is given as is: the verifier encodes it when the signature covers its Base64 URL encoded form.
+
+## Empty payload or detached payload
+
+In the JSON serializations, the payload is detached when the `payload` member is **absent**. Since 4.2.5, a token whose `payload` member is present but empty (`"payload":""`) carries an empty payload, not a detached one:
+
+* it is verified against that empty payload;
+* giving it a detached payload throws an `InvalidPayloadException` (`A detached payload is set, but the JWS already has a payload.`). Before 4.2.5, the detached payload was ignored and the token was verified against its empty payload.
+
+In the compact serialization, an empty payload segment (`header..signature`) still means a detached payload. The JSON serializers write the tokens the same way: the JSON Flattened serializer writes an empty attached payload as `"payload":""` instead of dropping the member, and the JSON General serializer leaves the member out for a detached payload instead of writing `"payload":null`.

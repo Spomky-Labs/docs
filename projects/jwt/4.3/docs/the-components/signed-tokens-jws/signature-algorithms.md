@@ -30,6 +30,12 @@ use Jose\Component\Signature\Algorithm\ES256K;
 
     Known limitation, unchanged: a secp256k1 key exported to PEM cannot be loaded back through the key loader on some OpenSSL builds. Keep such keys as JWK.
 
+### RSA keys
+
+Since 4.2.6, the `RS*` and `PS*` algorithms refuse an RSA key beyond the limits of OpenSSL, as the encryption algorithms do: see [RSA keys](../encrypted-tokens-jwe/encryption-algorithms.md#rsa-keys). When `JWSVerifier` is given such a key, the verification with that key fails and the next key of the key set is tried.
+
+Since 4.3, the verification of `PS256`, `PS384` and `PS512` signatures computes the RSA public operation with OpenSSL when the extension is loaded: its cost no longer depends on the GMP or BCMath extension. Signing with these algorithms is still computed in PHP, where GMP remains recommended.
+
 ### The `Ed25519` and `Ed448` algorithms
 
 [RFC 9864](https://www.rfc-editor.org/rfc/rfc9864.html) registers the fully-specified `Ed25519` and `Ed448` algorithms and deprecates the polymorphic `EdDSA`: the name of the algorithm alone must say which curve is in use. The keys are unchanged — an `OKP` key with `crv: Ed25519` or `crv: Ed448` — only the `alg` value differs.

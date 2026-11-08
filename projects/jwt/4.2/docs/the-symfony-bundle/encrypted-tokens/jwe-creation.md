@@ -6,7 +6,7 @@ A `JWEBuilderFactory` is available as a service in your application container:
 
 ```php
 <?php
-use Jose\Component\Encryption\JWEBuilderFactory;
+use Jose\Bundle\JoseFramework\Services\JWEBuilderFactory;
 
 $jweBuilderFactory = $container->get(JWEBuilderFactory::class);
 ```

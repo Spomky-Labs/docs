@@ -77,3 +77,52 @@ $jwkset->get('key-1'); // The first key registered with that ID
 !!! warning
 
     Before 4.2, the keys were indexed by `kid` and the last key registered with a given ID silently replaced the previous one. See the [migration guide](../../migration/from-v4.1-to-v4.2.md#duplicate-key-ids-in-a-key-set).
+
+## Distant key sets
+
+`JKUFactory` and `X5UFactory` fetch a key set from a URL with a [Symfony HTTP client](https://symfony.com/doc/current/http_client.html). `JKUFactory` reads a JWKSet document, `X5UFactory` a JSON object of X.509 certificates. The second argument of `loadFromUrl()` holds the headers of the request.
+
+```php
+<?php
+
+use Jose\Component\KeyManagement\JKUFactory;
+use Jose\Component\KeyManagement\X5UFactory;
+use Symfony\Component\HttpClient\HttpClient;
+
+$httpClient = HttpClient::create();
+
+$jkuFactory = new JKUFactory($httpClient);
+$jwkset = $jkuFactory->loadFromUrl('https://login.microsoftonline.com/common/discovery/keys');
+
+$x5uFactory = new X5UFactory($httpClient);
+$jwkset = $x5uFactory->loadFromUrl(
+    'https://www.googleapis.com/oauth2/v1/certs',
+    ['X-Api-Key' => $apiKey] // Optional headers of the request
+);
+```
+
+!!! danger
+
+    Only fetch URLs your application trusts, such as one written in its configuration. The `jku` and `x5u` header parameters of a token are chosen by its sender: never fetch them unless they are in an exact list of trusted URLs.
+
+### Redirects
+
+The factories send their request with the redirect policy of the HTTP client: Symfony's clients follow up to 20 redirects by default, to any host, and the body of the last response becomes the key set. To refuse redirects, give the factory a client whose `max_redirects` option is 0: a redirect then makes `loadFromUrl()` throw.
+
+```php
+$jkuFactory = new JKUFactory(HttpClient::create(['max_redirects' => 0]));
+```
+
+### Certificates of a `x5u` document
+
+Each entry of a `x5u` document is a certificate, PEM encoded or as the base64 body of its PEM form. Since 4.2.7, an entry that starts with `file://` is wrapped between PEM markers like any other base64 entry: OpenSSL never receives it as a path, so the document cannot make the application read a local file, and such an entry fails to load.
+
+### Cache
+
+`enabledCache()` stores the fetched documents in a PSR-6 cache pool. It is deprecated since 4.1: give the factory an HTTP client that caches the responses instead, such as Symfony's `CachingHttpClient`.
+
+Since 4.2.7, the cache key covers the URL **and the headers** of the request: two calls for the same URL with other headers, for instance another tenant or other credentials, fetch their own document. Before, the second call got the document fetched with the first headers until the entry expired. The entries stored by an earlier version are not read any more, so the first call after the upgrade fetches the document again. A request whose headers cannot be serialized, such as an anonymous `Stringable` object, bypasses the cache: it is sent on every call and never stored.
+
+!!! info
+
+    A caching HTTP client must tell those requests apart too. Symfony's `CachingHttpClient` separates the responses of one URL by the request headers that their `Vary` header names: an endpoint that picks the key set from a custom header must list that header in `Vary`.

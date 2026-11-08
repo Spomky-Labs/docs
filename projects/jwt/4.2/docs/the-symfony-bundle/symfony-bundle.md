@@ -133,8 +133,8 @@ The bundle provides comprehensive support for all JWT Framework components. Expl
 All services created through the bundle configuration are automatically available for auto-wiring. You can inject them by type or by name:
 
 ```php
-use Jose\Component\Signature\JWSBuilderFactory;
-use Jose\Component\Signature\JWSVerifierFactory;
+use Jose\Bundle\JoseFramework\Services\JWSBuilderFactory;
+use Jose\Bundle\JoseFramework\Services\JWSVerifierFactory;
 
 class MyService
 {
@@ -146,6 +146,44 @@ class MyService
     }
 }
 ```
+
+## Configuration split across several files
+
+A service may be configured in more than one place: a `when@prod` block, a second file such as `config/packages/prod/jose.yaml`, or another bundle through the [`ConfigurationHelper`](configuration-helper.md). Since 4.2.7, Symfony merges the alias lists of such a service as follows:
+
+* **checker lists add up**: the checkers of a later list are added to the earlier ones, and an alias listed twice is kept once. This applies to the `claims` and `headers` lists of `checkers`, to the `header_checkers` of the JWS and JWE loaders, and to the `jws_header_checkers` and `jwe_header_checkers` of the nested token loaders;
+* **algorithm and serializer lists are replaced**: the last list wins, so that a later configuration cannot widen what a service accepts by accident. This applies to the `signature_algorithms` and `encryption_algorithms` lists of the builders, verifiers, decrypters and loaders, to the `serializers` of the loaders, and to the `jws_serializers` and `jwe_serializers` of the nested token builders and loaders. An empty list replaces nothing;
+* the `serializers` lists of `jws.serializers` and `jwe.serializers` add up, as they always did.
+
+```yaml
+# config/packages/jose.yaml
+jose:
+    checkers:
+        claims:
+            api:
+                claims: ['exp', 'iat', 'nbf']
+    jws:
+        verifiers:
+            api:
+                signature_algorithms: ['RS256', 'HS256']
+
+# config/packages/prod/jose.yaml
+jose:
+    checkers:
+        claims:
+            api:
+                claims: ['aud_api'] # In prod, the manager checks exp, iat, nbf and aud_api
+    jws:
+        verifiers:
+            api:
+                signature_algorithms: ['ES256'] # In prod, the verifier only accepts ES256
+```
+
+!!! warning
+
+    Before 4.2.7, these lists were merged position by position. With the configuration above, `aud_api` replaced `exp` in the claim checker manager, and the verifier kept accepting `HS256`. If your configuration is split, check the result with `php bin/console debug:config jose`.
+
+Aliases given under a name, as a mapping rather than a list, are merged by name as before.
 
 ## Configuration reference
 
