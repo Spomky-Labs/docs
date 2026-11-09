@@ -206,15 +206,54 @@ $name = $result->getSerializerName(); // e.g. "jwe_json_flattened"
 
 ## Bounded JSON decoding
 
-Since 4.2.6, the JWS and JWE serializers bound the JSON they decode before handing it to `json_decode()`. They count the brackets (`[`), braces (`{`) and commas (`,`) found outside the string literals of a document, which bounds the number of values and members it can hold. All the JSON documents of one token share a budget of **4,096**: the token itself in the JSON serializations, and each of its protected headers. A token beyond that budget is rejected before `json_decode()` runs on the document that exceeds it, with the same `Unsupported input.` error as any input that cannot be parsed, so the serializer manager and the loaders report it like any other token they cannot read.
+Since 4.2.6, the JWS and JWE serializers bound the JSON they decode before handing it to `json_decode()`. They count the brackets (`[`), braces (`{`) and commas (`,`) found outside the string literals of a document, which bounds the number of values and members it can hold. All the JSON documents of one token share a budget of **4,096**: the token itself in the JSON serializations, and each of its protected headers. A token beyond that budget is rejected before `json_decode()` runs on the document that exceeds it.
 
 The content of the strings is not counted: a large payload, an unencoded (`b64: false`) payload or a long `x5c` chain costs nothing. A protected header usually holds a few dozen values, and a signature or recipient entry five to ten, so the budget leaves room for hundreds of signatures or recipients. To limit their number, set the maximum number of [signatures](../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures) or [recipients](../the-components/encrypted-tokens-jwe/jwe-loading.md#maximum-number-of-recipients) of the loader.
 
 The budget only applies to the documents of the tokens, and to those of an [SD-JWT](selective-disclosure.md), which share one budget with its Disclosures. The key sets loaded from a `jku` or `x5u` URL, and the claims your application decodes once the token is verified or decrypted, are not limited.
 
+### Rejections for a bound
+
+A document is also rejected when it is nested more deeply than `json_decode()` reads: 511 levels of arrays and objects, the document itself being the first.
+
+Since 4.3, the serializers name the bound that a token goes beyond, with a `Jose\Component\Core\Exception\JsonBoundExceededException`:
+
+| Bound | Message |
+| ----- | ------- |
+| More than 4,096 JSON values | `The JSON documents of the token hold more JSON values than the 4096 that are decoded.` |
+| More than 511 levels | `A JSON document of the token is nested too deeply.` |
+
+The values are counted before a document is decoded, so a document beyond both bounds is reported for its values. The JSON serializers throw the `JsonBoundExceededException` itself. The compact serializers throw an `InvalidSerializationException` with the same message, and chain it. Invalid JSON is still rejected with `Unsupported input.`, or `Unsupported input` by the compact serializers.
+
+Before 4.3, both bounds gave the messages of invalid JSON, and the JSON serializers threw an `InvalidArgumentException` for them. `JsonBoundExceededException` extends it, so the catch blocks written for previous versions keep matching.
+
+The serializer managers throw `Unsupported input.` whatever the cause, and the loaders chain that exception in their own. To tell a token beyond a bound apart from a malformed one, walk the chain:
+
+```php
+<?php
+
+use Jose\Component\Core\Exception\JoseException;
+use Jose\Component\Core\Exception\JsonBoundExceededException;
+
+try {
+    $result = $jwsLoader->loadAndVerify($token, $jwkset);
+} catch (JoseException $throwable) {
+    for ($cause = $throwable; $cause !== null; $cause = $cause->getPrevious()) {
+        if ($cause instanceof JsonBoundExceededException) {
+            $this->logger->warning('A token beyond the bounds of the JSON decoder was rejected.', [
+                'bound' => $cause->getMessage(),
+            ]);
+            break;
+        }
+    }
+
+    throw $throwable;
+}
+```
+
 ## Reading a token without knowing its mode
 
-`unserializeToken()` tries every serializer it holds and returns an `UnserializationResult` carrying both the token object and the name of the serializer that could read it. When none of them can, the exception thrown by the last one is chained as the previous exception, so the actual reason of the failure remains available.
+`unserializeToken()` tries every serializer it holds and returns an `UnserializationResult` carrying both the token object and the name of the serializer that could read it. When none of them can, it throws `Unsupported input.` and chains the exception of the last serializer it tried. That serializer may not be the one of the format of the token: when the JSON serializers come after the compact one, a compact token with a malformed protected header gets their rejection, invalid JSON, as its cause. Since 4.3, a token rejected for a [bound of the JSON decoder](#rejections-for-a-bound) is the exception: the manager chains the rejection of the serializer that met the bound, whichever serializer came last.
 
 !!! warning
 

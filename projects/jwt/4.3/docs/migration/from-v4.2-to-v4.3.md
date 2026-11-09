@@ -200,6 +200,8 @@ try {
 
 Two failures gained a precise type: both loaders report a token that cannot be loaded with `InvalidTokenException`, where the JWS loader used to throw a bare `Exception` and the JWE loader a `RuntimeException`.
 
+A token beyond the bounds of the JSON decoder, more than 4,096 JSON values or more than 511 levels, is rejected with a `JsonBoundExceededException`. It extends `InvalidArgumentException`, which the JSON serializers threw for such a token. See [Rejections for a bound](../advanced-topics/serialization.md#rejections-for-a-bound).
+
 ### Sealed internal mutators
 
 `JWS::addSignature()` and `JWE::withPayload()` were public only because the objects are not built in one go — the first is what the builder and the serializers use to append a signature, the second is how the decrypter injects the plaintext it just authenticated. Both were reachable by anybody holding a token, so a JWS returned by a loader could gain a signature that was never verified, and the payload of a decrypted JWE could be replaced by an arbitrary value.
@@ -454,6 +456,7 @@ Nothing that requires a change in your code, unless you exchange AES-CBC-HMAC to
 * **The key agreement algorithms accept `deriveKey` and `deriveBits`.** A key whose `key_ops` lists either operation can be used by the `ECDH-*` algorithms to build and to decrypt, as WebCrypto exports such keys with either. See [Key operations](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#key-operations-key_ops).
 * **The RSA public key operation is computed by OpenSSL.** Encrypting with `RSA-OAEP`, `RSA-OAEP-256` and `RSA1_5`, and verifying `PS*` signatures, no longer depend on the GMP or BCMath extension for their speed. Decryption still does: GMP remains recommended.
 * **The size of a key wrapped with AES Key Wrap is checked before it is unwrapped.** No token changes outcome; a wrongly sized one fails with `Invalid encrypted key size`.
+* **The serializers name the bound a token goes beyond.** A token of more than 4,096 JSON values or more than 511 levels was rejected with the message of invalid JSON. The message now names the bound, and the serializer managers chain that rejection, whichever serializer they tried last. The managers and the loaders keep their own messages. See [Rejections for a bound](../advanced-topics/serialization.md#rejections-for-a-bound).
 
 An unrelated misconfiguration is now reported early: passing an algorithm that is neither a key encryption nor a content encryption algorithm to `JWEBuilder` or `JWEDecrypter` is deprecated, where it used to turn into a much later *algorithm not supported* error.
 
