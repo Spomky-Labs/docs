@@ -1,8 +1,10 @@
 # From v4.2 to v4.3
 
-This is a minor version upgrade: **your code keeps working**. Version 4.3 introduces no breaking change, but it is the version where 5.0 is prepared, so it carries a lot of deprecations. Each of them names its replacement, and the [summary table](#deprecation-summary) at the end lists them all.
+This is a minor version upgrade: **your code keeps working**. Version 4.3 introduces no breaking change, but it is the version where 5.0 is prepared, so it carries a lot of deprecations. Each of them names its replacement, and the [summary table](#deprecation-summary) at the end lists them all. A few behaviours and return types change too: read [Behaviour changes](#behaviour-changes) before you upgrade.
 
 Two algorithms move to their own packages. If your application enables `none` or `RSA1_5`, this is the only change that needs an entry in your `composer.json` — see [Dangerous algorithms](#dangerous-algorithms-move-to-their-own-packages).
+
+If your application requires the packages one by one — `web-token/jwt-library`, `web-token/jwt-bundle`, `web-token/jwt-experimental`… — instead of `web-token/jwt-framework`, update them together, for example with `composer update "web-token/*" --with-all-dependencies`. The bundle and the experimental package of 4.3 require the library 4.3.
 
 Coming from an earlier version, read the previous guides first: [From v4.1 to v4.2](from-v4.1-to-v4.2.md), then [From v4.0 to v4.1](from-v4.0-to-v4.1.md).
 
@@ -108,7 +110,7 @@ $first  = $base->addSignature($key1, ['alg' => 'HS256'])->build();
 $second = $base->addSignature($key2, ['alg' => 'RS256'])->build(); // $base is untouched
 ```
 
-`create()` is deprecated: there is no state to reset any more. Remove the call.
+`create()` is deprecated: there is no state to reset any more. Remove the call. Until 5.0, it returns a new, empty builder and leaves the one it is called on untouched: if your code ignores what it returns, read [Behaviour changes](#behaviour-changes).
 
 ### Immutable managers
 
@@ -280,7 +282,7 @@ Two platform notes:
 * `Ed448` and `X448` run on OpenSSL and need **PHP 8.4 or later**: before that version PHP cannot ask OpenSSL for the digest-less signature or the raw key material of these curves. `Ed448::isSupported()` tells whether the platform can run the algorithm, its constructor throws a `MissingDependencyException` when it cannot, and the Symfony Bundle registers it only when it can run.
 * `Ed25519` and `X25519` still use the `sodium` extension when it is loaded. On PHP 8.4 they now fall back to OpenSSL when it is not, so `sodium` is no longer required there.
 
-**Migrating from `EdDSA`** — the algorithm keeps working, the tokens already in circulation still verify, and signing with it raises a deprecation notice. Register `Ed25519` next to `EdDSA` on the verifiers, switch the issuer to `alg: Ed25519` with the same key, then drop `EdDSA` once no old token is left. A key carrying `alg: EdDSA` is refused by the `Ed25519` algorithm (and the reverse), so update the `alg` of the keys with the issuer, or leave it out during the migration. See the [signature algorithms](../the-components/signed-tokens-jws/signature-algorithms.md#the-ed25519-and-ed448-algorithms) page.
+**Migrating from `EdDSA`** — the algorithm keeps working, the tokens already in circulation still verify, and signing with it raises a deprecation notice. Register `Ed25519` next to `EdDSA` on the verifiers, switch the issuer to `alg: Ed25519` with the same key, then drop `EdDSA` once no old token is left. A key carrying `alg: EdDSA` is refused by the `Ed25519` algorithm (and the reverse), so update the `alg` of the keys with the issuer, or leave it out during the migration. The key analyzer reports the keys that still carry `alg: EdDSA`. See the [signature algorithms](../the-components/signed-tokens-jws/signature-algorithms.md#the-ed25519-and-ed448-algorithms) page.
 
 ### JWK thumbprint URI
 
@@ -358,7 +360,7 @@ The Symfony Bundle creates the services from a `jose.selective_disclosure` confi
 
 `UrlKeySetFactory` is announced for removal in 5.0, yet `JKUFactory` and `X5UFactory` — the documented way to load a `jku` or a `x5u` key set, and not deprecated themselves — extended it.
 
-The fetching code moved to an internal trait the two factories use, so **they no longer inherit anything from the deprecated class** and neither of them emits a deprecation. `UrlKeySetFactory` now says what is deprecated — itself, as a public extension point — and extending it raises a notice.
+The fetching code moved to an internal trait the two factories use. They **still extend `UrlKeySetFactory` in 4.3**, so the code that type-hints that class keeps receiving them, but they never run its code: neither of them emits a deprecation, nor does a class of yours that extends them. `UrlKeySetFactory` now says what is deprecated — itself, as a public extension point — and extending it directly raises a notice. In 5.0, the class is removed and the two factories no longer extend it: type-hint `JKUFactory` or `X5UFactory` instead.
 
 `enabledCache()`, deprecated by annotation since 4.1, raises the notice now and states its replacement: an HTTP client that caches the responses, which honours the cache directives of the endpoint where the fixed lifetime of a cache pool ignores them.
 
@@ -448,10 +450,23 @@ A support given a token it does not handle returns an object carrying two empty 
 
 ## Behaviour changes
 
-Nothing that requires a change in your code, unless you exchange AES-CBC-HMAC tokens with an AAD: upgrade the applications that decrypt them first. The points worth knowing:
+Most of these changes need nothing from your code. Three of them may:
+
+* you exchange AES-CBC-HMAC tokens with an AAD: upgrade the applications that decrypt them first;
+* you catch the errors of a builder around a single call;
+* you call `create()` on a builder without using what it returns.
+
+The points worth knowing:
 
 * **`JWEDecrypter::decrypt()` does not modify the JWE it receives.** The deprecated `decryptUsingKey()`/`decryptUsingKeySet()` still write the payload into the object passed by reference, so both behaviours coexist until 5.0.
-* **The builders no longer depend on the order of the calls.** Sequences that used to fail — adding a recipient before the shared protected header carrying its `alg`, or reusing a shared builder service after a `b64` build — now succeed. Nothing that worked before stops working.
+* **The builders no longer depend on the order of the calls.** Sequences that used to fail — adding a recipient before the shared protected header carrying its `alg`, or reusing a shared builder service after a `b64` build — now succeed. In return, some errors are reported later. They keep their messages, and their classes are the ones thrown before or subclasses of them: a `try` block around the whole sequence still catches them, but a `try` block around the method that used to throw does not.
+    * `JWEBuilder` checks the headers, the algorithms and the keys of the recipients in `build()`. `withSharedProtectedHeader()`, `withSharedHeader()` and `addRecipient()` checked them before and throw nothing any more.
+    * `JWSBuilder::addSignature()` still checks the signature it adds. The consistency of `b64` among the signatures, and with a payload set by `withEncodedPayload()`, is checked by `build()`; `addSignature()` and `withEncodedPayload()` checked it before.
+* **`create()` no longer empties the builder it is called on.** It returns a new, empty builder and leaves the receiver untouched. A call that ignores the result, such as `$builder->create();` before reusing `$builder`, used to drop the payload, the headers and the signatures or recipients of `$builder`. Now they stay: a signature or a recipient added next comes on top of the old ones. Remove the call and start from the builder service again, which nothing modifies any more, or use what `create()` returns.
+* **The loaders return the interfaces of their services.** `getJwsVerifier()` returns a `JWSVerifierInterface`, `getJweDecrypter()` a `JWEDecrypterInterface` and `getHeaderCheckerManager()` a `?HeaderCheckerManagerInterface`. This applies to the `JWSLoader` and `JWELoader` of the library and to those of the bundle. They return the object the loader was built with, so nothing changes when your code runs. Static analysers only know the interface, though, so call `verify()` or `decrypt()` and type-hint the interfaces. Otherwise:
+    * a call to the deprecated `verifyWithKeySet()`, `decryptUsingKey()` or `decryptUsingKeySet()` on the returned object is reported as a call to an undefined method;
+    * passing the object where a `JWSVerifier`, a `JWEDecrypter` or a `HeaderCheckerManager` is expected is reported as a type error.
+* **The key analyzer reports `alg: EdDSA`.** `AlgorithmAnalyzer` adds a `medium` message to a key whose `alg` is `EdDSA`: `The algorithm "EdDSA" is deprecated. Use the fully-specified "Ed25519" algorithm instead.`, or `"Ed448"` for a key on that curve. The bundle registers this analyzer, so the `key:analyze` and `keyset:analyze` commands and the profiler of the bundle report it as well. A check that rejects keys with any message, or with a `medium` one, now flags these keys. See [Migrating from `EdDSA`](#ed25519-ed448-and-x448).
 * **AES-CBC-HMAC tokens with an AAD follow RFC 7518.** The authentication tag of `A128CBC-HS256`, `A192CBC-HS384` and `A256CBC-HS512` covers the length of the whole authenticated data, where earlier versions counted the protected header only. Other implementations accept the tokens of 4.3, and 4.3 accepts theirs. The tokens issued by earlier versions still decrypt, with a deprecation notice, but earlier versions cannot decrypt the tokens issued by 4.3. Only the JSON serializations with an `aad` member are concerned. See [AES-CBC-HMAC tokens with an AAD](../advanced-topics/encrypted-tokens/additional-authentication-data-aad.md#aes-cbc-hmac-tokens-with-an-aad).
 * **The key agreement algorithms accept `deriveKey` and `deriveBits`.** A key whose `key_ops` lists either operation can be used by the `ECDH-*` algorithms to build and to decrypt, as WebCrypto exports such keys with either. See [Key operations](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#key-operations-key_ops).
 * **The RSA public key operation is computed by OpenSSL.** Encrypting with `RSA-OAEP`, `RSA-OAEP-256` and `RSA1_5`, and verifying `PS*` signatures, no longer depend on the GMP or BCMath extension for their speed. Decryption still does: GMP remains recommended.
@@ -488,7 +503,7 @@ composer require web-token/jwt-rsa15       # only if you use "RSA1_5"
 +use Jose\Rsa15\KeyEncryption\RSA15;
 ```
 
-The Symfony Bundle registers the classes of the new packages, so applications that never enable those algorithms are not flooded with a deprecation they cannot act on. The configuration aliases are unchanged: `none` and `RSA1_5` still name them.
+The Symfony Bundle registers the classes of the new packages, so applications that never enable those algorithms are not flooded with a deprecation they cannot act on. The configuration aliases are unchanged: `none` and `RSA1_5` still name them. The services of the former classes stay until 5.0 for the applications that inject them, deprecated and no longer tagged, like the experimental `ES256K` one. Injecting one raises the deprecation of the service, then the one of the class.
 
 !!! warning
 
@@ -531,7 +546,7 @@ Everything below still works in 4.3 and is removed in 5.0.
 | The sixteen static `JWKFactory::createXxx()` methods | Inject `JWKFactoryInterface` — see [the table above](#the-key-factory-is-an-injectable-service) |
 | `JWKSet::sortKeys()` | None — it is an implementation detail of `selectKey()` |
 | `UrlKeySetFactory::enabledCache()` | An HTTP client that caches the responses |
-| Extending `UrlKeySetFactory` | `JKUFactory`, `X5UFactory`, or your own implementation |
+| Extending or type-hinting `UrlKeySetFactory` | `JKUFactory`, `X5UFactory`, or your own implementation. The two factories still extend it in 4.3, but no longer in 5.0 |
 | `JKUFactory` and `X5UFactory` fetching a key set through a redirect without a redirect policy | The final URL, or `false` (refuse) or `true` (follow) as the second argument; `follow_redirects` with the bundle |
 | A `dir` key longer than the content encryption key | A key of exactly that size: its first bytes still decrypt the tokens already issued. See [Direct encryption](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#direct-encryption-dir) |
 | An AES key wrapping key longer than its algorithm key size | A key of exactly 128, 192 or 256 bits: its first bytes still decrypt the tokens already issued. See [AES key wrapping keys](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#aes-key-wrapping-keys) |
@@ -564,7 +579,8 @@ Everything below still works in 4.3 and is removed in 5.0.
 
 | Deprecated | Replacement |
 | ---------- | ----------- |
-| The inheritance based event dispatching services | The decorators registered under the same service ids — no configuration change needed |
+| The `Jose\Bundle\JoseFramework\Services` classes that extend a service of the library: `JWSBuilder`, `JWSVerifier`, `JWSLoader`, `JWEBuilder`, `JWEDecrypter`, `JWELoader`, `NestedTokenBuilder`, `NestedTokenLoader`, `ClaimCheckerManager` and `HeaderCheckerManager` | Type-hint the interfaces of the library. The bundle still creates these classes in 4.3. In 5.0, it creates the `EventDispatching*` decorators under the same service ids instead, with no configuration change. The decorators are available now for the services you build yourself |
+| The `Jose\Component\Signature\Algorithm\None`, `Jose\Component\Encryption\Algorithm\KeyEncryption\RSA15` and `Jose\Experimental\Signature\ES256K` services | The services of the new classes, registered under the same `none`, `RSA1_5` and `ES256K` aliases |
 | Two services tagged with the same alias (`jose.algorithm`, `jose.checker.header`, `jose.checker.claim`) | One alias per service; to replace a service of the bundle, redefine its id or decorate it. See [One service per alias](../the-symfony-bundle/header-and-claim-checker-management.md#one-service-per-alias) |
 
 The event dispatching verifier and decrypter of the bundle used to drop the callable the loaders pass to observe the discarded keys, so the reason of a failure was lost as soon as the bundle services were used. They forward it now, as the new decorators do.
