@@ -19,13 +19,17 @@ The variable `$jws` will be a valid JWS object with all computed signatures. Nex
 ```php
 use Jose\Component\Signature\Serializer;
 
-$manager = Serializer\JWSSerializerManager::create([
+$manager = new Serializer\JWSSerializerManager([
     new Serializer\CompactSerializer(),
-    new Serializer\JsonFlattenedSerializer(),
-    new Serializer\JsonGeneralSerializer(),
+    new Serializer\JSONFlattenedSerializer(),
+    new Serializer\JSONGeneralSerializer(),
 ]);
 
 $tokenWithAllSignatures = $manager->serialize('jws_json_general', $jws);
 $compactTokenWithSignatureAtIndex1 = $manager->serialize('jws_compact', $jws, 1);
 $flattenedTokenWithSignatureAtIndex2 = $manager->serialize('jws_json_flattened', $jws, 2);
 ```
+
+## Loading a token with several signatures
+
+A `JWSLoader` tries the signatures of a token one after the other, until one of them is verified, and the sender of the token decides how many there are. Since 4.2.6, the loader can reject a token that carries more signatures than you expect before trying any of them: see [Maximum number of signatures](../../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures).

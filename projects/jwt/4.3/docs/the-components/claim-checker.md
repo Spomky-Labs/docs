@@ -47,6 +47,52 @@ $claimCheckerManager->check($claims, ['iss', 'sub', 'aud']);
 
     Since 4.3, the manager implements `ClaimCheckerManagerInterface`. Type-hint the interface rather than the concrete class, and decorate it instead of extending it — extending `ClaimCheckerManager` is deprecated.
 
+### One checker per claim
+
+A manager holds one checker per claim: when two checkers of the list cover the same claim, the last one replaces the other, which never runs. With `new ExpirationTimeChecker($clock)` followed by a `CallableChecker('exp', …)` that limits the lifetime of the token, an expired token is accepted. In the other order, a token valid for ten years is accepted.
+
+!!! warning
+
+    Since 4.3, building a claim checker manager with two different checkers of the same claim is deprecated, and it is not possible in 5.0. The last checker is still the one kept. The same checker instance listed twice triggers nothing.
+
+Combine the rules of a claim in a single checker. The provided checkers are final, so wrap the one you need in a [custom claim checker](#custom-claim-checker):
+
+```php
+<?php
+
+namespace Acme\Checker;
+
+use Jose\Component\Checker\ClaimChecker;
+use Jose\Component\Checker\ExpirationTimeChecker;
+use Jose\Component\Checker\InvalidClaimException;
+use Psr\Clock\ClockInterface;
+
+final readonly class ShortLivedTokenChecker implements ClaimChecker
+{
+    private ExpirationTimeChecker $expirationTimeChecker;
+
+    public function __construct(
+        private ClockInterface $clock,
+        private int $maxLifetime // In seconds
+    ) {
+        $this->expirationTimeChecker = new ExpirationTimeChecker($clock);
+    }
+
+    public function checkClaim(mixed $value): void
+    {
+        $this->expirationTimeChecker->checkClaim($value); // The token has not expired
+        if ($value - $this->clock->now()->getTimestamp() > $this->maxLifetime) {
+            throw new InvalidClaimException('The token lives too long.', 'exp', $value);
+        }
+    }
+
+    public function supportedClaim(): string
+    {
+        return 'exp';
+    }
+}
+```
+
 ## Custom claim checker
 
 Your application may use other claims that you will have to check, therefore custom claim checkers have to be created.

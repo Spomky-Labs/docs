@@ -66,6 +66,14 @@ $headerCheckerManager->check($jwt, 0, ['alg', 'enc', 'crit']);
 
     Since 4.3, the manager implements `HeaderCheckerManagerInterface`. Type-hint the interface rather than the concrete class: it is what the loaders expect, and it lets you decorate the manager. Extending `HeaderCheckerManager` is deprecated.
 
+### One checker per header parameter
+
+A manager holds one checker per header parameter: when two checkers of the list cover the same parameter, the last one replaces the other, which never runs. The rules of the replaced checker are lost, a protected header requirement included: an `AudienceChecker('api', true)` followed by an `AudienceChecker('api')` accepts an unprotected `aud`.
+
+!!! warning
+
+    Since 4.3, building a header checker manager with two different checkers of the same header parameter is deprecated, and it is not possible in 5.0. The last checker is still the one kept. Combine the rules of a parameter in a single checker. The same checker instance listed twice triggers nothing.
+
 ## Provided header checker objects
 
 The library provides several header checker classes you can instantiate and use at will. They are all located in the namespace `Jose\Component\Checker`.
@@ -84,7 +92,7 @@ The library provides several header checker classes you can instantiate and use 
 | IssuerChecker | `iss` | No |
 | NotBeforeChecker | `nbf` | **Yes** |
 | UnencodedPayloadChecker | `b64`<br>See [unencoded payload](../advanced-topics/signed-tokens/unencoded-payload.md) for more information. | No |
-| CallableChecker | Generic object that can execute a callable for checking a particular parameter | No |
+| CallableChecker | Generic object that can execute a callable for checking a particular parameter.<br>The value is accepted only when the callable returns `true`, see [the example](examples/validation.md#custom-claim-validation-with-callablechecker). | No |
 | IsEqualChecker | Generic object that can compare a particular parameter to a predefined value | No |
 
 ## Explicit typing with the `typ` header

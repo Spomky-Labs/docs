@@ -88,13 +88,38 @@ $jws = $jwsLoader->loadAndVerifyWithKey($token, $jwk, $signature, $payload);
 
 In case you use a key set, you can use the method `loadAndVerifyWithKeySet`.
 
+### Maximum number of signatures
+
+A token in the JSON General serialization carries as many signatures as its sender wants, and the loader tries them one after the other. Since 4.2.6, the loader accepts the maximum number of signatures of a token as a fourth argument of its constructor: a token with more signatures is rejected before any of them is processed.
+
+```php
+<?php
+
+use Jose\Component\Signature\JWSLoader;
+
+$jwsLoader = new JWSLoader(
+    $serializerManager,
+    $jwsVerifier,
+    $headerCheckerManager,
+    10 // The maximum number of signatures of a token
+);
+```
+
+The value must be a positive integer. Without it, the number of signatures is not limited, as before 4.2.6. Set it when the loader accepts the JSON General serialization (`jws_json_general`) from senders you do not trust: 10 is enough for the tokens met in practice. The compact and JSON Flattened serializations always carry exactly one signature.
+
+A token with too many signatures fails like any other token: the loader throws `Unable to load and verify the token.`, and the previous exception says that the token has too many signatures.
+
+!!! info
+
+    That argument is not declared in the signature of the constructor yet: it is read with `func_num_args()`/`func_get_arg(3)`, so that classes extending the loader keep working. It will be declared in 5.0, with 10 as its default value. `JWSLoaderFactory` does not pass it in 4.2: create the loader yourself to set it.
+
 ## JWSLoaderFactory object
 
 The `JWSLoaderFactory` object is able to create `JWSLoader` objects on demand. It requires the following factories:
 
 * `JWSSerializerManagerFactory`
 * `JWSVerifierFactory`
-* `HeaderCheckerManagerFactory` (optional)
+* `HeaderCheckerManagerFactory` (optional, see below)
 
 ```php
 <?php
@@ -113,6 +138,12 @@ $jwsLoader = $jwsLoaderFactory->create(
     ['alg']          // Optional list of header checker aliases
 );
 ```
+
+### Without a header checker manager factory
+
+A factory created with `null` instead of a `HeaderCheckerManagerFactory` can only create loaders that check no header parameter, not even those listed in `crit`. Since 4.2.7, its `create()` method throws an `InvalidArgumentException` (`Header checkers were requested, but no header checker manager factory is available.`) when header checker aliases are given. It used to ignore them and return a loader that checked nothing. With an empty list, it still returns a loader without header checker manager.
+
+The exception is thrown when the loader is created, not when a token is loaded. To fix it, give the factory a `HeaderCheckerManagerFactory`. With the Symfony bundle, use the [factory services of the bundle](../../the-symfony-bundle/signed-tokens/jws-verification.md#jws-loader-service) rather than registering the library factories with autowiring, which leaves this argument `null`.
 
 ## Understanding failures
 

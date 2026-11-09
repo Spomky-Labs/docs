@@ -44,10 +44,76 @@ This framework comes with several encryption algorithms. These algorithms are in
 
 The `ECDH-ES*` and `ECDH-SS*` algorithms accept:
 
-* `EC` keys using the `P-256`, `P-384`, `P-521`, `secp256k1`, `BP-256`, `BP-384` or `BP-512` curve,
+* `EC` keys using the `P-256`, `P-384`, `P-521`, `BP-256`, `BP-384` or `BP-512` curve,
 * `OKP` keys using the `X25519` curve (SODIUM extension is required).
 
 The `BP-*` curves are the Brainpool curves. They are part of the core library and do not require the experimental package. Please read the [warning about their interoperability](../key-jwk-and-key-set-jwkset/key-management.md#elliptic-curve-key-pair) before using them.
+
+## Key requirements
+
+The algorithms check the keys they are given and the keys a token carries. A key that does not meet the requirements below makes `build()` throw. On decryption, it is not used and the decrypter moves on to the next key of the key set: a token that no key can decrypt is rejected as usual.
+
+### Direct encryption (`dir`)
+
+With `dir`, the `oct` key is the content encryption key (CEK) itself, so its size is set by the content encryption algorithm:
+
+| Content encryption algorithm | Key size |
+|---|---|
+| A128GCM<br>A192GCM<br>A256GCM | 128 bits<br>192 bits<br>256 bits |
+| A128CBC-HS256<br>A192CBC-HS384<br>A256CBC-HS512 | 256 bits<br>384 bits<br>512 bits |
+
+The AES-CBC-HMAC algorithms need twice the size their name suggests, as half of the key authenticates the content and the other half encrypts it: a 128-bit key is too short for `A128CBC-HS256`. With `dir`, the `alg` member of the key, when present, names the content encryption algorithm:
+
+```php
+use Jose\Component\KeyManagement\JWKFactory;
+
+$jwk = JWKFactory::createOctKey(512, ['alg' => 'A256CBC-HS512', 'use' => 'enc']);
+```
+
+Since 4.2.6, a shorter key is refused: `build()` throws `Invalid CEK size`, and the decrypter does not decrypt with it. A longer key is still accepted, but only its first bytes are used, as many as the CEK has: use a key of exactly the size above.
+
+### Encrypted key of the direct modes
+
+`dir`, `ECDH-ES` and `ECDH-SS` transport no key: the encrypted key of the token is empty. Since 4.2.6, the decrypter refuses a token of these modes whose encrypted key is not empty. In the JSON serializations, an `encrypted_key` member set to `""` is still accepted. The tokens built by the library always leave it empty.
+
+### AES key wrapping keys
+
+`A128KW`, `A192KW`, `A256KW`, `A128GCMKW`, `A192GCMKW` and `A256GCMKW` need an `oct` key of exactly 128, 192 or 256 bits, as their name says. Generate it at random; never build it from a text secret or from an environment variable that may be empty:
+
+```php
+use Jose\Component\KeyManagement\JWKFactory;
+
+$jwk = JWKFactory::createOctKey(256, ['alg' => 'A256KW', 'use' => 'enc']);
+```
+
+Since 4.2.6, a shorter key, an empty one included, is refused with `Invalid key length.`, to wrap and to unwrap. A longer key is still accepted, but only its first 16, 24 or 32 bytes are used: use a key of exactly the key size of the algorithm.
+
+The same goes for the experimental `A128CTR`, `A192CTR` and `A256CTR` (128, 192 and 256 bits) and `chacha20-poly1305` (256 bits) key encryption algorithms.
+
+### RSA keys
+
+Since 4.2.6, every RSA algorithm, the signature ones included, refuses a key beyond the limits of OpenSSL:
+
+* a modulus longer than 16384 bits;
+* a public exponent longer than the modulus;
+* a public exponent longer than 64 bits when the modulus is longer than 3072 bits.
+
+Every key that OpenSSL accepts is still accepted. Use keys of 2048 bits at least.
+
+Since 4.2.6, `RSA-OAEP` and `RSA-OAEP-256` handle a single RSA block, as RFC 7518 requires:
+
+* the CEK must fit in one block. With a key shorter than 2048 bits it may not: `RSA-OAEP-256` with a 1024-bit key and `A256CBC-HS512` throws `Message too long`;
+* an encrypted key longer than the modulus is refused.
+
+!!! note
+
+    `RSA-OAEP`, `RSA-OAEP-256` and `RSA1_5` compute the RSA operations in PHP, at a cost that depends on the GMP or BCMath extension. Install GMP when you encrypt to keys chosen by others, such as keys registered by clients: without it, a single operation can take seconds.
+
+### Ephemeral public key (`epk`)
+
+With `ECDH-ES` and its `+A*KW` variants, the token carries the ephemeral public key of the sender in its `epk` header parameter. That key must be a point of the curve of the recipient key, with coordinates no longer than the size of the curve; otherwise the token is refused with `Unable to derive the key`. Since 4.2.6, these checks come before any costly computation, with or without the GMP extension.
+
+Since 4.2.6, `ECDH-SS` refuses the same way a sender key on another curve than the recipient key.
 
 ## Experimental algorithms
 

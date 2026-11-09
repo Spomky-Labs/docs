@@ -6,7 +6,7 @@ A `JWSSerializerManagerFactory` is available as a service in your application co
 
 ```php
 <?php
-use Jose\Component\Signature\JWSSerializerManagerFactory;
+use Jose\Component\Signature\Serializer\JWSSerializerManagerFactory;
 
 $jwsSerializerManagerFactory = $container->get(JWSSerializerManagerFactory::class);
 ```

@@ -7,8 +7,8 @@ The Symfony Bundle provides Header and Claim Checker Manager Factory services.&#
 ```php
 <?php
 
-use Jose\Component\Checker\HeaderCheckerManagerFactory;
-use Jose\Component\Checker\ClaimCheckerManagerFactory;
+use Jose\Bundle\JoseFramework\Services\HeaderCheckerManagerFactory;
+use Jose\Bundle\JoseFramework\Services\ClaimCheckerManagerFactory;
 
 $headerCheckerManagerFactory = $container->get(HeaderCheckerManagerFactory::class);
 $headerCheckerManager = $headerCheckerManagerFactory->create([...]);
@@ -35,6 +35,8 @@ jose:
 ```
 
 With the previous configuration, the bundle will create public Header and Claim Checker Managers named `jose.header_checker.checker1` and `jose.claim_checker.checker1` with selected checkers.
+
+When a manager is configured in more than one place, for instance in a `when@prod` block or by another bundle, its checker lists add up: see [Configuration split across several files](symfony-bundle.md#configuration-split-across-several-files).
 
 ## Custom header or claim checker
 

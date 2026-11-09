@@ -29,10 +29,10 @@ Now let's create our first JWE object.
 ```php
 use Jose\Component\Core\JWK;
 
-// Our key.
+// Our key: 256 bits, the key size of A256KW.
 $jwk = new JWK([
     'kty' => 'oct',
-    'k' => 'dzI6nbW4OcNF-AtfxGAmuyz7IpHRudBI0WgGjZWgaRJt6prBn3DARXgUR8NVwKhfL43QBIU2Un3AvCGCHRgY4TbEqhOi8-i98xxmCggNjde4oaW6wkJ2NgM3Ss9SOX9zS3lcVzdCMdum-RwVJ301kbin4UtGztuzJBeg5oVN00MGxjC2xWwyI0tgXVs-zJs5WlafCuGfX1HrVkIf5bvpE0MQCSjdJpSeVao6-RSTYDajZf7T88a2eVjeW31mMAg-jzAWfUrii61T_bYPJFOXW8kkRWoa1InLRdG6bKB9wQs9-VdXZP60Q4Yuj_WZ-lO7qV9AEFrUkkjpaDgZT86w2g',
+    'k' => 'lX2B8De7F0jmDDlg52fp-Exeen2OUMxKxt2pZG7JMcI',
 ]);
 
 // The payload we want to encrypt. It MUST be a string.
@@ -54,6 +54,8 @@ $jwe = $jweBuilder
     ->addRecipient($jwk)    // We add a recipient (a shared key or public key).
     ->build();              // We build it
 ```
+
+The key must suit the key encryption algorithm, its size included, or `build()` throws. See the [key requirements](encryption-algorithms.md#key-requirements).
 
 ## Static key agreement (ECDH-SS)
 
@@ -78,7 +80,7 @@ The sender key does not add a recipient, so it may be set before or after `addRe
 
 !!! info
 
-    The decryption side needs both keys too, with the roles swapped. See [JWE Loading](jwe-loading.md#static-key-agreement).
+    The decryption side needs both keys too. See [JWE Loading](jwe-loading.md#static-key-agreement) for the order in which to pass them: since 4.2.7, both orders work.
 
 ## Header parameters
 
@@ -103,5 +105,5 @@ $token = $serializer->serialize($jwe, 0); // We serialize the recipient at index
 All good! The variable `$token` now contains a string that should be something like that:
 
 ```php
-eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0.9RLpf3Gauf05QPNCMzPcH4XNBLmH0s3e-YWwOe57MTG844gnc-g2ywfXt_R0Q9qsR6WhkmQEhdLk2CBvfqr4ob4jFlvJK0yW.CCvfoTKO9tQlzCvbAuFAJg.PxrDlsbSRcxC5SuEJ84i9E9_R3tCyDQsEPTIllSCVxVcHiPOC2EdDlvUwYvznirYP6KMTdKMgLqxB4BwI3CWtys0fceSNxrEIu_uv1WhzJg.4DnyeLEAfB4I8Eq0UobnP8ymlX1UIfSSADaJCXr3RlU
+eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.-rH3aFiivrg3ptfnhqmGZI-RHftx1Rr18QIUA5n-lwp4vWmCyCErrnaMP6deJYIgA1vyKPTf5wTj5s0970j1FqHgiH6Wqfn-.1aQIEld9RxZCIBg63w85jw.qOJnjgw3NP56YzG6Y1w4X-Yvppswj-skID_j5v3c4l7zsmk5b2UYXbPqVSJZDLs7aRgWYHV0g25Xx1Jti_IKb6hJ2mfwTnnHaccVT9Q5AxfRqId8pUjYnmovKxauaPquy2-W0py86sU2NidjO5QqQQ.aANQ4-I5uhEZ5C_CB66hKSTQ2vl6YShRo3txjS90_6M
 ```

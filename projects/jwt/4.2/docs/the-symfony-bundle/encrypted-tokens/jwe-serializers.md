@@ -6,7 +6,7 @@ A `JWESerializerManagerFactory` is available as a service in your application co
 
 ```php
 <?php
-use Jose\Component\Encryption\JWESerializerManagerFactory;
+use Jose\Component\Encryption\Serializer\JWESerializerManagerFactory;
 
 $jweSerializerManagerFactory = $container->get(JWESerializerManagerFactory::class);
 ```

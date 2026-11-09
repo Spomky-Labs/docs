@@ -47,3 +47,16 @@
     })();
   </script>
 {% endblock %}
+
+{#-
+  Shown by the theme on every version that is not the one the "latest" alias points to: the address alone
+  does not say it, and a reader who arrives from a search engine on an older version should know there is
+  a newer one. The version is the last segment of site_url; "../" from the root of a version is the root
+  of the project, which redirects to the latest version.
+-#}
+{% block outdated %}
+  {% set version = config.site_url.rstrip("/").split("/") | last %}
+  You are reading the documentation of version {{ version }}, which is not the latest one.
+  <a href="{{ '../' ~ base_url }}"><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+{% endblock %}

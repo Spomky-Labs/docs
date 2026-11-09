@@ -70,7 +70,7 @@ A `Disclosable` may contain other `Disclosable` values: the claim is then select
 ]),
 ```
 
-The payload of the Issuer-signed JWT carries the digests in the `_sd` array of each object, sorted so that the original order of the claims is hidden, and in `{"...": "<digest>"}` elements at the positions of the selectively disclosable array elements. The hash algorithm is written in the `_sd_alg` claim.
+The payload of the Issuer-signed JWT carries the digests in the `_sd` array of each object, sorted so that the original order of the claims is hidden, and in `{"...": "<digest>"}` elements at the positions of the selectively disclosable array elements. The hash algorithm is written in the `_sd_alg` claim. The values are converted to JSON by `json_encode()`, in the payload as in the Disclosures, except the pure enums: see [Disclosures](#disclosures).
 
 ### Salts, hash algorithm and decoy digests
 
@@ -89,9 +89,13 @@ The decoy digests have the length of the real ones and are mixed with them by th
 ### What the Issuer refuses
 
 * An `alg` that is not a digital signature algorithm: `none`, but also a MAC such as `HS256`, which a Verifier could not attribute to the Issuer.
-* The claim names `_sd`, `...` and `_sd_alg`, which are reserved.
+* The claim names `_sd`, `...` and `_sd_alg`, which are reserved, wherever they appear in the claims, selectively disclosable or not: in the PHP arrays, and in the JSON of the objects, such as a `JWK` in `cnf`, a `JsonSerializable` or a `stdClass`.
 * A selectively disclosable `iss`, `aud`, `exp`, `nbf` or `cnf` at the top level of the claims: the Verifier needs them to evaluate the SD-JWT (section 9.7 of the RFC). The elements of `aud` may be selectively disclosable.
 * Two Disclosures with the same salt.
+* A selectively disclosable value nested too deeply or holding too many JSON values, whose Disclosure could not be parsed back (see [Disclosures](#disclosures)).
+* An SD-JWT that the Holder and the Verifier would reject for its size: a Processed SD-JWT Payload of more than 64 levels, or Disclosures that hold more than 4096 JSON values together, with the JSON object of the SD-JWT in the JWS JSON serialization (see [Verifying a presentation](#verifying-a-presentation)).
+
+The Issuer checks the size of the SD-JWT before signing it: it parses and processes the SD-JWT to issue, with placeholder signatures, as the Holder and the Verifier would. Beyond a bound, `issue()` and `issueJson()` throw an `InvalidArgumentException` that names it, `The processed payload of the SD-JWT is nested more than 64 levels deep.` or `The Disclosures of the SD-JWT hold more JSON values than the 4096 the Holder and the Verifier decode.`, with the exception of the processor or of the parser as the previous one.
 
 !!! tip
 
@@ -121,7 +125,7 @@ $sdJwt = SDJWT::fromString($token);
 $presentation = $sdJwt->select(['given_name'], ['address', 'locality'], ['nationalities', 1]);
 ```
 
-The Disclosures of a claim come with the Disclosures of the objects that contain it, without which the claim could not be inserted: selecting `['address', 'locality']` of a recursive `address` also selects the Disclosure of `address`. Selecting an object or an array selects everything it contains. A claim that is always disclosed needs no Disclosure. A path that designates no claim is refused, so that a mistyped name does not silently disclose less than intended.
+The Disclosures of a claim come with the Disclosures of the objects that contain it, without which the claim could not be inserted: selecting `['address', 'locality']` of a recursive `address` also selects the Disclosure of `address`. Selecting an object or an array selects everything it contains. A claim that is always disclosed needs no Disclosure. A path that designates no claim is refused, so that a mistyped name does not silently disclose less than intended. The Disclosures are processed with the rules of the [Verifier](#verifying-a-presentation): `select()` throws an `InvalidTokenException` when one is broken, for a Disclosure presented twice or a payload nested more than 64 levels deep for instance.
 
 The indexes are those of the arrays once all the Disclosures are applied, as the Holder sees them; the member names are always strings, `['age_equal_or_over', '18']` for instance.
 
@@ -203,6 +207,7 @@ $verified = $verifier->verifyWithKeyBinding($token, $issuerKeySet, 'https://veri
 
 $claims = $verified->getClaims();          // The Processed SD-JWT Payload
 $verified->getIssuerKey();                 // The key that verified the Issuer-signed JWT
+$verified->getIssuerSignedJwt();           // The Issuer-signed JWT, with the verified signature only
 $verified->getHolderKey();                 // The key of "cnf" that verified the Key Binding JWT, if any
 $verified->getSdJwt()->getDisclosures();   // The presented Disclosures
 ```
@@ -212,11 +217,15 @@ The Holder key is read from the `cnf` claim of the Processed SD-JWT Payload, wit
 The SD-JWT is rejected when:
 
 * it is in neither format of the RFC, or the Issuer-signed JWT cannot be verified by the loader, or is not signed with a digital signature algorithm;
+* its Disclosures and, in the JWS JSON serialization, its JSON object hold more than 4096 JSON values together (see below);
 * `_sd_alg` is not one of the accepted hash algorithms;
 * a Disclosure is malformed, has the reserved claim name `_sd` or `...`, is presented twice or is not referenced by any digest of the Issuer-signed JWT or of another presented Disclosure;
 * a digest appears twice, whether it matches a Disclosure or not;
 * the Disclosure of an array element is referenced from an object, or the other way round, or a disclosed claim already exists in its object;
+* the Processed SD-JWT Payload has more than 64 levels of objects and arrays, the payload object being the first;
 * the claims of the Processed SD-JWT Payload are rejected by the claim checkers, or a mandatory claim is missing.
+
+The JSON documents of the SD-JWT are bounded before anything is verified. `SDJWT::fromString()` decodes the Disclosures and, in the JWS JSON serialization, the JSON object of the SD-JWT with a single budget of 4096 values, each `[`, `{` and `,` outside the strings counting as one: the budget the JWS and JWE serializers of the library give the JSON documents of a token. This leaves room for 1,365 Disclosures of claims with a scalar value, or 2,048 of array elements, in the compact format. In the JWS JSON serialization, each Disclosure also adds a comma to the JSON object, which leaves room for 1,022 claims or 1,363 array elements with one signature, a little less with several signatures or other unprotected header parameters. Beyond it, `SDJWT::fromString()` throws an `InvalidSerializationException`, and the [Issuer](#what-the-issuer-refuses) refuses to issue such an SD-JWT. `Disclosure::fromString()` gives the Disclosure it parses a budget of its own.
 
 The Key Binding JWT is rejected when its signature cannot be verified with the key of `cnf`, its algorithm is not a digital signature algorithm, its `typ` is not `kb+jwt`, its `iat` is in the future or older than the maximum age, its `aud` or `nonce` is not the expected one, its `sd_hash` does not match the presented SD-JWT, or its `exp` or `nbf`, if any, says it is not valid.
 
@@ -291,6 +300,12 @@ $serializerManager = new JWSSerializerManager([
 
 The Key Binding JWT is always in the compact serialization. In the general serialization, the Issuer-signed JWT is accepted once one of its signatures is verified, as the JWS loader does, and the algorithm of that signature must be a digital signature algorithm. The `sd_hash` is computed over the first signature, whichever one is verified.
 
+The Issuer-signed JWT of the result, `getIssuerSignedJwt()`, only has the verified signature, at index 0, whatever the serialization: the other signatures are not verified, and whoever holds the SD-JWT can add some. The SD-JWT as presented, with all its signatures, is returned by `getSdJwt()`.
+
+!!! warning
+
+    Only the protected header of the verified signature is authenticated. Its unprotected header can be changed by anyone, in the flattened serialization as in the general one, and even in an SD-JWT+KB, whose `sd_hash` does not cover it: read the header parameters the application relies on, such as `kid` or `x5c`, from the protected header.
+
 ## Disclosures
 
 The `Disclosure` class is the building block of the package. It creates the Disclosure of an object property or of an array element, parses one, and computes its digest:
@@ -312,6 +327,21 @@ $disclosure->digest('sha-512');
 ```
 
 The JSON arrays are serialized as the examples of the RFC are: elements separated by `", "`, non-ASCII characters escaped. Any JSON is valid and the digest covers the encoded string, so this changes nothing for the other implementations; it is the serialization that reproduces the examples of the RFC from their salts, which the test suite of the library does.
+
+The objects of a value are converted by `json_encode()`, as in the payload of the Issuer-signed JWT, then written with these separators:
+
+* a backed enum is disclosed as its value;
+* a `JsonSerializable` as the value its `jsonSerialize()` method returns;
+* a `DateTimeImmutable` as the object of its `date`, `timezone_type` and `timezone` fields;
+* an `ArrayObject` as the object of its storage, `{"0": 1, "1": 2}` for `new ArrayObject([1, 2])`;
+* a `stdClass` as a JSON object, `{}` when it is empty.
+
+A value that `json_encode()` cannot serialize, such as an object that references itself, is refused with an `InvalidArgumentException`. The pure enums, neither backed nor `JsonSerializable`, are the exception: a Disclosure gives a pure enum the object of its name, `{"name": "Active"}` for `Status::Active`, alone or in the arrays of the value. A pure enum in the payload, or held by an object, is refused as `json_encode()` refuses it.
+
+A Disclosure that `Disclosure::fromString()` could not parse back is refused when it is created, with an `InvalidArgumentException` whose previous exception tells which bound was hit:
+
+* the depth: the value holds at most 510 levels of arrays and objects, the array of the Disclosure being the 511th that `Disclosure::fromString()` reads;
+* the [budget of 4096 JSON values](#verifying-a-presentation), counted over the whole Disclosure: `forArrayElement()` accepts a list of 4,094 integers at most, and `forObjectProperty()` 4,093, its claim name taking one more.
 
 ## Symfony bundle
 
@@ -364,3 +394,5 @@ This configuration creates three services:
 The clock is the `Psr\Clock\ClockInterface` service of the application, as for the claim checkers. The services can be autowired by their class or their interface, with an argument named after the service: `SDJWTIssuerInterface $issuer1SdJwtIssuer`, `SDJWTHolderInterface $holder1SdJwtHolder`, `SDJWTVerifierInterface $verifier1SdJwtVerifier`.
 
 The factories `SDJWTIssuerFactory`, `SDJWTHolderFactory` and `SDJWTVerifierFactory` are public services too, for the services created at runtime.
+
+When an issuer, a holder or a verifier is configured in several places, a `when@prod` block or a second configuration file for instance, its alias lists are merged as those of the other services of the bundle: the `header_checkers`, `key_binding_header_checkers` and `claim_checkers` lists add up, an alias listed twice being kept once, while the last `signature_algorithms` or `key_binding_signature_algorithms` list replaces the previous one. An empty list leaves the previous one unchanged. The `mandatory_claims`, `hash_algorithms` and `serializers` lists add up.

@@ -11,6 +11,12 @@ This framework comes with several signature algorithms. These algorithms are in 
 | EdDSA (*only with the* Ed25519 *curve*) | Edwards-curve Digital Signature Algorithm (EdDSA) |
 | none | **Not a secure algorithm. Please use with caution** |
 
+### RSA keys
+
+Since 4.2.6, the `RS*` and `PS*` algorithms refuse an RSA key beyond the limits of OpenSSL, as the encryption algorithms do: see [RSA keys](../encrypted-tokens-jwe/encryption-algorithms.md#rsa-keys). When `JWSVerifier` is given such a key, the verification with that key fails and the next key of the key set is tried.
+
+`PS256`, `PS384` and `PS512` compute the verification in PHP, at a cost that depends on the GMP or BCMath extension. Install GMP when you verify signatures made with keys chosen by others, such as the `jwk` header parameter of a DPoP proof: without it, a single verification can take seconds.
+
 ### Experimental algorithms
 
 The following signature algorithms are experimental and must not be used in production unless you know what you are doing. **They are proposed for testing purpose only.**

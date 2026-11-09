@@ -11,7 +11,7 @@
     site/jwt/index.html       sends /jwt/ to /jwt/latest/
 
 Every project holds its own pages, its project mark and its logo partial. Everything else — the fonts,
-the stylesheets, the shared brand files and the three common templates — lives once in shared/ and is
+the stylesheets, the shared brand files and the four common templates — lives once in shared/ and is
 copied in before each build. Those copies are in .gitignore: they are not sources.
 """
 

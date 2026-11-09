@@ -50,6 +50,7 @@ jose:
 
 * It is **highly recommended** to use a caching layer for your HTTP client and thus avoid unnecessary calls to the key set endpoint (e.g. Symfony's `CachingHttpClient`).
 * The **connection must be secured** and certificate verification should not be disabled.
+* When the endpoint picks the key set from a request header (see the `headers` option below), the caching layer must tell those requests apart: Symfony's `CachingHttpClient` separates the responses of one URL by the request headers that their `Vary` header names, so the endpoint must list that header in `Vary`.
 
 !!! warning
 
@@ -67,6 +68,8 @@ jose:
                 url: 'https://login.microsoftonline.com/common/discovery/keys'
 ```
 
+The `jku` and `x5u` methods accept a `headers` option: the headers added to the request, for instance `headers: { X-Api-Key: '%env(KEY_SET_API_KEY)%' }`.
+
 #### From a X5U (X509 certificates URL)
 
 The following example will allow you to load a key set from a distant URI. The key set must be a list of X509 certificates.
@@ -78,6 +81,26 @@ jose:
             x5u: # Method
                 url: 'https://www.googleapis.com/oauth2/v1/certs'
 ```
+
+Each entry of the document is a certificate, PEM encoded or as the base64 body of its PEM form. Since 4.2.7, an entry that starts with `file://` is never read as the path of a local file: it fails to load like any other invalid certificate.
+
+#### Redirects
+
+Since 4.3, the `follow_redirects` option sets how the key set factories handle a redirect of the key set URL. It applies to the `jku` and the `x5u` methods.
+
+```yaml
+jose:
+    jku_factory:
+        enabled: true
+        client: 'http_client'
+        follow_redirects: false
+```
+
+* `false`: redirects are refused. The request a redirect points to is never sent, and the loading of the key set fails.
+* `true`: redirects are followed by the HTTP client, as before.
+* not set: redirects are followed, but a key set fetched through a redirect triggers a deprecation, as 5.0 refuses redirects by default.
+
+Prefer `false`, and write in the configuration the URL the redirect leads to. See [Redirects](../../the-components/key-jwk-and-key-set-jwkset/key-set-management.md#redirects) for the behaviour of the factories.
 
 ## Shared key sets
 

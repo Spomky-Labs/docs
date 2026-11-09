@@ -108,13 +108,38 @@ $key       = $result->getKey();            // The key that verified the signatur
 
     `loadAndVerifyWithKey()` and `loadAndVerifyWithKeySet()` wrote the signature index into a variable of the caller. They are deprecated since 4.3 and removed in 5.0: use `loadAndVerify()`, which carries that index in its result. See the [migration guide](../../migration/from-v4.2-to-v4.3.md#result-objects-instead-of-output-parameters).
 
+### Maximum number of signatures
+
+A token in the JSON General serialization carries as many signatures as its sender wants, and the loader tries them one after the other. The loader accepts the maximum number of signatures of a token as a fourth argument of its constructor (since 4.2.6): a token with more signatures is rejected before any of them is processed.
+
+```php
+<?php
+
+use Jose\Component\Signature\JWSLoader;
+
+$jwsLoader = new JWSLoader(
+    $serializerManager,
+    $jwsVerifier,
+    $headerCheckerManager,
+    JWSLoader::DEFAULT_MAX_SIGNATURES // 10
+);
+```
+
+The value must be a positive integer. The compact and JSON Flattened serializations always carry exactly one signature, so the limit matters when the loader accepts the JSON General serialization (`jws_json_general`). A token with too many signatures fails like any other token: `loadAndVerify()` throws, and the previous exception says that the token has too many signatures.
+
+`JWSLoaderFactory::create()` takes the same value as a fourth argument (see [below](#jwsloaderfactory-object)), and the bundle as the [`max_signatures`](../../the-symfony-bundle/signed-tokens/jws-verification.md#maximum-number-of-signatures) option of a loader.
+
+!!! warning
+
+    Without that argument, the number of signatures is not limited. Since 4.3, loading a token with more than 10 signatures without a maximum is deprecated: in 5.0, such a token is rejected unless a higher maximum is set. Setting a maximum, higher or lower than 10, silences the notice. The argument is read with `func_num_args()`/`func_get_arg(3)` until 5.0 declares it, with `JWSLoader::DEFAULT_MAX_SIGNATURES` (10) as its default value.
+
 ## JWSLoaderFactory object
 
 The `JWSLoaderFactory` object is able to create `JWSLoader` objects on demand. It requires the following factories:
 
 * `JWSSerializerManagerFactory`
 * `JWSVerifierFactory`
-* `HeaderCheckerManagerFactory` (optional)
+* `HeaderCheckerManagerFactory` (required in 5.0, see below)
 
 ```php
 <?php
@@ -130,9 +155,18 @@ $jwsLoaderFactory = new JWSLoaderFactory(
 $jwsLoader = $jwsLoaderFactory->create(
     ['jws_compact'], // List of serializer aliases
     ['HS256'],       // List of signature algorithm aliases
-    ['alg']          // Optional list of header checker aliases
+    ['alg'],         // Optional list of header checker aliases
+    10               // Optional maximum number of signatures of a token
 );
 ```
+
+### Without a header checker manager factory
+
+A factory created with `null` instead of a `HeaderCheckerManagerFactory` can only create loaders that check no header parameter, not even those listed in `crit`. Since 4.2.7, its `create()` method throws an `InvalidArgumentException` (`Header checkers were requested, but no header checker manager factory is available.`) when header checker aliases are given, instead of ignoring them. With an empty list, it still returns a loader without header checker manager.
+
+!!! warning
+
+    Since 4.3, creating a `JWSLoaderFactory` without a header checker manager factory is deprecated, and the argument is required in 5.0. Pass a `HeaderCheckerManagerFactory` that has the `JWSTokenSupport` [token type support](../header-checker.md#header-checker-manager-factory): without it, the loaders refuse every token (`Unsupported token type.`). With the Symfony bundle, use the [factory services of the bundle](../../the-symfony-bundle/signed-tokens/jws-verification.md#jws-loader-service): registering the library factories with autowiring leaves this argument `null`.
 
 ## Understanding failures
 

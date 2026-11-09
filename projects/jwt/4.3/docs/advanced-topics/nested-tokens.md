@@ -27,6 +27,26 @@ $signature = $result->getSignatureIndex(); // Useful when multiple signatures ar
 
     `load()` wrote the signature index into a variable of the caller. Passing that `$signature` argument is deprecated since 4.3 and the argument is removed in 5.0: use `loadAndVerify()`, which carries the index in its result. Calling `load($token, $encryptionKeySet, $signatureKeySet)` without it stays valid.
 
+### The `cty` header parameter
+
+A JWE carries a nested token when its `cty` header parameter is `JWT`. The `NestedTokenBuilder` writes it in the protected header, the only header covered by the authentication tag. In the JSON serializations, the loader also finds it in the shared unprotected header or in the header of the recipient, where it can be added to a token without any key.
+
+Since 4.3, loading a nested token whose `cty` is outside the protected header is deprecated. A third argument of the constructor sets what the loader does with such a token:
+
+| Third argument | Token whose `cty` is outside the protected header |
+| -------------- | ------------------------------------------------- |
+| absent or `null` | loaded, with a deprecation notice |
+| `true` | loaded |
+| `false` | refused before the inner JWS is verified: `The "cty" header parameter must be in the protected header.` |
+
+```php
+$nestedTokenLoader = new NestedTokenLoader($jweLoader, $jwsLoader, false);
+```
+
+5.0 refuses such a token by default. Have the issuer put `cty` in the protected header, and pass `false` to refuse the other tokens now; pass `true` to keep loading the tokens of an issuer you cannot change. A token whose `cty` is in the protected header, every compact token among them, loads whatever the value.
+
+`NestedTokenLoaderFactory::create()` takes the same value as a seventh argument, after the JWS header checkers.
+
 ## Nested token building
 
 To instantiate the `NestedTokenBuilder`, you will need the following components:
@@ -39,13 +59,13 @@ To instantiate the `NestedTokenBuilder`, you will need the following components:
 ```php
 use Jose\Component\NestedToken\NestedTokenBuilder;
 
-$nestedTokenBuilder = new NestedTokenBuilder($jweLoader, $jweSerializerManager, $jwsLoader, $jwsSerializerManager);
+$nestedTokenBuilder = new NestedTokenBuilder($jweBuilder, $jweSerializerManager, $jwsBuilder, $jwsSerializerManager);
 ```
 
 Its use is a bit more complicated than the loading as the nested token may be designed for several recipients or may have several signatures.
 
 ```php
-$token = $builder->create(
+$token = $nestedTokenBuilder->create(
     $payload,                                     // The payload to protect
     [[                                            // A list of signatures. 'key' is mandatory and at least one of 'protected_header'/'header' has to be set.
         'key'              => $signature_key,     // The key used to sign. Mandatory.
@@ -59,7 +79,7 @@ $token = $builder->create(
         'key'    => $encryption_key,              // The recipient key.
         'header' => ['bar' => 'foo'],             // The recipient unprotected header.
     ]],
-    'jwe_json_flattened'                          // The serialization mode for the JWE.
+    'jwe_json_flattened',                         // The serialization mode for the JWE.
     '1, 2, 3, 4'                                  // Additional Authenticated Data (AAD). Optional.
 );
 ```
@@ -83,8 +103,7 @@ jose:
         loaders:
             loader_1:
                 signature_algorithms: ['PS256']
-                key_encryption_algorithms: ['RSA-OAEP']
-                content_encryption_algorithms: ['A128GCM']
+                encryption_algorithms: ['RSA-OAEP', 'A128GCM']
                 jws_serializers: ['jws_compact']
                 jws_header_checkers: [...]
                 jwe_serializers: ['jwe_compact']
@@ -93,8 +112,7 @@ jose:
         builders:
             builder_1:
                 signature_algorithms: ['PS256']
-                key_encryption_algorithms: ['RSA-OAEP']
-                content_encryption_algorithms: ['A128GCM']
+                encryption_algorithms: ['RSA-OAEP', 'A128GCM']
                 jws_serializers: ['jws_compact']
                 jwe_serializers: ['jwe_compact']
                 is_public: true
@@ -107,6 +125,17 @@ This configuration will create two public services:
 
 These services can be called from the container (unless private) or injected in your services.
 
+Since 4.3, the `allow_unprotected_content_type` option of a loader sets what it does with a token whose [`cty` header parameter](#the-cty-header-parameter) is outside the protected header: `true` loads it, `false` refuses it. When the option is not set, such a token loads with a deprecation notice.
+
+```yaml
+jose:
+    nested_token:
+        loaders:
+            loader_1:
+                # ...
+                allow_unprotected_content_type: false
+```
+
 ### Configuration helper
 
 As any other services, you can create a nested token loader or builder from another bundle extension. The following bundle extension class will create the same configuration and services as above.
@@ -118,8 +147,8 @@ class AcmeExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(ContainerBuilder $container)
     {
-        ConfigurationHelper::addNestedTokenLoader($container, 'loader_1', ['jwe_compact'], ['RSA-OAEP'], ['A128GCM'], [], ['jws_compact'], ['PS256'], [], true, []);
-        ConfigurationHelper::addNestedTokenBuilder($container, 'builder_1', ['jwe_compact'], ['RSA-OAEP'], ['A128GCM'], ['jws_compact'], ['PS256'], true, []);
+        ConfigurationHelper::addNestedTokenLoader($container, 'loader_1', ['jwe_compact'], ['RSA-OAEP', 'A128GCM'], [], ['jws_compact'], ['PS256'], [], true, []);
+        ConfigurationHelper::addNestedTokenBuilder($container, 'builder_1', ['jwe_compact'], ['RSA-OAEP', 'A128GCM'], ['jws_compact'], ['PS256'], true, []);
     }
 }
 ```

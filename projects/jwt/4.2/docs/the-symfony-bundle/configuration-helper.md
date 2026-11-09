@@ -71,6 +71,8 @@ jose:
                     tag_name2: {attribute1: 'foo'}
 ```
 
+The helper prepends its configuration, so the `jose` configuration of the application comes after it. When both configure the same service, the lists are merged as described in [Configuration split across several files](symfony-bundle.md#configuration-split-across-several-files): since 4.2.7, a checker added with `addClaimChecker()` or `addHeaderChecker()` is kept next to the checkers the application lists, and the algorithm and serializer lists of the application replace those of the helper.
+
 Other methods are:
 
 * For the `jws` section:

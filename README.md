@@ -37,7 +37,7 @@ version of any project.
 |---|---|
 | `mkdocs.yml`, `docs/` | The hub: the home page, the legal notice, the privacy policy, the contact page |
 | `projects/<project>/<version>/` | One documentation, one version: its `mkdocs.yml`, its pages, its project mark, its logo partial |
-| `shared/` | What every one of them has in common: the fonts, the stylesheets, the shared brand files and three templates. Copied in before each build; the copies are in `.gitignore` |
+| `shared/` | What every one of them has in common: the fonts, the stylesheets, the shared brand files and four templates. Copied in before each build; the copies are in `.gitignore` |
 | `overrides/` | The templates of the hub |
 | `tools/build.py` | The build: the hub, then every version, then the `versions.json` and the redirection of each project |
 | `site-root/` | The `404.html` of the whole site, copied over the build. The `CNAME` is a page of the hub, in `docs/` |
@@ -55,7 +55,9 @@ cp -R projects/jwt/4.3 projects/jwt/4.4
 ```
 
 The newest version of a project, by version order, takes the `latest` alias and is what `/jwt/` redirects
-to. `tools/build.py` works it out; there is nothing else to declare.
+to. `tools/build.py` works it out; there is nothing else to declare. The version menu in the header lists
+every version from the `versions.json` the build writes, and every version that is not the latest one shows
+a note above the header that links to it.
 
 A new project is the same, one directory down: `projects/<prefix>/<version>/`, with its mark in
 `docs/assets/brand/` and its `overrides/partials/logo.html`. Add its card to `docs/index.md`.

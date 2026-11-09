@@ -154,3 +154,31 @@ These fixes need no action on your side, but they may explain an error you were 
 * **`Foreign payload encoding detected.` on unrelated builds.** `JWSBuilder::addSignature()` is documented as immutable but wrote the payload encoding on `$this` before cloning. As the Symfony Bundle registers the builder as a shared service, the first call using `b64` pinned the mode of that service for the rest of the process.
 * **A sender key could not be used with `ECDH-SS`.** `JWEBuilder::withSenderKey()` derived the key management mode and checked the key against it, which failed whatever the call order was. The sender key does not add a recipient: it is now verified by `build()`, once the recipients and the content encryption algorithm are known. `JWEDecrypter::decryptUsingKey()` also passed the sender key as the output key parameter of `decryptUsingKeySet()`, so it never reached the algorithm.
 * **Setting a shared header after a recipient raised a fatal `Error`.** `withSharedProtectedHeader()` and `withSharedHeader()` called `getHeader()` on the already registered recipients, but `addRecipient()` stores plain arrays. The duplicated header parameter check now runs as intended.
+
+## Changes in the patch releases
+
+The patch releases of 4.2 change no API, but a few of them refuse an input that an earlier 4.2 release accepted: the fix of a vulnerability, or of a bug whose behaviour could not be kept. If you upgrade from an earlier 4.2 release, read the lines of the releases you skip. Version 4.3 contains all of them.
+
+### 4.2.5
+
+* A JWS in a JSON serialization whose `payload` member is present but empty carries an empty payload, not a detached one: giving it a detached payload throws. See [Empty payload or detached payload](../advanced-topics/signed-tokens/detached-payload.md#empty-payload-or-detached-payload).
+
+### 4.2.6
+
+4.2.6 is a security release: it fixes the vulnerabilities described in the [security advisories](https://github.com/web-token/jwt-framework/security/advisories) published on 8 November 2026. Some of the fixes refuse keys or tokens that were accepted before:
+
+* The JSON documents of a token are decoded within a budget of 4,096 values. See [Bounded JSON decoding](../advanced-topics/serialization.md#bounded-json-decoding).
+* The loaders accept a maximum number of [signatures](../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures) or [recipients](../the-components/encrypted-tokens-jwe/jwe-loading.md#maximum-number-of-recipients) as a fourth argument, and the recipients of a token share the iteration cap of the `PBES2-*` algorithms.
+* A `dir` key shorter than the content encryption key and an AES key wrapping key shorter than its algorithm needs are refused, and so is a token of a direct mode (`dir`, `ECDH-ES`, `ECDH-SS`) whose encrypted key is not empty, or whose `epk` is not a point of the curve of the recipient key. See the [key requirements](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#key-requirements).
+* Every RSA algorithm refuses a key beyond the limits of OpenSSL, and `RSA-OAEP` handles a single block. See [RSA keys](../the-components/encrypted-tokens-jwe/encryption-algorithms.md#rsa-keys).
+* The library keeps key material out of stack traces. A custom algorithm should do the same: see [Custom algorithm](../advanced-topics/custom-algorithm.md#keeping-key-material-out-of-stack-traces).
+
+### 4.2.7
+
+* `ECDH-SS*` tokens are decrypted from the two static keys only: an `epk` header parameter is never read, and both orders of the keys work. See [Static key agreement](../the-components/encrypted-tokens-jwe/jwe-loading.md#static-key-agreement).
+* An entry of a `x5u` document that starts with `file://` is never read as the path of a file, and fails to load. See [Certificates of a x5u document](../the-components/key-jwk-and-key-set-jwkset/key-set-management.md#certificates-of-a-x5u-document).
+* The cache of `JKUFactory` and `X5UFactory` keys the documents by URL **and** request headers. See [Cache](../the-components/key-jwk-and-key-set-jwkset/key-set-management.md#cache).
+* `CallableChecker` accepts a value only when its callable returns `true`: a truthy value such as `1` or a non-empty string is refused. See [Custom claim validation with CallableChecker](../the-components/examples/validation.md#custom-claim-validation-with-callablechecker).
+* The `JWSLoaderFactory` and `JWELoaderFactory` of the library and of the bundle throw when header checkers are requested but no header checker manager factory is available, where they ignored them. See [Without a header checker manager factory](../the-components/signed-tokens-jws/jws-loading.md#without-a-header-checker-manager-factory).
+* In the Symfony bundle, the alias lists of a service configured in several places add up (checkers) or are replaced (algorithms and serializers), where they were merged position by position. See [Configuration split across several files](../the-symfony-bundle/symfony-bundle.md#configuration-split-across-several-files).
+* With the `sodium` extension and libsodium 1.0.21 or earlier, a byte outside the base64url alphabet in a token or a key was decoded; it is refused, as it is without the extension.
