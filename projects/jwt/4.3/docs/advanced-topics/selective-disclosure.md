@@ -93,6 +93,9 @@ The decoy digests have the length of the real ones and are mixed with them by th
 * A selectively disclosable `iss`, `aud`, `exp`, `nbf` or `cnf` at the top level of the claims: the Verifier needs them to evaluate the SD-JWT (section 9.7 of the RFC). The elements of `aud` may be selectively disclosable.
 * Two Disclosures with the same salt.
 * A selectively disclosable value nested too deeply or holding too many JSON values, whose Disclosure could not be parsed back (see [Disclosures](#disclosures)).
+* An SD-JWT that the Holder and the Verifier would reject for its size: a Processed SD-JWT Payload of more than 64 levels, or Disclosures that hold more than 4096 JSON values together, with the JSON object of the SD-JWT in the JWS JSON serialization (see [Verifying a presentation](#verifying-a-presentation)).
+
+The Issuer checks the size of the SD-JWT before signing it: it parses and processes the SD-JWT to issue, with placeholder signatures, as the Holder and the Verifier would. Beyond a bound, `issue()` and `issueJson()` throw an `InvalidArgumentException` that names it, `The processed payload of the SD-JWT is nested more than 64 levels deep.` or `The Disclosures of the SD-JWT hold more JSON values than the 4096 the Holder and the Verifier decode.`, with the exception of the processor or of the parser as the previous one.
 
 !!! tip
 
@@ -222,7 +225,7 @@ The SD-JWT is rejected when:
 * the Processed SD-JWT Payload has more than 64 levels of objects and arrays, the payload object being the first;
 * the claims of the Processed SD-JWT Payload are rejected by the claim checkers, or a mandatory claim is missing.
 
-The JSON documents of the SD-JWT are bounded before anything is verified. `SDJWT::fromString()` decodes the Disclosures and, in the JWS JSON serialization, the JSON object of the SD-JWT with a single budget of 4096 values, each `[`, `{` and `,` outside the strings counting as one: the budget the JWS and JWE serializers of the library give the JSON documents of a token. This leaves room for about 1,300 Disclosures of claims with a scalar value in the compact format, and about 1,000 in the JWS JSON serialization. Beyond it, `SDJWT::fromString()` throws an `InvalidSerializationException`. `Disclosure::fromString()` gives the Disclosure it parses a budget of its own.
+The JSON documents of the SD-JWT are bounded before anything is verified. `SDJWT::fromString()` decodes the Disclosures and, in the JWS JSON serialization, the JSON object of the SD-JWT with a single budget of 4096 values, each `[`, `{` and `,` outside the strings counting as one: the budget the JWS and JWE serializers of the library give the JSON documents of a token. This leaves room for 1,365 Disclosures of claims with a scalar value, or 2,048 of array elements, in the compact format. In the JWS JSON serialization, each Disclosure also adds a comma to the JSON object, which leaves room for 1,022 claims or 1,363 array elements with one signature, a little less with several signatures or other unprotected header parameters. Beyond it, `SDJWT::fromString()` throws an `InvalidSerializationException`, and the [Issuer](#what-the-issuer-refuses) refuses to issue such an SD-JWT. `Disclosure::fromString()` gives the Disclosure it parses a budget of its own.
 
 The Key Binding JWT is rejected when its signature cannot be verified with the key of `cnf`, its algorithm is not a digital signature algorithm, its `typ` is not `kb+jwt`, its `iat` is in the future or older than the maximum age, its `aud` or `nonce` is not the expected one, its `sd_hash` does not match the presented SD-JWT, or its `exp` or `nbf`, if any, says it is not valid.
 
