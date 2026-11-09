@@ -93,9 +93,18 @@ The decoy digests have the length of the real ones and are mixed with them by th
 * A selectively disclosable `iss`, `aud`, `exp`, `nbf` or `cnf` at the top level of the claims: the Verifier needs them to evaluate the SD-JWT (section 9.7 of the RFC). The elements of `aud` may be selectively disclosable.
 * Two Disclosures with the same salt.
 * A selectively disclosable value nested too deeply or holding too many JSON values, whose Disclosure could not be parsed back (see [Disclosures](#disclosures)).
-* An SD-JWT that the Holder and the Verifier would reject for its size: a Processed SD-JWT Payload of more than 64 levels, or Disclosures that hold more than 4096 JSON values together, with the JSON object of the SD-JWT in the JWS JSON serialization (see [Verifying a presentation](#verifying-a-presentation)).
+* An SD-JWT that the Holder and the Verifier would reject for its size: a Processed SD-JWT Payload of more than 64 levels, Disclosures that hold more than 4096 JSON values together, with the JSON object of the SD-JWT in the JWS JSON serialization, or, in that serialization, an unprotected header nested too deeply (see [Verifying a presentation](#verifying-a-presentation)).
 
-The Issuer checks the size of the SD-JWT before signing it: it parses and processes the SD-JWT to issue, with placeholder signatures, as the Holder and the Verifier would. Beyond a bound, `issue()` and `issueJson()` throw an `InvalidArgumentException` that names it, `The processed payload of the SD-JWT is nested more than 64 levels deep.` or `The Disclosures of the SD-JWT hold more JSON values than the 4096 the Holder and the Verifier decode.`, with the exception of the processor or of the parser as the previous one.
+The Issuer checks the size of the SD-JWT before signing it: it parses and processes the SD-JWT to issue, with placeholder signatures, as the Holder and the Verifier would. Beyond a bound, `issue()` and `issueJson()` throw an `InvalidArgumentException` that names it, with the exception of the processor or of the parser as the previous one:
+
+| Bound | Message |
+| ----- | ------- |
+| 64 levels of the Processed SD-JWT Payload | `The processed payload of the SD-JWT is nested more than 64 levels deep.` |
+| 4096 JSON values, compact format | `The Disclosures of the SD-JWT hold more JSON values than the 4096 the Holder and the Verifier decode.` |
+| 4096 JSON values, JWS JSON serialization | `The Disclosures and the unprotected headers of the SD-JWT hold more JSON values than the 4096 the Holder and the Verifier decode.` |
+| Depth of an unprotected header | `The unprotected headers of the SD-JWT are nested more deeply than the Holder and the Verifier decode.` |
+
+`issueJson()` also refuses, with an `InvalidArgumentException`, an unprotected header that the Holder and the Verifier could not parse for another reason, such as a list. The message is the one of the parser (`The "header" member must be a JSON object.`).
 
 !!! tip
 
@@ -227,6 +236,16 @@ The SD-JWT is rejected when:
 
 The JSON documents of the SD-JWT are bounded before anything is verified. `SDJWT::fromString()` decodes the Disclosures and, in the JWS JSON serialization, the JSON object of the SD-JWT with a single budget of 4096 values, each `[`, `{` and `,` outside the strings counting as one: the budget the JWS and JWE serializers of the library give the JSON documents of a token. This leaves room for 1,365 Disclosures of claims with a scalar value, or 2,048 of array elements, in the compact format. In the JWS JSON serialization, each Disclosure also adds a comma to the JSON object, which leaves room for 1,022 claims or 1,363 array elements with one signature, a little less with several signatures or other unprotected header parameters. Beyond it, `SDJWT::fromString()` throws an `InvalidSerializationException`, and the [Issuer](#what-the-issuer-refuses) refuses to issue such an SD-JWT. `Disclosure::fromString()` gives the Disclosure it parses a budget of its own.
 
+A document is also rejected when it is nested more deeply than `json_decode()` reads, 511 levels of arrays and objects. The message names the bound, and invalid JSON keeps its own:
+
+| Document | More than 4096 JSON values | Nested too deeply | Invalid JSON |
+| -------- | -------------------------- | ----------------- | ------------ |
+| A Disclosure, in `SDJWT::fromString()` | `The SD-JWT holds more JSON values than the 4096 that are decoded.` | `The Disclosure is nested too deeply.` | `The Disclosure is not valid JSON.` |
+| A Disclosure, in `Disclosure::fromString()` | `With this Disclosure, there are more than 4096 JSON values to decode.` | `The Disclosure is nested too deeply.` | `The Disclosure is not valid JSON.` |
+| The JSON object, in `SDJWT::fromString()` and `SDJWT::create()` | `The JWS JSON serialization holds more JSON values than the 4096 that are decoded.` | `The JWS JSON serialization is nested too deeply.` | `The JWS JSON serialization must be a JSON object.` |
+
+The Disclosures share the budget, so the SD-JWT is rejected as a whole, whichever Disclosure takes it beyond 4096, with the exception of that Disclosure as the previous one. The values are counted before a document is decoded: a document beyond both bounds is reported for its values. Further down the chain is the `JsonBoundExceededException` of the decoder, as for the [JWS and JWE tokens](serialization.md#rejections-for-a-bound). The Verifier reports these rejections as the others: its `InvalidTokenException`, `The SD-JWT cannot be parsed.`, has the exception of the parser as the previous one.
+
 The Key Binding JWT is rejected when its signature cannot be verified with the key of `cnf`, its algorithm is not a digital signature algorithm, its `typ` is not `kb+jwt`, its `iat` is in the future or older than the maximum age, its `aud` or `nonce` is not the expected one, its `sd_hash` does not match the presented SD-JWT, or its `exp` or `nbf`, if any, says it is not valid.
 
 ## JWS JSON serialization
@@ -269,7 +288,7 @@ $sdJwt->getSerialization(); // "jws_json_general"
 $token = $sdJwt->toString(); // The JSON object, the Disclosures in the header of the first signature
 ```
 
-The claims are processed as by `issue()`. The unprotected headers cannot have the `disclosures` and `kb_jwt` parameters, which belong to the SD-JWT.
+The claims are processed as by `issue()`. The unprotected headers cannot have the `disclosures` and `kb_jwt` parameters, which belong to the SD-JWT. Their JSON values count against the budget of the SD-JWT, with those of the Disclosures, and the Issuer refuses the headers that the Holder and the Verifier could not parse (see [What the Issuer refuses](#what-the-issuer-refuses)).
 
 ### Presenting in the JSON serialization
 
@@ -338,10 +357,12 @@ The objects of a value are converted by `json_encode()`, as in the payload of th
 
 A value that `json_encode()` cannot serialize, such as an object that references itself, is refused with an `InvalidArgumentException`. The pure enums, neither backed nor `JsonSerializable`, are the exception: a Disclosure gives a pure enum the object of its name, `{"name": "Active"}` for `Status::Active`, alone or in the arrays of the value. A pure enum in the payload, or held by an object, is refused as `json_encode()` refuses it.
 
-A Disclosure that `Disclosure::fromString()` could not parse back is refused when it is created, with an `InvalidArgumentException` whose previous exception tells which bound was hit:
+A Disclosure that `Disclosure::fromString()` could not parse back is refused when it is created, with an `InvalidArgumentException` whose message names the bound:
 
-* the depth: the value holds at most 510 levels of arrays and objects, the array of the Disclosure being the 511th that `Disclosure::fromString()` reads;
-* the [budget of 4096 JSON values](#verifying-a-presentation), counted over the whole Disclosure: `forArrayElement()` accepts a list of 4,094 integers at most, and `forObjectProperty()` 4,093, its claim name taking one more.
+* the depth, `The value is nested too deeply: its Disclosure could not be parsed.`: the value holds at most 510 levels of arrays and objects, the array of the Disclosure being the 511th that `Disclosure::fromString()` reads;
+* the [budget of 4096 JSON values](#verifying-a-presentation), `The value holds too many JSON values: its Disclosure would hold more than the 4096 that are decoded.`: counted over the whole Disclosure, `forArrayElement()` accepts a list of 4,094 integers at most, and `forObjectProperty()` 4,093, its claim name taking one more.
+
+The values are counted first, so a value beyond both bounds is reported for its values. The Issuer refuses a `Disclosable` value with the same messages.
 
 ## Symfony bundle
 
