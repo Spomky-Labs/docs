@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.3, which is not the latest one.
+  <a href="../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -583,6 +595,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#key-sets-fetched-from-a-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key sets fetched from a URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-material-in-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key material in logs
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -672,6 +706,17 @@
     <span class="md-ellipsis">
       
         Unserialize the token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bound-what-a-token-may-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bound what a token may cost
       
     </span>
   </a>
@@ -3434,6 +3479,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#key-sets-fetched-from-a-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key sets fetched from a URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-material-in-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key material in logs
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3523,6 +3590,17 @@
     <span class="md-ellipsis">
       
         Unserialize the token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bound-what-a-token-may-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bound what a token may cost
       
     </span>
   </a>
@@ -3621,17 +3699,26 @@
 <p>Since 4.3, neither of them is shipped by the main library: they live in the dedicated <code>web-token/jwt-unsecured</code> and <code>web-token/jwt-rsa15</code> packages. Enabling one is therefore a decision recorded in your <code>composer.json</code>, which an audit can see. If one of these packages is installed in your project, make sure you know why.</p>
 <h2 id="keys-and-key-sets">Keys and key sets<a class="headerlink" href="#keys-and-key-sets" title="Link to this section">&para;</a></h2>
 <h3 id="key-size">Key size<a class="headerlink" href="#key-size" title="Link to this section">&para;</a></h3>
-<p>A small key size is as secure as a password like <code>123456789</code>. You should use at least 256 bits symmetric keys and at least 2048 bits RSA keys.</p>
-<p>In any case, you MUST use a true random number generator.</p>
+<p>A small key size is as secure as a password like <code>123456789</code>.</p>
+<ul>
+<li>RSA keys: 2048 bits at least. Since 4.2.6, a key beyond the limits of OpenSSL is refused.</li>
+<li>HMAC keys (<code>HS256</code>, <code>HS384</code>, <code>HS512</code>): at least as long as the output of the hash function, that is 256, 384 and 512 bits (<a href="https://datatracker.ietf.org/doc/html/rfc7518#section-3.2">RFC 7518 section 3.2</a>). The library does not check it: make sure of it when you create the key.</li>
+<li>Encryption keys (<code>dir</code>, <code>A*KW</code>, <code>A*GCMKW</code>): exactly the size the algorithm needs. The library checks it; see the <a href="../../the-components/encrypted-tokens-jwe/encryption-algorithms/#key-requirements">key requirements</a>.</li>
+</ul>
+<p>In any case, you MUST use a true random number generator. Never build a key from a text secret, or from an environment variable that may be empty: the <code>PBES2-*</code> algorithms are the ones made for passwords.</p>
 <h3 id="additional-information">Additional information<a class="headerlink" href="#additional-information" title="Link to this section">&para;</a></h3>
 <p>It is highly recommended to set the following parameters to your key:</p>
 <ul>
 <li><code>kid</code>: A unique key ID,</li>
 <li><code>use</code>: indicates the usage of the key. Either <code>sig</code> (signature/verification) or <code>enc</code> (encryption/decryption).&#x20;</li>
-<li><code>alg</code>: the algorithm allowed to be used with this key.</li>
+<li><code>alg</code>: the algorithm allowed to be used with this key. A key with an <code>alg</code> parameter is never used with another algorithm, which matters in a key set shared by several algorithms.</li>
 </ul>
 <h3 id="key-rotation">Key rotation<a class="headerlink" href="#key-rotation" title="Link to this section">&para;</a></h3>
 <p>A key is fine but may be cracked e.g. by bruteforce. Changing your keys after several days or weeks is encouraged.</p>
+<h3 id="key-sets-fetched-from-a-url">Key sets fetched from a URL<a class="headerlink" href="#key-sets-fetched-from-a-url" title="Link to this section">&para;</a></h3>
+<p>Fetch a key set only from a URL your application trusts, such as one written in its configuration. The <code>jku</code> and <code>x5u</code> header parameters of a token are chosen by its sender: never fetch them unless they are in an exact list of trusted URLs. Refuse the redirects too: pass <code>false</code> as the second argument of <code>JKUFactory</code> and <code>X5UFactory</code>, or set the <code>follow_redirects</code> option of the bundle to <code>false</code>. See <a href="../../the-components/key-jwk-and-key-set-jwkset/key-set-management/#redirects">Distant key sets</a>.</p>
+<h3 id="key-material-in-logs">Key material in logs<a class="headerlink" href="#key-material-in-logs" title="Link to this section">&para;</a></h3>
+<p>Since 4.2.6, the library marks the parameters that carry key material with <code>#[\SensitiveParameter]</code>, so that they are not written in stack traces. A custom algorithm should do the same: see <a href="../../advanced-topics/custom-algorithm/#keeping-key-material-out-of-stack-traces">Custom algorithm</a>. In production, also set <code>zend.exception_ignore_args = On</code>, as the <code>php.ini-production</code> file of PHP does.</p>
 <h2 id="token-creation">Token creation<a class="headerlink" href="#token-creation" title="Link to this section">&para;</a></h2>
 <h3 id="header-parameters">Header parameters<a class="headerlink" href="#header-parameters" title="Link to this section">&para;</a></h3>
 <p>Broadly speaking, you should set your header parameter in the protected header. The use of the unprotected header should be limited to specific use cases.</p>
@@ -3671,10 +3758,19 @@
 </div>
 <h3 id="unserialize-the-token">Unserialize the token<a class="headerlink" href="#unserialize-the-token" title="Link to this section">&para;</a></h3>
 <p>You should only use the serialization mode(s) you need. If you intend to use your tokens in a web context, then use only the Compact Serialization. If an error occurred during this process, you should consider the token as invalid.</p>
+<h3 id="bound-what-a-token-may-cost">Bound what a token may cost<a class="headerlink" href="#bound-what-a-token-may-cost" title="Link to this section">&para;</a></h3>
+<p>A token is read before anything about it is verified, so whoever sends it chooses its size and its shape:</p>
+<ul>
+<li>Limit the size of the request bodies and headers at the web server. Some servers accept request headers of about 1 MB by default.</li>
+<li>Since 4.2.6, the serializers decode at most 4,096 JSON values per token: see <a href="../../advanced-topics/serialization/#bounded-json-decoding">Bounded JSON decoding</a>. This budget does not replace a size limit: the claims and the key sets are not bounded.</li>
+<li>If you accept the JSON General serialization, set the maximum number of <a href="../../the-components/signed-tokens-jws/jws-loading/#maximum-number-of-signatures">signatures</a> or <a href="../../the-components/encrypted-tokens-jwe/jwe-loading/#maximum-number-of-recipients">recipients</a> of your loaders, or do not register <code>jws_json_general</code> and <code>jwe_json_general</code>. Since 4.3, loading a token with more than 10 of them without a maximum is deprecated, and 5.0 sets 10 by default.</li>
+<li>Accept the <code>PBES2-*</code> algorithms only from senders you trust: each recipient asks for its own iteration count, up to the <code>max_count</code> of the algorithm.</li>
+</ul>
 <h3 id="check-the-header">Check the header<a class="headerlink" href="#check-the-header" title="Link to this section">&para;</a></h3>
 <p>It is strongly recommended that all header parameters are checked before the cryptographic operations (signature verification or content decryption).</p>
 <p>Please note that unknown header parameters must be ignored. If your token is verified, those parameters should not be used.</p>
 <p>When used, unprotected header parameters should be handled with care. They are not covered by the signature or the AAD: never let them drive a cryptographic decision, and never trust a value you only found there.</p>
+<p>This applies to the <code>cty</code> header parameter of a nested token: since 4.3, pass <code>false</code> as the third argument of <code>NestedTokenLoader</code>, or set the <code>allow_unprotected_content_type</code> option of the bundle to <code>false</code>, to refuse a nested token whose <code>cty</code> is outside the protected header of the JWE. See <a href="../../advanced-topics/nested-tokens/#the-cty-header-parameter">Nested tokens</a>.</p>
 <h3 id="signature-verification-payload-decryption">Signature verification / payload decryption<a class="headerlink" href="#signature-verification-payload-decryption" title="Link to this section">&para;</a></h3>
 <p>Let the component do its job. The most important step for developers is to ensure that the right key/key set is used.</p>
 <h3 id="check-the-claims">Check the claims<a class="headerlink" href="#check-the-claims" title="Link to this section">&para;</a></h3>
@@ -3703,7 +3799,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:22:40 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3826,7 +3922,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

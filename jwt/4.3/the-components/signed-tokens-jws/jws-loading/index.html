@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.3, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -1030,6 +1042,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="JWSLoader object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#maximum-number-of-signatures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximum number of signatures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1040,6 +1069,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="JWSLoaderFactory object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#without-a-header-checker-manager-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without a header checker manager factory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3166,6 +3212,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="JWSLoader object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#maximum-number-of-signatures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximum number of signatures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3176,6 +3239,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="JWSLoaderFactory object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#without-a-header-checker-manager-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without a header checker manager factory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3305,56 +3385,82 @@
 <p class="admonition-title">Warning</p>
 <p><code>loadAndVerifyWithKey()</code> and <code>loadAndVerifyWithKeySet()</code> wrote the signature index into a variable of the caller. They are deprecated since 4.3 and removed in 5.0: use <code>loadAndVerify()</code>, which carries that index in its result. See the <a href="../../../migration/from-v4.2-to-v4.3/#result-objects-instead-of-output-parameters">migration guide</a>.</p>
 </div>
+<h3 id="maximum-number-of-signatures">Maximum number of signatures<a class="headerlink" href="#maximum-number-of-signatures" title="Link to this section">&para;</a></h3>
+<p>A token in the JSON General serialization carries as many signatures as its sender wants, and the loader tries them one after the other. The loader accepts the maximum number of signatures of a token as a fourth argument of its constructor (since 4.2.6): a token with more signatures is rejected before any of them is processed.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Signature\JWSLoader</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">$jwsLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWSLoader</span><span class="p">(</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="nv">$serializerManager</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="nv">$jwsVerifier</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="nv">$headerCheckerManager</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="nx">JWSLoader</span><span class="o">::</span><span class="na">DEFAULT_MAX_SIGNATURES</span> <span class="c1">// 10</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>The value must be a positive integer. The compact and JSON Flattened serializations always carry exactly one signature, so the limit matters when the loader accepts the JSON General serialization (<code>jws_json_general</code>). A token with too many signatures fails like any other token: <code>loadAndVerify()</code> throws, and the previous exception says that the token has too many signatures.</p>
+<p><code>JWSLoaderFactory::create()</code> takes the same value as a fourth argument (see <a href="#jwsloaderfactory-object">below</a>), and the bundle as the <a href="../../../the-symfony-bundle/signed-tokens/jws-verification/#maximum-number-of-signatures"><code>max_signatures</code></a> option of a loader.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Without that argument, the number of signatures is not limited. Since 4.3, loading a token with more than 10 signatures without a maximum is deprecated: in 5.0, such a token is rejected unless a higher maximum is set. Setting a maximum, higher or lower than 10, silences the notice. The argument is read with <code>func_num_args()</code>/<code>func_get_arg(3)</code> until 5.0 declares it, with <code>JWSLoader::DEFAULT_MAX_SIGNATURES</code> (10) as its default value.</p>
+</div>
 <h2 id="jwsloaderfactory-object">JWSLoaderFactory object<a class="headerlink" href="#jwsloaderfactory-object" title="Link to this section">&para;</a></h2>
 <p>The <code>JWSLoaderFactory</code> object is able to create <code>JWSLoader</code> objects on demand. It requires the following factories:</p>
 <ul>
 <li><code>JWSSerializerManagerFactory</code></li>
 <li><code>JWSVerifierFactory</code></li>
-<li><code>HeaderCheckerManagerFactory</code> (optional)</li>
+<li><code>HeaderCheckerManagerFactory</code> (required in 5.0, see below)</li>
 </ul>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Signature\JWSLoaderFactory</span><span class="p">;</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">$jwsLoaderFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWSLoaderFactory</span><span class="p">(</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="nv">$jwsSerializerManagerFactory</span><span class="p">,</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="nv">$jwsVerifierFactory</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="nv">$headerCheckerManagerFactory</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">);</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nv">$jwsLoader</span> <span class="o">=</span> <span class="nv">$jwsLoaderFactory</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="p">[</span><span class="s1">'jws_compact'</span><span class="p">],</span> <span class="c1">// List of serializer aliases</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="p">[</span><span class="s1">'HS256'</span><span class="p">],</span>       <span class="c1">// List of signature algorithm aliases</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="p">[</span><span class="s1">'alg'</span><span class="p">]</span>          <span class="c1">// Optional list of header checker aliases</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">);</span>
-</span></code></pre></div>
-<h2 id="understanding-failures">Understanding failures<a class="headerlink" href="#understanding-failures" title="Link to this section">&para;</a></h2>
-<p>When a token cannot be loaded or verified, the loaders and the serializer manager chain the last error met along the way as the previous exception. The message of the outer exception stays generic on purpose — it is the one you may safely show — while the cause tells you what actually happened:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Core\Exception\JoseException</span><span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Signature\JWSLoaderFactory</span><span class="p">;</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">try</span> <span class="p">{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$jwsLoader</span><span class="o">-&gt;</span><span class="na">loadAndVerify</span><span class="p">(</span><span class="nv">$token</span><span class="p">,</span> <span class="nv">$jwkset</span><span class="p">);</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">JoseException</span> <span class="nv">$throwable</span><span class="p">)</span> <span class="p">{</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">logger</span><span class="o">-&gt;</span><span class="na">debug</span><span class="p">(</span><span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="p">[</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="s1">'cause'</span> <span class="o">=&gt;</span> <span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getPrevious</span><span class="p">()</span><span class="o">?-&gt;</span><span class="na">getMessage</span><span class="p">(),</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="p">]);</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="k">throw</span> <span class="nv">$throwable</span><span class="p">;</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nv">$jwsLoaderFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWSLoaderFactory</span><span class="p">(</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="nv">$jwsSerializerManagerFactory</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="nv">$jwsVerifierFactory</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="nv">$headerCheckerManagerFactory</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">);</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nv">$jwsLoader</span> <span class="o">=</span> <span class="nv">$jwsLoaderFactory</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="p">[</span><span class="s1">'jws_compact'</span><span class="p">],</span> <span class="c1">// List of serializer aliases</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="p">[</span><span class="s1">'HS256'</span><span class="p">],</span>       <span class="c1">// List of signature algorithm aliases</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="p">[</span><span class="s1">'alg'</span><span class="p">],</span>         <span class="c1">// Optional list of header checker aliases</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="mi">10</span>               <span class="c1">// Optional maximum number of signatures of a token</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="without-a-header-checker-manager-factory">Without a header checker manager factory<a class="headerlink" href="#without-a-header-checker-manager-factory" title="Link to this section">&para;</a></h3>
+<p>A factory created with <code>null</code> instead of a <code>HeaderCheckerManagerFactory</code> can only create loaders that check no header parameter, not even those listed in <code>crit</code>. Since 4.2.7, its <code>create()</code> method throws an <code>InvalidArgumentException</code> (<code>Header checkers were requested, but no header checker manager factory is available.</code>) when header checker aliases are given, instead of ignoring them. With an empty list, it still returns a loader without header checker manager.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Since 4.3, creating a <code>JWSLoaderFactory</code> without a header checker manager factory is deprecated, and the argument is required in 5.0. Pass a <code>HeaderCheckerManagerFactory</code> that has the <code>JWSTokenSupport</code> <a href="../../header-checker/#header-checker-manager-factory">token type support</a>: without it, the loaders refuse every token (<code>Unsupported token type.</code>). With the Symfony bundle, use the <a href="../../../the-symfony-bundle/signed-tokens/jws-verification/#jws-loader-service">factory services of the bundle</a>: registering the library factories with autowiring leaves this argument <code>null</code>.</p>
+</div>
+<h2 id="understanding-failures">Understanding failures<a class="headerlink" href="#understanding-failures" title="Link to this section">&para;</a></h2>
+<p>When a token cannot be loaded or verified, the loaders and the serializer manager chain the last error met along the way as the previous exception. The message of the outer exception stays generic on purpose — it is the one you may safely show — while the cause tells you what actually happened:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Core\Exception\JoseException</span><span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">try</span> <span class="p">{</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$jwsLoader</span><span class="o">-&gt;</span><span class="na">loadAndVerify</span><span class="p">(</span><span class="nv">$token</span><span class="p">,</span> <span class="nv">$jwkset</span><span class="p">);</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">JoseException</span> <span class="nv">$throwable</span><span class="p">)</span> <span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">logger</span><span class="o">-&gt;</span><span class="na">debug</span><span class="p">(</span><span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="p">[</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>        <span class="s1">'cause'</span> <span class="o">=&gt;</span> <span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getPrevious</span><span class="p">()</span><span class="o">?-&gt;</span><span class="na">getMessage</span><span class="p">(),</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="p">]);</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="k">throw</span> <span class="nv">$throwable</span><span class="p">;</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Every exception thrown by the framework implements <code>JoseException</code>, so a single catch block handles any failure. Each of them extends the SPL exception that was thrown at that place before 4.3, hence catch blocks written for previous versions keep matching.</p>
 <p><code>JWSVerifier</code> reports a failure through its result rather than an exception, so the per-key failures it meets while trying a key set are reported through an optional callable. It is called once per key that failed:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$jwsVerifier</span><span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nv">$jws</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="nv">$jwkset</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="k">null</span><span class="p">,</span> <span class="c1">// Detached payload</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="k">static</span> <span class="k">function</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$throwable</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>        <span class="c1">// Called for each key that could not verify the signature.</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="p">}</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$jwsVerifier</span><span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="nv">$jws</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="nv">$jwkset</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">null</span><span class="p">,</span> <span class="c1">// Detached payload</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="k">static</span> <span class="k">function</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$throwable</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="c1">// Called for each key that could not verify the signature.</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="p">}</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">);</span>
 </span></code></pre></div>
 
 
@@ -3376,7 +3482,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3499,7 +3605,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

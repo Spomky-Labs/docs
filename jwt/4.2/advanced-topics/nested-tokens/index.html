@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.2, which is not the latest one.
+  <a href="../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -3210,10 +3222,10 @@
 </ul>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">use</span> <span class="nx">Jose\Component\NestedToken\NestedTokenBuilder</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">$nestedTokenBuilder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">NestedTokenBuilder</span><span class="p">(</span><span class="nv">$jweLoader</span><span class="p">,</span> <span class="nv">$jweSerializerManager</span><span class="p">,</span> <span class="nv">$jwsLoader</span><span class="p">,</span> <span class="nv">$jwsSerializerManager</span><span class="p">);</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">$nestedTokenBuilder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">NestedTokenBuilder</span><span class="p">(</span><span class="nv">$jweBuilder</span><span class="p">,</span> <span class="nv">$jweSerializerManager</span><span class="p">,</span> <span class="nv">$jwsBuilder</span><span class="p">,</span> <span class="nv">$jwsSerializerManager</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Its use is a bit more complicated than the loading as the nested token may be designed for several recipients or may have several signatures.</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">$token</span> <span class="o">=</span> <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">$token</span> <span class="o">=</span> <span class="nv">$nestedTokenBuilder</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="nv">$payload</span><span class="p">,</span>                                     <span class="c1">// The payload to protect</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="p">[[</span>                                            <span class="c1">// A list of signatures. 'key' is mandatory and at least one of 'protected_header'/'header' has to be set.</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="s1">'key'</span>              <span class="o">=&gt;</span> <span class="nv">$signature_key</span><span class="p">,</span>     <span class="c1">// The key used to sign. Mandatory.</span>
@@ -3227,7 +3239,7 @@
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="s1">'key'</span>    <span class="o">=&gt;</span> <span class="nv">$encryption_key</span><span class="p">,</span>              <span class="c1">// The recipient key.</span>
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="s1">'header'</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'bar'</span> <span class="o">=&gt;</span> <span class="s1">'foo'</span><span class="p">],</span>             <span class="c1">// The recipient unprotected header.</span>
 </span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="p">]],</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="s1">'jwe_json_flattened'</span>                          <span class="c1">// The serialization mode for the JWE.</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="s1">'jwe_json_flattened'</span><span class="p">,</span>                         <span class="c1">// The serialization mode for the JWE.</span>
 </span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="s1">'1, 2, 3, 4'</span>                                  <span class="c1">// Additional Authenticated Data (AAD). Optional.</span>
 </span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">);</span>
 </span></code></pre></div>
@@ -3246,21 +3258,19 @@
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">        </span><span class="nt">loaders</span><span class="p">:</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">            </span><span class="nt">loader_1</span><span class="p">:</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">                </span><span class="nt">signature_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'PS256'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">                </span><span class="nt">key_encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'RSA-OAEP'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">                </span><span class="nt">content_encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'A128GCM'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">                </span><span class="nt">jws_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jws_compact'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">                </span><span class="nt">jws_header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">                </span><span class="nt">jwe_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jwe_compact'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">                </span><span class="nt">jwe_header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">                </span><span class="nt">is_public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">        </span><span class="nt">builders</span><span class="p">:</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">            </span><span class="nt">builder_1</span><span class="p">:</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">                </span><span class="nt">signature_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'PS256'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">                </span><span class="nt">key_encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'RSA-OAEP'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">                </span><span class="nt">content_encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'A128GCM'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">                </span><span class="nt">jws_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jws_compact'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">                </span><span class="nt">jwe_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jwe_compact'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">                </span><span class="nt">is_public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">                </span><span class="nt">encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'RSA-OAEP'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'A128GCM'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">                </span><span class="nt">jws_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jws_compact'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">                </span><span class="nt">jws_header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">                </span><span class="nt">jwe_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jwe_compact'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">                </span><span class="nt">jwe_header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">                </span><span class="nt">is_public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">        </span><span class="nt">builders</span><span class="p">:</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">            </span><span class="nt">builder_1</span><span class="p">:</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">                </span><span class="nt">signature_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'PS256'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">                </span><span class="nt">encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'RSA-OAEP'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'A128GCM'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">                </span><span class="nt">jws_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jws_compact'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">                </span><span class="nt">jwe_serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jwe_compact'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">                </span><span class="nt">is_public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></code></pre></div>
 <p>This configuration will create two public services:</p>
 <ul>
@@ -3276,8 +3286,8 @@
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">prepend</span><span class="p">(</span><span class="nx">ContainerBuilder</span> <span class="nv">$container</span><span class="p">)</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="p">{</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="nx">ConfigurationHelper</span><span class="o">::</span><span class="na">addNestedTokenLoader</span><span class="p">(</span><span class="nv">$container</span><span class="p">,</span> <span class="s1">'loader_1'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'RSA-OAEP'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'A128GCM'</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[</span><span class="s1">'jws_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'PS256'</span><span class="p">],</span> <span class="p">[],</span> <span class="k">true</span><span class="p">,</span> <span class="p">[]);</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="nx">ConfigurationHelper</span><span class="o">::</span><span class="na">addNestedTokenBuilder</span><span class="p">(</span><span class="nv">$container</span><span class="p">,</span> <span class="s1">'builder_1'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'RSA-OAEP'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'A128GCM'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'jws_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'PS256'</span><span class="p">],</span> <span class="k">true</span><span class="p">,</span> <span class="p">[]);</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="nx">ConfigurationHelper</span><span class="o">::</span><span class="na">addNestedTokenLoader</span><span class="p">(</span><span class="nv">$container</span><span class="p">,</span> <span class="s1">'loader_1'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'RSA-OAEP'</span><span class="p">,</span> <span class="s1">'A128GCM'</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[</span><span class="s1">'jws_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'PS256'</span><span class="p">],</span> <span class="p">[],</span> <span class="k">true</span><span class="p">,</span> <span class="p">[]);</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="nx">ConfigurationHelper</span><span class="o">::</span><span class="na">addNestedTokenBuilder</span><span class="p">(</span><span class="nv">$container</span><span class="p">,</span> <span class="s1">'builder_1'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'RSA-OAEP'</span><span class="p">,</span> <span class="s1">'A128GCM'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'jws_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'PS256'</span><span class="p">],</span> <span class="k">true</span><span class="p">,</span> <span class="p">[]);</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="p">}</span>
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">}</span>
 </span></code></pre></div>
@@ -3301,7 +3311,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:09:39 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3424,7 +3434,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

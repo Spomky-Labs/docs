@@ -195,7 +195,11 @@ body {
 
 /* The title of the page, after a rule, once the reader has scrolled past its heading. A project mark
    already names the project: on a screen wide enough to show it, the name is not written a second time.
-   Beside the Slabs logotype, the name stays. */
+   Beside the Slabs logotype, the name stays.
+
+   The theme puts the version selector inside the block of that name, so only the name goes: hiding the
+   whole block hid the selector with it, and no reader could tell which version they were reading, nor
+   that others existed. */
 .md-header__title {
   font-size: var(--slabs-nav);
   font-weight: 600;
@@ -212,8 +216,8 @@ body {
     border-left-color: transparent;
   }
 
-  .md-header:has(.sl-logo--mark) .md-header__title .md-header__topic:first-child {
-    visibility: hidden;
+  .md-header:has(.sl-logo--mark) .md-header__title .md-header__topic:first-child > .md-ellipsis {
+    display: none;
   }
 }
 
@@ -325,6 +329,27 @@ body {
 .md-version__link:is(:focus, :hover) {
   background-color: var(--doc-tint);
   color: var(--doc-text);
+}
+
+/* The note above the header of a version that is not the latest: a state note, the slab on its edge, the
+   link underlined in orange like every other link. */
+.md-banner--warning {
+  background-color: var(--doc-note-ground);
+  border-bottom: 1px solid var(--doc-rule);
+  border-left: 4px solid var(--slabs-orange);
+  color: var(--doc-text);
+}
+
+.md-banner--warning .md-banner__inner {
+  font-size: var(--slabs-caption);
+  margin-bottom: calc(var(--slabs-space-base) * 2);
+  margin-top: calc(var(--slabs-space-base) * 2);
+}
+
+.md-banner--warning a {
+  color: var(--doc-text);
+  text-decoration: underline 2px var(--slabs-orange);
+  text-underline-offset: 0.2em;
 }
 
 /* ---------------------------------------------------------------- Layout (p. 31) */

@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.2, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -1153,6 +1165,78 @@
     <span class="md-ellipsis">
       
         Curves supported by the key agreement algorithms
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direct-encryption-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct encryption (dir)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encrypted-key-of-the-direct-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted key of the direct modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aes-key-wrapping-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AES key wrapping keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rsa-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RSA keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ephemeral-public-key-epk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ephemeral public key (epk)
       
     </span>
   </a>
@@ -3193,6 +3277,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#key-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direct-encryption-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct encryption (dir)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encrypted-key-of-the-direct-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted key of the direct modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aes-key-wrapping-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AES key wrapping keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rsa-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RSA keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ephemeral-public-key-epk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ephemeral public key (epk)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#experimental-algorithms" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3348,10 +3504,68 @@
 <h3 id="curves-supported-by-the-key-agreement-algorithms">Curves supported by the key agreement algorithms<a class="headerlink" href="#curves-supported-by-the-key-agreement-algorithms" title="Link to this section">&para;</a></h3>
 <p>The <code>ECDH-ES*</code> and <code>ECDH-SS*</code> algorithms accept:</p>
 <ul>
-<li><code>EC</code> keys using the <code>P-256</code>, <code>P-384</code>, <code>P-521</code>, <code>secp256k1</code>, <code>BP-256</code>, <code>BP-384</code> or <code>BP-512</code> curve,</li>
+<li><code>EC</code> keys using the <code>P-256</code>, <code>P-384</code>, <code>P-521</code>, <code>BP-256</code>, <code>BP-384</code> or <code>BP-512</code> curve,</li>
 <li><code>OKP</code> keys using the <code>X25519</code> curve (SODIUM extension is required).</li>
 </ul>
 <p>The <code>BP-*</code> curves are the Brainpool curves. They are part of the core library and do not require the experimental package. Please read the <a href="../../key-jwk-and-key-set-jwkset/key-management/#elliptic-curve-key-pair">warning about their interoperability</a> before using them.</p>
+<h2 id="key-requirements">Key requirements<a class="headerlink" href="#key-requirements" title="Link to this section">&para;</a></h2>
+<p>The algorithms check the keys they are given and the keys a token carries. A key that does not meet the requirements below makes <code>build()</code> throw. On decryption, it is not used and the decrypter moves on to the next key of the key set: a token that no key can decrypt is rejected as usual.</p>
+<h3 id="direct-encryption-dir">Direct encryption (<code>dir</code>)<a class="headerlink" href="#direct-encryption-dir" title="Link to this section">&para;</a></h3>
+<p>With <code>dir</code>, the <code>oct</code> key is the content encryption key (CEK) itself, so its size is set by the content encryption algorithm:</p>
+<table>
+<thead>
+<tr>
+<th>Content encryption algorithm</th>
+<th>Key size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A128GCM<br>A192GCM<br>A256GCM</td>
+<td>128 bits<br>192 bits<br>256 bits</td>
+</tr>
+<tr>
+<td>A128CBC-HS256<br>A192CBC-HS384<br>A256CBC-HS512</td>
+<td>256 bits<br>384 bits<br>512 bits</td>
+</tr>
+</tbody>
+</table>
+<p>The AES-CBC-HMAC algorithms need twice the size their name suggests, as half of the key authenticates the content and the other half encrypts it: a 128-bit key is too short for <code>A128CBC-HS256</code>. With <code>dir</code>, the <code>alg</code> member of the key, when present, names the content encryption algorithm:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">use</span> <span class="nx">Jose\Component\KeyManagement\JWKFactory</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">$jwk</span> <span class="o">=</span> <span class="nx">JWKFactory</span><span class="o">::</span><span class="na">createOctKey</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="p">[</span><span class="s1">'alg'</span> <span class="o">=&gt;</span> <span class="s1">'A256CBC-HS512'</span><span class="p">,</span> <span class="s1">'use'</span> <span class="o">=&gt;</span> <span class="s1">'enc'</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>Since 4.2.6, a shorter key is refused: <code>build()</code> throws <code>Invalid CEK size</code>, and the decrypter does not decrypt with it. A longer key is still accepted, but only its first bytes are used, as many as the CEK has: use a key of exactly the size above.</p>
+<h3 id="encrypted-key-of-the-direct-modes">Encrypted key of the direct modes<a class="headerlink" href="#encrypted-key-of-the-direct-modes" title="Link to this section">&para;</a></h3>
+<p><code>dir</code>, <code>ECDH-ES</code> and <code>ECDH-SS</code> transport no key: the encrypted key of the token is empty. Since 4.2.6, the decrypter refuses a token of these modes whose encrypted key is not empty. In the JSON serializations, an <code>encrypted_key</code> member set to <code>""</code> is still accepted. The tokens built by the library always leave it empty.</p>
+<h3 id="aes-key-wrapping-keys">AES key wrapping keys<a class="headerlink" href="#aes-key-wrapping-keys" title="Link to this section">&para;</a></h3>
+<p><code>A128KW</code>, <code>A192KW</code>, <code>A256KW</code>, <code>A128GCMKW</code>, <code>A192GCMKW</code> and <code>A256GCMKW</code> need an <code>oct</code> key of exactly 128, 192 or 256 bits, as their name says. Generate it at random; never build it from a text secret or from an environment variable that may be empty:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">use</span> <span class="nx">Jose\Component\KeyManagement\JWKFactory</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">$jwk</span> <span class="o">=</span> <span class="nx">JWKFactory</span><span class="o">::</span><span class="na">createOctKey</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="p">[</span><span class="s1">'alg'</span> <span class="o">=&gt;</span> <span class="s1">'A256KW'</span><span class="p">,</span> <span class="s1">'use'</span> <span class="o">=&gt;</span> <span class="s1">'enc'</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>Since 4.2.6, a shorter key, an empty one included, is refused with <code>Invalid key length.</code>, to wrap and to unwrap. A longer key is still accepted, but only its first 16, 24 or 32 bytes are used: use a key of exactly the key size of the algorithm.</p>
+<p>The same goes for the experimental <code>A128CTR</code>, <code>A192CTR</code> and <code>A256CTR</code> (128, 192 and 256 bits) and <code>chacha20-poly1305</code> (256 bits) key encryption algorithms.</p>
+<h3 id="rsa-keys">RSA keys<a class="headerlink" href="#rsa-keys" title="Link to this section">&para;</a></h3>
+<p>Since 4.2.6, every RSA algorithm, the signature ones included, refuses a key beyond the limits of OpenSSL:</p>
+<ul>
+<li>a modulus longer than 16384 bits;</li>
+<li>a public exponent longer than the modulus;</li>
+<li>a public exponent longer than 64 bits when the modulus is longer than 3072 bits.</li>
+</ul>
+<p>Every key that OpenSSL accepts is still accepted. Use keys of 2048 bits at least.</p>
+<p>Since 4.2.6, <code>RSA-OAEP</code> and <code>RSA-OAEP-256</code> handle a single RSA block, as RFC 7518 requires:</p>
+<ul>
+<li>the CEK must fit in one block. With a key shorter than 2048 bits it may not: <code>RSA-OAEP-256</code> with a 1024-bit key and <code>A256CBC-HS512</code> throws <code>Message too long</code>;</li>
+<li>an encrypted key longer than the modulus is refused.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>RSA-OAEP</code>, <code>RSA-OAEP-256</code> and <code>RSA1_5</code> compute the RSA operations in PHP, at a cost that depends on the GMP or BCMath extension. Install GMP when you encrypt to keys chosen by others, such as keys registered by clients: without it, a single operation can take seconds.</p>
+</div>
+<h3 id="ephemeral-public-key-epk">Ephemeral public key (<code>epk</code>)<a class="headerlink" href="#ephemeral-public-key-epk" title="Link to this section">&para;</a></h3>
+<p>With <code>ECDH-ES</code> and its <code>+A*KW</code> variants, the token carries the ephemeral public key of the sender in its <code>epk</code> header parameter. That key must be a point of the curve of the recipient key, with coordinates no longer than the size of the curve; otherwise the token is refused with <code>Unable to derive the key</code>. Since 4.2.6, these checks come before any costly computation, with or without the GMP extension.</p>
+<p>Since 4.2.6, <code>ECDH-SS</code> refuses the same way a sender key on another curve than the recipient key.</p>
 <h2 id="experimental-algorithms">Experimental algorithms<a class="headerlink" href="#experimental-algorithms" title="Link to this section">&para;</a></h2>
 <p>The following algorithms are experimental and must not be used in production unless you know what you are doing. <strong>They are proposed for testing purpose only.</strong></p>
 <h3 id="key-encryption_1">Key encryption<a class="headerlink" href="#key-encryption_1" title="Link to this section">&para;</a></h3>
@@ -3394,18 +3608,18 @@
 </table>
 <h2 id="how-to-use">How to use<a class="headerlink" href="#how-to-use" title="Link to this section">&para;</a></h2>
 <p>These algorithms have to be used with the <a href="../../algorithm-management-jwa/">Algorithm Manager</a>.</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Core\AlgorithmManager</span><span class="p">;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\KeyEncryption\A128KW</span><span class="p">;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\KeyEncryption\PBES2HS256A128KW</span><span class="p">;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256</span><span class="p">;</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nv">$algorithmManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlgorithmManager</span><span class="p">([</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="k">new</span> <span class="nx">A128KW</span><span class="p">(),</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">new</span> <span class="nx">PBES2HS256A128KW</span><span class="p">(),</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">new</span> <span class="nx">A128CBCHS256</span><span class="p">(),</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">]);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Core\AlgorithmManager</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\KeyEncryption\A128KW</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\KeyEncryption\PBES2HS256A128KW</span><span class="p">;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256</span><span class="p">;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="nv">$algorithmManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlgorithmManager</span><span class="p">([</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="k">new</span> <span class="nx">A128KW</span><span class="p">(),</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="k">new</span> <span class="nx">PBES2HS256A128KW</span><span class="p">(),</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="k">new</span> <span class="nx">A128CBCHS256</span><span class="p">(),</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">]);</span>
 </span></code></pre></div>
 <p>By default, <code>PBES2*</code> algorithms use the following parameter values:</p>
 <ul>
@@ -3414,14 +3628,14 @@
 </ul>
 <p>You may need to use other values. This can be done during the instantiation of the algorithm:</p>
 <p>Example with 16 bytes (128 bits) salt and 1024 counts:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Core\AlgorithmManager</span><span class="p">;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\KeyEncryption\PBES2HS256A128KW</span><span class="p">;</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nv">$algorithmManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlgorithmManager</span><span class="p">([</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">new</span> <span class="nx">PBES2HS256A128KW</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">]);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Core\AlgorithmManager</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\Algorithm\KeyEncryption\PBES2HS256A128KW</span><span class="p">;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nv">$algorithmManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlgorithmManager</span><span class="p">([</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">new</span> <span class="nx">PBES2HS256A128KW</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">]);</span>
 </span></code></pre></div>
 
 
@@ -3443,7 +3657,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:09:39 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3566,7 +3780,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

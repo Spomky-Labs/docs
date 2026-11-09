@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.2, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -2400,6 +2412,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiple signatures
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -2416,6 +2446,38 @@
   
 
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#loading-a-token-with-several-signatures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading a token with several signatures
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -2997,6 +3059,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#loading-a-token-with-several-signatures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading a token with several signatures
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3034,16 +3115,18 @@
 <p>The variable <code>$jws</code> will be a valid JWS object with all computed signatures. Next step is the serialization of these signatures.</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">use</span> <span class="nx">Jose\Component\Signature\Serializer</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">$manager</span> <span class="o">=</span> <span class="nx">Serializer\JWSSerializerManager</span><span class="o">::</span><span class="na">create</span><span class="p">([</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Serializer\JWSSerializerManager</span><span class="p">([</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">new</span> <span class="nx">Serializer\CompactSerializer</span><span class="p">(),</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="k">new</span> <span class="nx">Serializer\JsonFlattenedSerializer</span><span class="p">(),</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">new</span> <span class="nx">Serializer\JsonGeneralSerializer</span><span class="p">(),</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="k">new</span> <span class="nx">Serializer\JSONFlattenedSerializer</span><span class="p">(),</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">new</span> <span class="nx">Serializer\JSONGeneralSerializer</span><span class="p">(),</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">]);</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nv">$tokenWithAllSignatures</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">serialize</span><span class="p">(</span><span class="s1">'jws_json_general'</span><span class="p">,</span> <span class="nv">$jws</span><span class="p">);</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="nv">$compactTokenWithSignatureAtIndex1</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">serialize</span><span class="p">(</span><span class="s1">'jws_compact'</span><span class="p">,</span> <span class="nv">$jws</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="nv">$flattenedTokenWithSignatureAtIndex2</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">serialize</span><span class="p">(</span><span class="s1">'jws_json_flattened'</span><span class="p">,</span> <span class="nv">$jws</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </span></code></pre></div>
+<h2 id="loading-a-token-with-several-signatures">Loading a token with several signatures<a class="headerlink" href="#loading-a-token-with-several-signatures" title="Link to this section">&para;</a></h2>
+<p>A <code>JWSLoader</code> tries the signatures of a token one after the other, until one of them is verified, and the sender of the token decides how many there are. Since 4.2.6, the loader can reject a token that carries more signatures than you expect before trying any of them: see <a href="../../../the-components/signed-tokens-jws/jws-loading/#maximum-number-of-signatures">Maximum number of signatures</a>.</p>
 
 
 
@@ -3064,7 +3147,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3187,7 +3270,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

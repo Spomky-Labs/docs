@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.2, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -953,6 +965,17 @@
       On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rsa-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RSA keys
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#experimental-algorithms" class="md-nav__link">
@@ -3065,6 +3088,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#rsa-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RSA keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#experimental-algorithms" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3147,6 +3181,9 @@
 </tr>
 </tbody>
 </table>
+<h3 id="rsa-keys">RSA keys<a class="headerlink" href="#rsa-keys" title="Link to this section">&para;</a></h3>
+<p>Since 4.2.6, the <code>RS*</code> and <code>PS*</code> algorithms refuse an RSA key beyond the limits of OpenSSL, as the encryption algorithms do: see <a href="../../encrypted-tokens-jwe/encryption-algorithms/#rsa-keys">RSA keys</a>. When <code>JWSVerifier</code> is given such a key, the verification with that key fails and the next key of the key set is tried.</p>
+<p><code>PS256</code>, <code>PS384</code> and <code>PS512</code> compute the verification in PHP, at a cost that depends on the GMP or BCMath extension. Install GMP when you verify signatures made with keys chosen by others, such as the <code>jwk</code> header parameter of a DPoP proof: without it, a single verification can take seconds.</p>
 <h3 id="experimental-algorithms">Experimental algorithms<a class="headerlink" href="#experimental-algorithms" title="Link to this section">&para;</a></h3>
 <p>The following signature algorithms are experimental and must not be used in production unless you know what you are doing. <strong>They are proposed for testing purpose only.</strong></p>
 <p>They are provided through the package <code>web-token/jwt-experimental</code>.</p>
@@ -3233,7 +3270,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3356,7 +3393,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

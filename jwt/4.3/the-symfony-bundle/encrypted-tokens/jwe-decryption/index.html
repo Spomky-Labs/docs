@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.3, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -1978,6 +1990,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="JWE loader service">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#maximum-number-of-recipients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximum number of recipients
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration helper
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -3188,6 +3228,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="JWE loader service">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#maximum-number-of-recipients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximum number of recipients
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration helper
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -3219,12 +3287,12 @@
 <h2 id="jwe-decrypter-factory-service">JWE decrypter factory service<a class="headerlink" href="#jwe-decrypter-factory-service" title="Link to this section">&para;</a></h2>
 <p>A <code>JWEDecrypterFactory</code> is available as a service in your application container:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\JWEDecrypterFactory</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">use</span> <span class="nx">Jose\Bundle\JoseFramework\Services\JWEDecrypterFactory</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">$jweDecrypterFactory</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="nx">JWEDecrypterFactory</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
 </span></code></pre></div>
 <p>With this factory, you will be able to create the JWEDecrypter you need:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">$jweDecrypter</span> <span class="o">=</span> <span class="nv">$jweDecrypterFactory</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">'HS256'</span><span class="p">]);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">$jweDecrypter</span> <span class="o">=</span> <span class="nv">$jweDecrypterFactory</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">'A256GCMKW'</span><span class="p">,</span> <span class="s1">'A256CBC-HS256'</span><span class="p">]);</span>
 </span></code></pre></div>
 <p>You can now use the JWEDecrypter as explained in the JWE Creation section.</p>
 <div class="admonition info">
@@ -3258,25 +3326,43 @@
 <h2 id="jwe-loader-service">JWE loader service<a class="headerlink" href="#jwe-loader-service" title="Link to this section">&para;</a></h2>
 <p>The <a href="../../../the-components/encrypted-tokens-jwe/jwe-loading/"><code>JWELoaderFactory</code></a> is available as a public service. You can retrieve it using the container or inject it into your services. It will help you to create <code>JWELoader</code> objects on demand.</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\JWELoaderFactory</span><span class="p">;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">use</span> <span class="nx">Jose\Bundle\JoseFramework\Services\JWELoaderFactory</span><span class="p">;</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nv">$jweLoaderFactory</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="nx">JWELoaderFactory</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
 </span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The factory services of the bundle are the classes of the <code>Jose\Bundle\JoseFramework\Services</code> namespace. Do not register the factories of the library, such as <code>Jose\Component\Encryption\JWELoaderFactory</code>, as services of your own: autowiring gives them no header checker manager factory, because the one of the bundle is another class, and the loaders they create check no header parameter. Since 4.2.7, they throw when header checkers are requested, and since 4.3 creating them that way is deprecated, see <a href="../../../the-components/encrypted-tokens-jwe/jwe-loading/#without-a-header-checker-manager-factory">Without a header checker manager factory</a>. The factory services of the bundle always have a header checker manager factory.</p>
+</div>
 <p>You can also create <code>JWELoader</code> objects as services using the configuration of the bundle.</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">jose</span><span class="p">:</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nt">jwe</span><span class="p">:</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">        </span><span class="nt">loaders</span><span class="p">:</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">            </span><span class="nt">jwe_loader1</span><span class="p">:</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">                </span><span class="nt">encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'A256GCMKW'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'A256CBC-HS256'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">                </span><span class="nt">header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'alg'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'enc'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">                </span><span class="nt">is_public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">                </span><span class="nt">serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jwe_compact'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">                </span><span class="nt">encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'A256GCMKW'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'A256CBC-HS256'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">                </span><span class="nt">header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'alg'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'enc'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">                </span><span class="nt">is_public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></code></pre></div>
-<p>Or using the <a href="../../configuration-helper/"><code>ConfigurationHelper</code></a>.</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">use</span> <span class="nx">Jose\Bundle\JoseFramework\Helper\ConfigurationHelper</span><span class="p">;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="o">...</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nx">ConfigurationHelper</span><span class="o">::</span><span class="na">addJWELoader</span><span class="p">(</span><span class="nv">$container</span><span class="p">,</span> <span class="s1">'jwe_loader1'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'A256GCMKW'</span><span class="p">,</span> <span class="s1">'A256CBC-HS256'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'alg'</span><span class="p">,</span> <span class="s1">'enc'</span><span class="p">],</span> <span class="k">true</span><span class="p">);</span>
+<h3 id="maximum-number-of-recipients">Maximum number of recipients<a class="headerlink" href="#maximum-number-of-recipients" title="Link to this section">&para;</a></h3>
+<p>Since 4.3, a loader accepts a <code>max_recipients</code> option: a token with more recipients is rejected before any of them is processed.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">jose</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nt">jwe</span><span class="p">:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">        </span><span class="nt">loaders</span><span class="p">:</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">            </span><span class="nt">jwe_loader1</span><span class="p">:</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">                </span><span class="nt">serializers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'jwe_compact'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'jwe_json_general'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">                </span><span class="nt">encryption_algorithms</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'A256GCMKW'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'A256CBC-HS256'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">                </span><span class="nt">header_checkers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'alg'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'enc'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">                </span><span class="nt">max_recipients</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+</span></code></pre></div>
+<p>Without it, the number of recipients is not limited, but loading a token with more than 10 recipients triggers a deprecation: 10 becomes the default maximum in 5.0. See <a href="../../../the-components/encrypted-tokens-jwe/jwe-loading/#maximum-number-of-recipients">Maximum number of recipients</a>.</p>
+<h3 id="configuration-helper">Configuration helper<a class="headerlink" href="#configuration-helper" title="Link to this section">&para;</a></h3>
+<p>A loader can also be created using the <a href="../../configuration-helper/"><code>ConfigurationHelper</code></a>.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">use</span> <span class="nx">Jose\Bundle\JoseFramework\Helper\ConfigurationHelper</span><span class="p">;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="o">...</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nx">ConfigurationHelper</span><span class="o">::</span><span class="na">addJWELoader</span><span class="p">(</span><span class="nv">$container</span><span class="p">,</span> <span class="s1">'jwe_loader1'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'A256GCMKW'</span><span class="p">,</span> <span class="s1">'A256CBC-HS256'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'alg'</span><span class="p">,</span> <span class="s1">'enc'</span><span class="p">],</span> <span class="k">true</span><span class="p">);</span>
 </span></code></pre></div>
 
 
@@ -3298,7 +3384,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3421,7 +3507,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

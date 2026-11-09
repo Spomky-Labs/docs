@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.3, which is not the latest one.
+  <a href="../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -2449,6 +2461,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#bounded-json-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bounded JSON decoding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reading-a-token-without-knowing-its-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3356,6 +3379,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#bounded-json-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bounded JSON decoding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reading-a-token-without-knowing-its-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3549,6 +3583,10 @@
 </span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="nv">$jwe</span>  <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">getJwe</span><span class="p">();</span>
 </span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="nv">$name</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">getSerializerName</span><span class="p">();</span> <span class="c1">// e.g. "jwe_json_flattened"</span>
 </span></code></pre></div>
+<h2 id="bounded-json-decoding">Bounded JSON decoding<a class="headerlink" href="#bounded-json-decoding" title="Link to this section">&para;</a></h2>
+<p>Since 4.2.6, the JWS and JWE serializers bound the JSON they decode before handing it to <code>json_decode()</code>. They count the brackets (<code>[</code>), braces (<code>{</code>) and commas (<code>,</code>) found outside the string literals of a document, which bounds the number of values and members it can hold. All the JSON documents of one token share a budget of <strong>4,096</strong>: the token itself in the JSON serializations, and each of its protected headers. A token beyond that budget is rejected before <code>json_decode()</code> runs on the document that exceeds it, with the same <code>Unsupported input.</code> error as any input that cannot be parsed, so the serializer manager and the loaders report it like any other token they cannot read.</p>
+<p>The content of the strings is not counted: a large payload, an unencoded (<code>b64: false</code>) payload or a long <code>x5c</code> chain costs nothing. A protected header usually holds a few dozen values, and a signature or recipient entry five to ten, so the budget leaves room for hundreds of signatures or recipients. To limit their number, set the maximum number of <a href="../../the-components/signed-tokens-jws/jws-loading/#maximum-number-of-signatures">signatures</a> or <a href="../../the-components/encrypted-tokens-jwe/jwe-loading/#maximum-number-of-recipients">recipients</a> of the loader.</p>
+<p>The budget only applies to the documents of the tokens, and to those of an <a href="../selective-disclosure/">SD-JWT</a>, which share one budget with its Disclosures. The key sets loaded from a <code>jku</code> or <code>x5u</code> URL, and the claims your application decodes once the token is verified or decrypted, are not limited.</p>
 <h2 id="reading-a-token-without-knowing-its-mode">Reading a token without knowing its mode<a class="headerlink" href="#reading-a-token-without-knowing-its-mode" title="Link to this section">&para;</a></h2>
 <p><code>unserializeToken()</code> tries every serializer it holds and returns an <code>UnserializationResult</code> carrying both the token object and the name of the serializer that could read it. When none of them can, the exception thrown by the last one is chained as the previous exception, so the actual reason of the failure remains available.</p>
 <div class="admonition warning">
@@ -3578,7 +3616,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3701,7 +3739,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

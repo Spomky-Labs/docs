@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.2, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -802,6 +814,56 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distant-key-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distant key sets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Distant key sets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#redirects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#certificates-of-a-x5u-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Certificates of a x5u document
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3064,6 +3126,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#distant-key-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distant key sets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Distant key sets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#redirects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#certificates-of-a-x5u-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Certificates of a x5u document
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3161,6 +3273,42 @@
 <p class="admonition-title">Warning</p>
 <p>Before 4.2, the keys were indexed by <code>kid</code> and the last key registered with a given ID silently replaced the previous one. See the <a href="../../../migration/from-v4.1-to-v4.2/#duplicate-key-ids-in-a-key-set">migration guide</a>.</p>
 </div>
+<h2 id="distant-key-sets">Distant key sets<a class="headerlink" href="#distant-key-sets" title="Link to this section">&para;</a></h2>
+<p><code>JKUFactory</code> and <code>X5UFactory</code> fetch a key set from a URL with a <a href="https://symfony.com/doc/current/http_client.html">Symfony HTTP client</a>. <code>JKUFactory</code> reads a JWKSet document, <code>X5UFactory</code> a JSON object of X.509 certificates. The second argument of <code>loadFromUrl()</code> holds the headers of the request.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">use</span> <span class="nx">Jose\Component\KeyManagement\JKUFactory</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">use</span> <span class="nx">Jose\Component\KeyManagement\X5UFactory</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">use</span> <span class="nx">Symfony\Component\HttpClient\HttpClient</span><span class="p">;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nv">$httpClient</span> <span class="o">=</span> <span class="nx">HttpClient</span><span class="o">::</span><span class="na">create</span><span class="p">();</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nv">$jkuFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JKUFactory</span><span class="p">(</span><span class="nv">$httpClient</span><span class="p">);</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nv">$jwkset</span> <span class="o">=</span> <span class="nv">$jkuFactory</span><span class="o">-&gt;</span><span class="na">loadFromUrl</span><span class="p">(</span><span class="s1">'https://login.microsoftonline.com/common/discovery/keys'</span><span class="p">);</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="nv">$x5uFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">X5UFactory</span><span class="p">(</span><span class="nv">$httpClient</span><span class="p">);</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="nv">$jwkset</span> <span class="o">=</span> <span class="nv">$x5uFactory</span><span class="o">-&gt;</span><span class="na">loadFromUrl</span><span class="p">(</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="s1">'https://www.googleapis.com/oauth2/v1/certs'</span><span class="p">,</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="p">[</span><span class="s1">'X-Api-Key'</span> <span class="o">=&gt;</span> <span class="nv">$apiKey</span><span class="p">]</span> <span class="c1">// Optional headers of the request</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Only fetch URLs your application trusts, such as one written in its configuration. The <code>jku</code> and <code>x5u</code> header parameters of a token are chosen by its sender: never fetch them unless they are in an exact list of trusted URLs.</p>
+</div>
+<h3 id="redirects">Redirects<a class="headerlink" href="#redirects" title="Link to this section">&para;</a></h3>
+<p>The factories send their request with the redirect policy of the HTTP client: Symfony's clients follow up to 20 redirects by default, to any host, and the body of the last response becomes the key set. To refuse redirects, give the factory a client whose <code>max_redirects</code> option is 0: a redirect then makes <code>loadFromUrl()</code> throw.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">$jkuFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JKUFactory</span><span class="p">(</span><span class="nx">HttpClient</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'max_redirects'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">]));</span>
+</span></code></pre></div>
+<h3 id="certificates-of-a-x5u-document">Certificates of a <code>x5u</code> document<a class="headerlink" href="#certificates-of-a-x5u-document" title="Link to this section">&para;</a></h3>
+<p>Each entry of a <code>x5u</code> document is a certificate, PEM encoded or as the base64 body of its PEM form. Since 4.2.7, an entry that starts with <code>file://</code> is wrapped between PEM markers like any other base64 entry: OpenSSL never receives it as a path, so the document cannot make the application read a local file, and such an entry fails to load.</p>
+<h3 id="cache">Cache<a class="headerlink" href="#cache" title="Link to this section">&para;</a></h3>
+<p><code>enabledCache()</code> stores the fetched documents in a PSR-6 cache pool. It is deprecated since 4.1: give the factory an HTTP client that caches the responses instead, such as Symfony's <code>CachingHttpClient</code>.</p>
+<p>Since 4.2.7, the cache key covers the URL <strong>and the headers</strong> of the request: two calls for the same URL with other headers, for instance another tenant or other credentials, fetch their own document. Before, the second call got the document fetched with the first headers until the entry expired. The entries stored by an earlier version are not read any more, so the first call after the upgrade fetches the document again. A request whose headers cannot be serialized, such as an anonymous <code>Stringable</code> object, bypasses the cache: it is sent on every call and never stored.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>A caching HTTP client must tell those requests apart too. Symfony's <code>CachingHttpClient</code> separates the responses of one URL by the request headers that their <code>Vary</code> header names: an endpoint that picks the key set from a custom header must list that header in <code>Vary</code>.</p>
+</div>
 
 
 
@@ -3181,7 +3329,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3304,7 +3452,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

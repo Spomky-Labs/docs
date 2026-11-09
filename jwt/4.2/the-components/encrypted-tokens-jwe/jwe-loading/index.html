@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -122,6 +122,18 @@
     </div>
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  
+  You are reading the documentation of version 4.2, which is not the latest one.
+  <a href="../../../.."><strong>Read the latest version</strong></a>, or pick another one from the
+  version menu in the header.
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../..",location),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
         
       </div>
     
@@ -1179,6 +1191,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="JWELoader object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#maximum-number-of-recipients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximum number of recipients
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1189,6 +1218,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="JWELoaderFactory object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#without-a-header-checker-manager-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without a header checker manager factory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3106,6 +3152,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="JWELoader object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#maximum-number-of-recipients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maximum number of recipients
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3116,6 +3179,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="JWELoaderFactory object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#without-a-header-checker-manager-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without a header checker manager factory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3210,7 +3290,7 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1">// Our key.</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nv">$jwk</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWK</span><span class="p">([</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="s1">'kty'</span> <span class="o">=&gt;</span> <span class="s1">'oct'</span><span class="p">,</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="s1">'k'</span> <span class="o">=&gt;</span> <span class="s1">'dzI6nbW4OcNF-AtfxGAmuyz7IpHRudBI0WgGjZWgaRJt6prBn3DARXgUR8NVwKhfL43QBIU2Un3AvCGCHRgY4TbEqhOi8-i98xxmCggNjde4oaW6wkJ2NgM3Ss9SOX9zS3lcVzdCMdum-RwVJ301kbin4UtGztuzJBeg5oVN00MGxjC2xWwyI0tgXVs-zJs5WlafCuGfX1HrVkIf5bvpE0MQCSjdJpSeVao6-RSTYDajZf7T88a2eVjeW31mMAg-jzAWfUrii61T_bYPJFOXW8kkRWoa1InLRdG6bKB9wQs9-VdXZP60Q4Yuj_WZ-lO7qV9AEFrUkkjpaDgZT86w2g'</span><span class="p">,</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="s1">'k'</span> <span class="o">=&gt;</span> <span class="s1">'lX2B8De7F0jmDDlg52fp-Exeen2OUMxKxt2pZG7JMcI'</span><span class="p">,</span> <span class="c1">// A 256-bit key, as A256KW expects</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">]);</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1">// The serializer manager. We only use the JWE Compact Serialization Mode.</span>
@@ -3219,7 +3299,7 @@
 </span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="p">]);</span>
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1">// The input we want to decrypt</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="nv">$token</span> <span class="o">=</span> <span class="s1">'eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0.9RLpf3Gauf05QPNCMzPcH4XNBLmH0s3e-YWwOe57MTG844gnc-g2ywfXt_R0Q9qsR6WhkmQEhdLk2CBvfqr4ob4jFlvJK0yW.CCvfoTKO9tQlzCvbAuFAJg.PxrDlsbSRcxC5SuEJ84i9E9_R3tCyDQsEPTIllSCVxVcHiPOC2EdDlvUwYvznirYP6KMTdKMgLqxB4BwI3CWtys0fceSNxrEIu_uv1WhzJg.4DnyeLEAfB4I8Eq0UobnP8ymlX1UIfSSADaJCXr3RlU'</span><span class="p">;</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="nv">$token</span> <span class="o">=</span> <span class="s1">'eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.-rH3aFiivrg3ptfnhqmGZI-RHftx1Rr18QIUA5n-lwp4vWmCyCErrnaMP6deJYIgA1vyKPTf5wTj5s0970j1FqHgiH6Wqfn-.1aQIEld9RxZCIBg63w85jw.qOJnjgw3NP56YzG6Y1w4X-Yvppswj-skID_j5v3c4l7zsmk5b2UYXbPqVSJZDLs7aRgWYHV0g25Xx1Jti_IKb6hJ2mfwTnnHaccVT9Q5AxfRqId8pUjYnmovKxauaPquy2-W0py86sU2NidjO5QqQQ.aANQ4-I5uhEZ5C_CB66hKSTQ2vl6YShRo3txjS90_6M'</span><span class="p">;</span>
 </span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
 </span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="c1">// We try to load the token.</span>
 </span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="nv">$jwe</span> <span class="o">=</span> <span class="nv">$serializerManager</span><span class="o">-&gt;</span><span class="na">unserialize</span><span class="p">(</span><span class="nv">$token</span><span class="p">);</span>
@@ -3245,29 +3325,52 @@
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nv">$jwe</span> <span class="o">=</span> <span class="nv">$jweLoader</span><span class="o">-&gt;</span><span class="na">loadAndDecryptWithKey</span><span class="p">(</span><span class="nv">$token</span><span class="p">,</span> <span class="nv">$key</span><span class="p">,</span> <span class="nv">$recipient</span><span class="p">);</span>
 </span></code></pre></div>
 <p>In case you use a key set, you can use the method <code>loadAndDecryptWithKeySet</code>.</p>
+<h3 id="maximum-number-of-recipients">Maximum number of recipients<a class="headerlink" href="#maximum-number-of-recipients" title="Link to this section">&para;</a></h3>
+<p>A token in the JSON General serialization carries as many recipients as its sender wants, and the loader tries them one after the other. Since 4.2.6, the loader accepts the maximum number of recipients of a token as a fourth argument of its constructor: a token with more recipients is rejected before any of them is processed.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\JWELoader</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nv">$jweLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWELoader</span><span class="p">(</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="nv">$serializerManager</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="nv">$jweDecrypter</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="nv">$headerCheckerManager</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="mi">10</span> <span class="c1">// The maximum number of recipients of a token</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>The value must be a positive integer. Without it, the number of recipients is not limited, as before 4.2.6. Set it when the loader accepts the JSON General serialization (<code>jwe_json_general</code>) from senders you do not trust: 10 is enough for the tokens met in practice. The compact and JSON Flattened serializations always carry exactly one recipient.</p>
+<p>A token with too many recipients fails like any other token: the loader throws <code>Unable to load and decrypt the token.</code>, and the previous exception says that the token has too many recipients.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>That argument is not declared in the signature of the constructor yet: it is read with <code>func_num_args()</code>/<code>func_get_arg(3)</code>, so that classes extending the loader keep working. It will be declared in 5.0, with 10 as its default value. <code>JWELoaderFactory</code> does not pass it in 4.2: create the loader yourself to set it.</p>
+</div>
+<p>Since 4.2.6, the recipients of a token also share the iteration count cap of the <code>PBES2-*</code> algorithms: in a token with N recipients, a PBES2 recipient may request at most <code>max_count / N</code> iterations, <code>max_count</code> being the third argument of the constructor of the algorithm (1,000,000 by default). A recipient that requests more is not decrypted. Tokens with a single recipient are not affected, and tokens built with the default count of 4,096 iterations are still decrypted up to 244 recipients.</p>
 <h2 id="jweloaderfactory-object">JWELoaderFactory object<a class="headerlink" href="#jweloaderfactory-object" title="Link to this section">&para;</a></h2>
 <p>The <code>JWELoaderFactory</code> object is able to create <code>JWELoader</code> objects on demand. It requires the following factories:</p>
 <ul>
 <li><code>JWESerializerManagerFactory</code></li>
 <li><code>JWEDecrypterFactory</code></li>
-<li><code>HeaderCheckerManagerFactory</code> (optional)</li>
+<li><code>HeaderCheckerManagerFactory</code> (optional, see below)</li>
 </ul>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\JWELoaderFactory</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nv">$jweLoaderFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWELoaderFactory</span><span class="p">(</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="nv">$jweSerializerManagerFactory</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="nv">$jweDecrypterFactory</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="nv">$headerCheckerManagerFactory</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">);</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nv">$jweLoader</span> <span class="o">=</span> <span class="nv">$jweLoaderFactory</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span>           <span class="c1">// List of serializer aliases</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="p">[</span><span class="s1">'A256KW'</span><span class="p">,</span> <span class="s1">'A256CBCHS512'</span><span class="p">],</span> <span class="c1">// List of encryption algorithm aliases (both key and content)</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="p">[</span><span class="s1">'alg'</span><span class="p">,</span> <span class="s1">'enc'</span><span class="p">]</span>             <span class="c1">// Optional list of header checker aliases</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="p">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">use</span> <span class="nx">Jose\Component\Encryption\JWELoaderFactory</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">$jweLoaderFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JWELoaderFactory</span><span class="p">(</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="nv">$jweSerializerManagerFactory</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="nv">$jweDecrypterFactory</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="nv">$headerCheckerManagerFactory</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">);</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nv">$jweLoader</span> <span class="o">=</span> <span class="nv">$jweLoaderFactory</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="p">[</span><span class="s1">'jwe_compact'</span><span class="p">],</span>           <span class="c1">// List of serializer aliases</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="p">[</span><span class="s1">'A256KW'</span><span class="p">,</span> <span class="s1">'A256CBCHS512'</span><span class="p">],</span> <span class="c1">// List of encryption algorithm aliases (both key and content)</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="p">[</span><span class="s1">'alg'</span><span class="p">,</span> <span class="s1">'enc'</span><span class="p">]</span>             <span class="c1">// Optional list of header checker aliases</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">);</span>
 </span></code></pre></div>
+<h3 id="without-a-header-checker-manager-factory">Without a header checker manager factory<a class="headerlink" href="#without-a-header-checker-manager-factory" title="Link to this section">&para;</a></h3>
+<p>A factory created with <code>null</code> instead of a <code>HeaderCheckerManagerFactory</code> can only create loaders that check no header parameter, not even those listed in <code>crit</code>. Since 4.2.7, its <code>create()</code> method throws an <code>InvalidArgumentException</code> (<code>Header checkers were requested, but no header checker manager factory is available.</code>) when header checker aliases are given. It used to ignore them and return a loader that checked nothing. With an empty list, it still returns a loader without header checker manager.</p>
+<p>The exception is thrown when the loader is created, not when a token is loaded. To fix it, give the factory a <code>HeaderCheckerManagerFactory</code>. With the Symfony bundle, use the <a href="../../../the-symfony-bundle/encrypted-tokens/jwe-decryption/#jwe-loader-service">factory services of the bundle</a> rather than registering the library factories with autowiring, which leaves this argument <code>null</code>.</p>
 <h2 id="header-validation">Header validation<a class="headerlink" href="#header-validation" title="Link to this section">&para;</a></h2>
 <p><a href="https://datatracker.ietf.org/doc/html/rfc7516#section-7.2.1">RFC 7516 section 7.2.1</a> requires the header parameter names of the three locations — shared protected header, shared unprotected header and per-recipient header — to be <strong>disjoint</strong>. The <code>JWEDecrypter</code> enforces it and rejects a token that repeats a parameter across two locations.</p>
 <p>Two consequences are worth knowing:</p>
@@ -3282,41 +3385,42 @@
 <p>This validation is not a substitute for the <a href="../../header-checker/">Header Checker</a>: it only checks where the parameters are, not what they contain.</p>
 <h2 id="static-key-agreement">Static key agreement<a class="headerlink" href="#static-key-agreement" title="Link to this section">&para;</a></h2>
 <p>The <code>ECDH-SS*</code> algorithms derive the agreement key from two <strong>static</strong> keys, so no <code>epk</code> header parameter is present in the token and the decrypter must be given both keys.</p>
-<p>Beware that the roles are swapped compared to the <a href="../jwe-creation/#static-key-agreement-ecdh-ss">creation side</a>: the key used to decrypt is the <strong>public key of the sender</strong>, and the additional key is the <strong>private key of the recipient</strong>.</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">$success</span> <span class="o">=</span> <span class="nv">$jweDecrypter</span><span class="o">-&gt;</span><span class="na">decryptUsingKey</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="nv">$jwe</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="nv">$senderPublicKey</span><span class="p">,</span>     <span class="c1">// The key of the sender</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="nv">$recipientPrivateKey</span>  <span class="c1">// Your own private key</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
+<p>The order below swaps the roles compared to the <a href="../jwe-creation/#static-key-agreement-ecdh-ss">creation side</a>: the key used to decrypt is the <strong>public key of the sender</strong>, and the additional key is the <strong>private key of the recipient</strong>.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">$success</span> <span class="o">=</span> <span class="nv">$jweDecrypter</span><span class="o">-&gt;</span><span class="na">decryptUsingKey</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="nv">$jwe</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="nv">$senderPublicKey</span><span class="p">,</span>     <span class="c1">// The key of the sender</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="nv">$recipientPrivateKey</span>  <span class="c1">// Your own private key</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">);</span>
 </span></code></pre></div>
+<p>Since 4.2.7, the other order works too: your private key as the key used to decrypt, and the public key of the sender as the additional key. Before 4.2.7, that order did not decrypt genuine tokens. The agreement is computed from the two static keys only, whichever of them is the private one, and an <code>epk</code> header parameter found in an <code>ECDH-SS*</code> token is never read.</p>
 <h2 id="understanding-failures">Understanding failures<a class="headerlink" href="#understanding-failures" title="Link to this section">&para;</a></h2>
 <p>When a token cannot be loaded or decrypted, the loaders and the serializer manager chain the last error met along the way as the previous exception:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">use</span> <span class="nx">Throwable</span><span class="p">;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">try</span> <span class="p">{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="nv">$jwe</span> <span class="o">=</span> <span class="nv">$jweLoader</span><span class="o">-&gt;</span><span class="na">loadAndDecryptWithKeySet</span><span class="p">(</span><span class="nv">$token</span><span class="p">,</span> <span class="nv">$jwkset</span><span class="p">,</span> <span class="nv">$recipient</span><span class="p">);</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$throwable</span><span class="p">)</span> <span class="p">{</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">logger</span><span class="o">-&gt;</span><span class="na">debug</span><span class="p">(</span><span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="p">[</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="s1">'cause'</span> <span class="o">=&gt;</span> <span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getPrevious</span><span class="p">()</span><span class="o">?-&gt;</span><span class="na">getMessage</span><span class="p">(),</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="p">]);</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="k">throw</span> <span class="nv">$throwable</span><span class="p">;</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">}</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">use</span> <span class="nx">Throwable</span><span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">try</span> <span class="p">{</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="nv">$jwe</span> <span class="o">=</span> <span class="nv">$jweLoader</span><span class="o">-&gt;</span><span class="na">loadAndDecryptWithKeySet</span><span class="p">(</span><span class="nv">$token</span><span class="p">,</span> <span class="nv">$jwkset</span><span class="p">,</span> <span class="nv">$recipient</span><span class="p">);</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$throwable</span><span class="p">)</span> <span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">logger</span><span class="o">-&gt;</span><span class="na">debug</span><span class="p">(</span><span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="p">[</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>        <span class="s1">'cause'</span> <span class="o">=&gt;</span> <span class="nv">$throwable</span><span class="o">-&gt;</span><span class="na">getPrevious</span><span class="p">()</span><span class="o">?-&gt;</span><span class="na">getMessage</span><span class="p">(),</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="p">]);</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="k">throw</span> <span class="nv">$throwable</span><span class="p">;</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>JWEDecrypter</code> returns a boolean and cannot throw without changing that contract, so its per-key failures are reported through a callable it accepts as an additional argument. It is called once per key that failed:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">$success</span> <span class="o">=</span> <span class="nv">$jweDecrypter</span><span class="o">-&gt;</span><span class="na">decryptUsingKeySet</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nv">$jwe</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="nv">$jwkset</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="nv">$jwk</span><span class="p">,</span>        <span class="c1">// Set with the key that succeeded</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="nv">$senderKey</span><span class="p">,</span>  <span class="c1">// Static key agreement only, see "Static Key Agreement" below</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="k">static</span> <span class="k">function</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$throwable</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="c1">// Called for each key that could not decrypt the token.</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="p">}</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">$success</span> <span class="o">=</span> <span class="nv">$jweDecrypter</span><span class="o">-&gt;</span><span class="na">decryptUsingKeySet</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="nv">$jwe</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="nv">$jwkset</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="nv">$jwk</span><span class="p">,</span>        <span class="c1">// Set with the key that succeeded</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="nv">$senderKey</span><span class="p">,</span>  <span class="c1">// Static key agreement only, see "Static Key Agreement" below</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="k">static</span> <span class="k">function</span> <span class="p">(</span><span class="nx">Throwable</span> <span class="nv">$throwable</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="c1">// Called for each key that could not decrypt the token.</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="p">}</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -3342,7 +3446,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 8, 2026 22:19:46 UTC">November 8, 2026</span>
   </span>
 
     
@@ -3465,7 +3569,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

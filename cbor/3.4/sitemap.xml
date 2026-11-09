@@ -2,134 +2,134 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/contributing/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/debugging/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/installation/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/license/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/performance/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/quick-reference/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/specifications/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/bundle/configuration/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/bundle/context/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/bundle/extending/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/bundle/installation/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/bundle/serializer/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/bundle/services/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/concepts/normalization/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/concepts/the-data-model/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/examples/api-responses/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/examples/cose/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/examples/sensor-data/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/examples/webauthn/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/guide/decoding/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/guide/encoding/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/guide/errors/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/guide/indefinite-length/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/guide/lists-and-maps/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/guide/streams/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/built-in/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/examples/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/overview/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/registering/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/registry-tags/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/registry/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/cbor/3.4/tags/writing-a-tag/</loc>
-         <lastmod>2026-11-06</lastmod>
+         <lastmod>2026-11-09</lastmod>
     </url>
 </urlset>
