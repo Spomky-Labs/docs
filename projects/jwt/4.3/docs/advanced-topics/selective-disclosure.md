@@ -92,6 +92,7 @@ The decoy digests have the length of the real ones and are mixed with them by th
 * The claim names `_sd`, `...` and `_sd_alg`, which are reserved, wherever they appear in the claims, selectively disclosable or not: in the PHP arrays, and in the JSON of the objects, such as a `JWK` in `cnf`, a `JsonSerializable` or a `stdClass`.
 * A selectively disclosable `iss`, `aud`, `exp`, `nbf` or `cnf` at the top level of the claims: the Verifier needs them to evaluate the SD-JWT (section 9.7 of the RFC). The elements of `aud` may be selectively disclosable.
 * Two Disclosures with the same salt.
+* A selectively disclosable value nested too deeply or holding too many JSON values, whose Disclosure could not be parsed back (see [Disclosures](#disclosures)).
 
 !!! tip
 
@@ -333,6 +334,11 @@ The objects of a value are converted by `json_encode()`, as in the payload of th
 * a `stdClass` as a JSON object, `{}` when it is empty.
 
 A value that `json_encode()` cannot serialize, such as an object that references itself, is refused with an `InvalidArgumentException`. The pure enums, neither backed nor `JsonSerializable`, are the exception: a Disclosure gives a pure enum the object of its name, `{"name": "Active"}` for `Status::Active`, alone or in the arrays of the value. A pure enum in the payload, or held by an object, is refused as `json_encode()` refuses it.
+
+A Disclosure that `Disclosure::fromString()` could not parse back is refused when it is created, with an `InvalidArgumentException` whose previous exception tells which bound was hit:
+
+* the depth: the value holds at most 510 levels of arrays and objects, the array of the Disclosure being the 511th that `Disclosure::fromString()` reads;
+* the [budget of 4096 JSON values](#verifying-a-presentation), counted over the whole Disclosure: `forArrayElement()` accepts a list of 4,094 integers at most, and `forObjectProperty()` 4,093, its claim name taking one more.
 
 ## Symfony bundle
 
