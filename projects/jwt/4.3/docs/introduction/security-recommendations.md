@@ -122,7 +122,7 @@ You should only use the serialization mode(s) you need. If you intend to use you
 A token is read before anything about it is verified, so whoever sends it chooses its size and its shape:
 
 * Limit the size of the request bodies and headers at the web server. Some servers accept request headers of about 1 MB by default.
-* Since 4.2.6, the serializers decode at most 4,096 JSON values per token: see [Bounded JSON decoding](../advanced-topics/serialization.md#bounded-json-decoding). This budget does not replace a size limit: the claims and the key sets are not bounded.
+* Since 4.2.6, the serializers decode at most 4,096 JSON values per token: see [Bounded JSON decoding](../advanced-topics/serialization.md#bounded-json-decoding). This budget does not replace a size limit: the claims and the key sets are not bounded. Since 4.3, a token rejected for this budget or for its depth has a `JsonBoundExceededException` in the chain of the exception, so your logs can count these tokens apart from the malformed ones.
 * If you accept the JSON General serialization, set the maximum number of [signatures](../the-components/signed-tokens-jws/jws-loading.md#maximum-number-of-signatures) or [recipients](../the-components/encrypted-tokens-jwe/jwe-loading.md#maximum-number-of-recipients) of your loaders, or do not register `jws_json_general` and `jwe_json_general`. Since 4.3, loading a token with more than 10 of them without a maximum is deprecated, and 5.0 sets 10 by default.
 * Accept the `PBES2-*` algorithms only from senders you trust: each recipient asks for its own iteration count, up to the `max_count` of the algorithm.
 

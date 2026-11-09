@@ -219,6 +219,8 @@ try {
 
 Every exception thrown by the framework implements `JoseException`, so a single catch block handles any failure. Each of them extends the SPL exception that was thrown at that place before 4.3, hence catch blocks written for previous versions keep matching.
 
+A token rejected for its size or its depth has a `JsonBoundExceededException` further down the chain, whose message names the bound: see [Rejections for a bound](../../advanced-topics/serialization.md#rejections-for-a-bound).
+
 `JWEDecrypter` reports a failure through its result rather than an exception, so the per-key failures it meets while trying a key set are reported through an optional callable. It is called once per key that failed:
 
 ```php
