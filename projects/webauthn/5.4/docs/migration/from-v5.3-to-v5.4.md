@@ -6,7 +6,7 @@ description: Upgrade guide from 5.3 to 5.4
 
 !!! success
 
-    No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0.
+    No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0. The only exception concerns the applications overriding the type of the counter column of the Doctrine mapping, see [the counter column](#database-schema-the-counter-column).
 
 Version 5.4 is the preparation step for 6.0: the profile-driven YAML configuration of the Symfony bundle is superseded by autowired helpers called from controllers you write yourself. The whole configuration surface that goes away in 6.0 is deprecated here, so you can migrate progressively while staying on the 5.x line.
 
@@ -32,6 +32,37 @@ bin/console doctrine:migrations:migrate
 ```
 
 The records created before 5.4, and those created from creation options without an explicit `rp.id`, keep `rpId` set to `null`. The serialized payloads without the `rpId` key are still accepted, and the member is omitted from the serialized output when it is `null`.
+
+## Database schema: the counter column
+
+!!! warning
+
+    **Action required if your entity extends `Webauthn\CredentialRecord`**
+
+The signature counter is an unsigned 32-bit integer, but the Doctrine mapping of the bundle declared a signed `INT` column: the counters above 2147483647 could not be stored. The mapping now declares a `BIGINT` column, so the migration generated for the `rpId` column also contains:
+
+```sql
+-- MySQL
+ALTER TABLE my_credential CHANGE counter counter BIGINT NOT NULL;
+-- PostgreSQL
+ALTER TABLE my_credential ALTER counter TYPE BIGINT;
+```
+
+Doctrine refuses an attribute override changing the type of an inherited field. If your entity overrides the counter column with an explicit type, for instance to add the `unsigned` option, drop the `type` from the override or the override itself:
+
+```php
+// Refused since 5.4.0: the mapping declares a bigint
+#[ORM\AttributeOverrides([
+    new ORM\AttributeOverride(name: 'counter', column: new ORM\Column(type: 'integer', options: ['unsigned' => true])),
+])]
+
+// Accepted
+#[ORM\AttributeOverrides([
+    new ORM\AttributeOverride(name: 'counter', column: new ORM\Column(options: ['unsigned' => true])),
+])]
+```
+
+The mapping itself is deprecated, see [below](#doctrine-mapping-of-the-bundle).
 
 ## Deprecations
 
@@ -182,6 +213,22 @@ public function __invoke(Request $request): Response
 ```
 
 The list lives in a single Symfony parameter, the security-critical decision is visible right where it applies, and the per-route overrides become trivial.
+
+### Doctrine mapping of the bundle
+
+!!! warning
+
+    **Deprecated in v5.4.0**
+
+The bundle maps `Webauthn\CredentialRecord`, `Webauthn\PublicKeyCredentialUserEntity` and `Webauthn\PublicKeyCredentialEntity` as Doctrine mapped superclasses. That mapping only served `DoctrineCredentialSourceRepository`, deprecated since 5.2.0, and is removed in 6.0.0. A deprecation is triggered for each entity extending one of these classes, when Doctrine loads its metadata:
+
+```
+Since web-auth/webauthn-symfony-bundle 5.4.0: The entity "App\Entity\WebauthnCredential" extends "Webauthn\CredentialRecord" and relies on the Doctrine mapping provided by the bundle. This mapping is deprecated and will be removed in 6.0.0. Map an entity of your application and convert it from and to "Webauthn\CredentialRecord" in your repository instead.
+```
+
+Map an entity of your application and convert it from and to `CredentialRecord` in your repository, as shown in [Credential Record Repository](../symfony-bundle/credential-record-repository.md). That entity declares the same properties as `CredentialRecord`, so it keeps your table: once the migration above has run, the switch requires no schema change. An entity that does not extend these classes is not concerned, even though the mapping is still registered.
+
+The user entity is already documented this way: see [User Entity Repository](../symfony-bundle/user-entity-repository.md).
 
 ### Reserved-for-future-use accessors
 
