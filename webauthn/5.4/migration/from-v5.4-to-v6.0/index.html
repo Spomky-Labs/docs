@@ -2694,6 +2694,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#entities-extending-the-credential-record-are-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entities extending the credential record are refused
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#publickeycredentialuserentityname-stays" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3025,6 +3036,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#entities-extending-the-credential-record-are-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entities extending the credential record are refused
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#publickeycredentialuserentityname-stays" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3221,6 +3243,11 @@
 <td>Your own Doctrine repository</td>
 </tr>
 <tr>
+<td>The Doctrine mapping of <code>CredentialRecord</code>, <code>PublicKeyCredentialUserEntity</code> and <code>PublicKeyCredentialEntity</code></td>
+<td>5.4.0</td>
+<td>An entity of your application, see <a href="../from-v5.3-to-v5.4/#doctrine-mapping-of-the-bundle">From 5.3 to 5.4</a></td>
+</tr>
+<tr>
 <td>The <code>credentialSource</code> property and <code>getPublicKeyCredentialSource()</code> of the events</td>
 <td>5.3.0</td>
 <td>The <code>credentialRecord</code> property</td>
@@ -3278,6 +3305,15 @@
 </div>
 <h3 id="a-secret-is-required-for-the-fake-credentials">A secret is required for the fake credentials<a class="headerlink" href="#a-secret-is-required-for-the-fake-credentials" title="Link to this section">&para;</a></h3>
 <p><code>Webauthn\SimpleFakeCredentialGenerator</code> requires a non-empty secret. See <a href="../from-v5.2-to-v5.3/">From 5.2 to 5.3</a> and <a href="../../symfony-bundle/advanced-behaviors/fake-credentials/">Fake Credentials</a>.</p>
+<h3 id="entities-extending-the-credential-record-are-refused">Entities extending the credential record are refused<a class="headerlink" href="#entities-extending-the-credential-record-are-refused" title="Link to this section">&para;</a></h3>
+<p>Without the Doctrine mapping of the bundle, an entity still extending <code>Webauthn\CredentialRecord</code> would only have the properties it declares itself, and <code>doctrine:migrations:diff</code> would propose to drop every column of your credential records. 6.0 refuses such an entity when Doctrine loads its metadata:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>The entity "App\Entity\WebauthnCredential" extends "Webauthn\CredentialRecord" without mapping its properties. The bundle no longer provides this mapping since 6.0.0: map an entity of your application and convert it from and to "Webauthn\CredentialRecord" in your repository instead.
+</span></code></pre></div>
+<p>The same applies to the entities extending <code>PublicKeyCredentialUserEntity</code> or <code>PublicKeyCredentialEntity</code>.</p>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Move to an entity of your application on 5.4, where the switch requires no schema change, before upgrading. See <a href="../from-v5.3-to-v5.4/#doctrine-mapping-of-the-bundle">From 5.3 to 5.4</a>.</p>
+</div>
 <h3 id="publickeycredentialuserentityname-stays">PublicKeyCredentialUserEntity.name stays<a class="headerlink" href="#publickeycredentialuserentityname-stays" title="Link to this section">&para;</a></h3>
 <p><code>PublicKeyCredentialUserEntity::$name</code> is <strong>not</strong> removed: the property moves from the abstract parent class down to the user entity and keeps working exactly as before. Only the Relying Party name goes away.</p>
 
@@ -3300,7 +3336,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 10, 2026 15:31:06 UTC">November 10, 2026</span>
   </span>
 
     

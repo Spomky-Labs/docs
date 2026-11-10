@@ -2582,6 +2582,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#database-schema-the-counter-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database schema: the counter column
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deprecations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2598,6 +2609,17 @@
     <span class="md-ellipsis">
       
         Profile-driven configuration superseded by helpers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#doctrine-mapping-of-the-bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Doctrine mapping of the bundle
       
     </span>
   </a>
@@ -2902,6 +2924,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#database-schema-the-counter-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database schema: the counter column
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deprecations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2918,6 +2951,17 @@
     <span class="md-ellipsis">
       
         Profile-driven configuration superseded by helpers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#doctrine-mapping-of-the-bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Doctrine mapping of the bundle
       
     </span>
   </a>
@@ -2990,7 +3034,7 @@
 <h1 id="from-53-to-54">From 5.3 to 5.4<a class="headerlink" href="#from-53-to-54" title="Link to this section">&para;</a></h1>
 <div class="admonition success">
 <p class="admonition-title">Success</p>
-<p>No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0.</p>
+<p>No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0. The only exception concerns the applications overriding the type of the counter column of the Doctrine mapping, see <a href="#database-schema-the-counter-column">the counter column</a>.</p>
 </div>
 <p>Version 5.4 is the preparation step for 6.0: the profile-driven YAML configuration of the Symfony bundle is superseded by autowired helpers called from controllers you write yourself. The whole configuration surface that goes away in 6.0 is deprecated here, so you can migrate progressively while staying on the 5.x line.</p>
 <h2 id="database-schema-the-new-rpid-column">Database schema: the new <code>rpId</code> column<a class="headerlink" href="#database-schema-the-new-rpid-column" title="Link to this section">&para;</a></h2>
@@ -3007,6 +3051,29 @@
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>bin/console<span class="w"> </span>doctrine:migrations:migrate
 </span></code></pre></div>
 <p>The records created before 5.4, and those created from creation options without an explicit <code>rp.id</code>, keep <code>rpId</code> set to <code>null</code>. The serialized payloads without the <code>rpId</code> key are still accepted, and the member is omitted from the serialized output when it is <code>null</code>.</p>
+<h2 id="database-schema-the-counter-column">Database schema: the counter column<a class="headerlink" href="#database-schema-the-counter-column" title="Link to this section">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Action required if your entity extends <code>Webauthn\CredentialRecord</code></strong></p>
+</div>
+<p>The signature counter is an unsigned 32-bit integer, but the Doctrine mapping of the bundle declared a signed <code>INT</code> column: the counters above 2147483647 could not be stored. The mapping now declares a <code>BIGINT</code> column, so the migration generated for the <code>rpId</code> column also contains:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- MySQL</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">my_credential</span><span class="w"> </span><span class="n">CHANGE</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1">-- PostgreSQL</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">my_credential</span><span class="w"> </span><span class="k">ALTER</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="k">TYPE</span><span class="w"> </span><span class="nb">BIGINT</span><span class="p">;</span>
+</span></code></pre></div>
+<p>Doctrine refuses an attribute override changing the type of an inherited field. If your entity overrides the counter column with an explicit type, for instance to add the <code>unsigned</code> option, drop the <code>type</code> from the override or the override itself:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Refused since 5.4.0: the mapping declares a bigint</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p">#[</span><span class="nd">ORM\AttributeOverrides</span><span class="p">([</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">new</span> <span class="nx">ORM\AttributeOverride</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="s1">'counter'</span><span class="p">,</span> <span class="nx">column</span><span class="o">:</span> <span class="k">new</span> <span class="nx">ORM\Column</span><span class="p">(</span><span class="nx">type</span><span class="o">:</span> <span class="s1">'integer'</span><span class="p">,</span> <span class="nx">options</span><span class="o">:</span> <span class="p">[</span><span class="s1">'unsigned'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">])),</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">])]</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">// Accepted</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">#[</span><span class="nd">ORM\AttributeOverrides</span><span class="p">([</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">new</span> <span class="nx">ORM\AttributeOverride</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="s1">'counter'</span><span class="p">,</span> <span class="nx">column</span><span class="o">:</span> <span class="k">new</span> <span class="nx">ORM\Column</span><span class="p">(</span><span class="nx">options</span><span class="o">:</span> <span class="p">[</span><span class="s1">'unsigned'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">])),</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">])]</span>
+</span></code></pre></div>
+<p>The mapping itself is deprecated, see <a href="#doctrine-mapping-of-the-bundle">below</a>.</p>
 <h2 id="deprecations">Deprecations<a class="headerlink" href="#deprecations" title="Link to this section">&para;</a></h2>
 <h3 id="profile-driven-configuration-superseded-by-helpers">Profile-driven configuration superseded by helpers<a class="headerlink" href="#profile-driven-configuration-superseded-by-helpers" title="Link to this section">&para;</a></h3>
 <div class="admonition warning">
@@ -3016,115 +3083,125 @@
 <p>The profile- and controller-driven YAML sections are superseded by the autowired helpers introduced in 5.4. Every section keeps working until 6.0; this section lists the migration path for each. See <a href="../../symfony-bundle/options-helpers/">Options Helpers</a> and <a href="../../symfony-bundle/verification-helpers/">Verification Helpers</a> for the complete reference.</p>
 <h4 id="webauthncreation_profiles-webauthnrequest_profiles"><code>webauthn.creation_profiles</code> / <code>webauthn.request_profiles</code><a class="headerlink" href="#webauthncreation_profiles-webauthnrequest_profiles" title="Link to this section">&para;</a></h4>
 <p>Move to the <code>WebauthnOptionsResponse</code> helper from a controller of your own.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Before (deprecated)</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">webauthn</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">creation_profiles</span><span class="p">:</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="nt">rp</span><span class="p">:</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">                </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">'example.com'</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">            </span><span class="nt">challenge_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">            </span><span class="nt">authenticator_selection_criteria</span><span class="p">:</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">                </span><span class="nt">user_verification</span><span class="p">:</span><span class="w"> </span><span class="s">'preferred'</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">                </span><span class="nt">resident_key</span><span class="p">:</span><span class="w"> </span><span class="s">'preferred'</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">            </span><span class="nt">attestation_conveyance</span><span class="p">:</span><span class="w"> </span><span class="s">'none'</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">request_profiles</span><span class="p">:</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">            </span><span class="nt">rp_id</span><span class="p">:</span><span class="w"> </span><span class="s">'example.com'</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">            </span><span class="nt">user_verification</span><span class="p">:</span><span class="w"> </span><span class="s">'preferred'</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Before (deprecated)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">webauthn</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">creation_profiles</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">            </span><span class="nt">rp</span><span class="p">:</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">                </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">'example.com'</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">            </span><span class="nt">challenge_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">            </span><span class="nt">authenticator_selection_criteria</span><span class="p">:</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">                </span><span class="nt">user_verification</span><span class="p">:</span><span class="w"> </span><span class="s">'preferred'</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">                </span><span class="nt">resident_key</span><span class="p">:</span><span class="w"> </span><span class="s">'preferred'</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">            </span><span class="nt">attestation_conveyance</span><span class="p">:</span><span class="w"> </span><span class="s">'none'</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="nt">request_profiles</span><span class="p">:</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">            </span><span class="nt">rp_id</span><span class="p">:</span><span class="w"> </span><span class="s">'example.com'</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">            </span><span class="nt">user_verification</span><span class="p">:</span><span class="w"> </span><span class="s">'preferred'</span>
 </span></code></pre></div>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// After</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">use</span> <span class="nx">Webauthn\AuthenticatorSelectionCriteria</span><span class="p">;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">use</span> <span class="nx">Webauthn\Bundle\Service\WebauthnOptionsResponse</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/webauthn/register/options'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span><span class="o">:</span> <span class="nd">JsonResponse</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="nd">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="o">-&gt;</span><span class="na">forCreation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">newUserGuesser</span><span class="p">)</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="o">-&gt;</span><span class="na">withChallengeLength</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="o">-&gt;</span><span class="na">withAuthenticatorSelectionCriteria</span><span class="p">(</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>            <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">create</span><span class="p">(</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>                <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE</span><span class="p">,</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>                <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">USER_VERIFICATION_REQUIREMENT_PREFERRED</span><span class="p">,</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>                <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">RESIDENT_KEY_REQUIREMENT_PREFERRED</span><span class="p">,</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>            <span class="p">)</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>        <span class="p">)</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>        <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="p">}</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// After</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">use</span> <span class="nx">Webauthn\AuthenticatorSelectionCriteria</span><span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">use</span> <span class="nx">Webauthn\Bundle\Service\WebauthnOptionsResponse</span><span class="p">;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/webauthn/register/options'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span><span class="o">:</span> <span class="nd">JsonResponse</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">{</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="nd">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="o">-&gt;</span><span class="na">forCreation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">newUserGuesser</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="o">-&gt;</span><span class="na">withChallengeLength</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="o">-&gt;</span><span class="na">withAuthenticatorSelectionCriteria</span><span class="p">(</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>            <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">create</span><span class="p">(</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>                <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE</span><span class="p">,</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>                <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">USER_VERIFICATION_REQUIREMENT_PREFERRED</span><span class="p">,</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>                <span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">RESIDENT_KEY_REQUIREMENT_PREFERRED</span><span class="p">,</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>            <span class="p">)</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>        <span class="p">)</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>        <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <h4 id="webauthncontrollers"><code>webauthn.controllers</code><a class="headerlink" href="#webauthncontrollers" title="Link to this section">&para;</a></h4>
 <p>Replace each <code>controllers.creation[name]</code> and <code>controllers.request[name]</code> block by a pair of user controllers, one for the options endpoint and one for the response endpoint. The routes move to <code>#[Route]</code> attributes; the per-controller <code>host</code>, <code>allowed_origins</code>, <code>allow_subdomains</code>, <code>hide_existing_credentials</code>, <code>user_entity_guesser</code> and the other options all have a direct <code>with*()</code> equivalent on the helpers.</p>
 <p>The full refactored example is on the <a href="../../symfony-bundle/verification-helpers/">Verification Helpers</a> page.</p>
 <h4 id="webauthnclient_override_policy"><code>webauthn.client_override_policy</code><a class="headerlink" href="#webauthnclient_override_policy" title="Link to this section">&para;</a></h4>
 <p>Build a <code>ClientOverridePolicy</code> inline in the controller and attach it to the helper. 5.4 ships a typed <code>ClientOverrideRule</code> value object that makes the call site much clearer than the legacy nested-array form (both shapes stay supported as first-class APIs):</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Before (deprecated)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">webauthn</span><span class="p">:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">client_override_policy</span><span class="p">:</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">        </span><span class="nt">user_verification</span><span class="p">:</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">            </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">            </span><span class="nt">allowed_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">preferred</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">required</span><span class="p p-Indicator">]</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Before (deprecated)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">webauthn</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">client_override_policy</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">        </span><span class="nt">user_verification</span><span class="p">:</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">            </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">            </span><span class="nt">allowed_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">preferred</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">required</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// After (5.4), typed factory recommended</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">use</span> <span class="nx">Webauthn\Bundle\Policy\ClientOverridePolicy</span><span class="p">;</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">use</span> <span class="nx">Webauthn\Bundle\Policy\ClientOverrideRule</span><span class="p">;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="o">-&gt;</span><span class="na">withClientOverrides</span><span class="p">(</span><span class="nx">ClientOverridePolicy</span><span class="o">::</span><span class="na">fromRules</span><span class="p">(</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="nx">userVerification</span><span class="o">:</span> <span class="nx">ClientOverrideRule</span><span class="o">::</span><span class="na">restrictTo</span><span class="p">([</span><span class="s1">'preferred'</span><span class="p">,</span> <span class="s1">'required'</span><span class="p">]),</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="p">))</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// After (5.4), typed factory recommended</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">use</span> <span class="nx">Webauthn\Bundle\Policy\ClientOverridePolicy</span><span class="p">;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">use</span> <span class="nx">Webauthn\Bundle\Policy\ClientOverrideRule</span><span class="p">;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="o">-&gt;</span><span class="na">withClientOverrides</span><span class="p">(</span><span class="nx">ClientOverridePolicy</span><span class="o">::</span><span class="na">fromRules</span><span class="p">(</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="nx">userVerification</span><span class="o">:</span> <span class="nx">ClientOverrideRule</span><span class="o">::</span><span class="na">restrictTo</span><span class="p">([</span><span class="s1">'preferred'</span><span class="p">,</span> <span class="s1">'required'</span><span class="p">]),</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="p">))</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Or the legacy nested-array form, also first-class</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="o">-&gt;</span><span class="na">withClientOverrides</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClientOverridePolicy</span><span class="p">([</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="s1">'user_verification'</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>            <span class="s1">'enabled'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>            <span class="s1">'allowed_values'</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'preferred'</span><span class="p">,</span> <span class="s1">'required'</span><span class="p">],</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="p">],</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="p">]))</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// Or the legacy nested-array form, also first-class</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="o">-&gt;</span><span class="na">withClientOverrides</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClientOverridePolicy</span><span class="p">([</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="s1">'user_verification'</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>            <span class="s1">'enabled'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>            <span class="s1">'allowed_values'</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'preferred'</span><span class="p">,</span> <span class="s1">'required'</span><span class="p">],</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="p">],</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="p">]))</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
 <p>See <a href="../../symfony-bundle/advanced-behaviors/client-override-policy/">Client Override Policy</a>.</p>
 <h4 id="webauthnallowed_origins-webauthnallow_subdomains"><code>webauthn.allowed_origins</code> / <code>webauthn.allow_subdomains</code><a class="headerlink" href="#webauthnallowed_origins-webauthnallow_subdomains" title="Link to this section">&para;</a></h4>
 <p>Two migration paths, depending on your topology.</p>
 <p><strong>Single-origin app (most common)</strong>: drop the YAML node entirely. The verifier falls back to the W3C-recommended same-origin check against the request host. Nothing else to do.</p>
 <p><strong>Multi-origin app</strong>: inject a Symfony parameter into the helper.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Before (deprecated)</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">webauthn</span><span class="p">:</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">allowed_origins</span><span class="p">:</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://app.example.com'</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://admin.example.com'</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">allow_subdomains</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Before (deprecated)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">webauthn</span><span class="p">:</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">allowed_origins</span><span class="p">:</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://app.example.com'</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://admin.example.com'</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="nt">allow_subdomains</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></code></pre></div>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># After, in config/services.yaml</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">parameters</span><span class="p">:</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">app.webauthn.origins</span><span class="p">:</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://app.example.com'</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://admin.example.com'</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># After, in config/services.yaml</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">parameters</span><span class="p">:</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">app.webauthn.origins</span><span class="p">:</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://app.example.com'</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'https://admin.example.com'</span>
 </span></code></pre></div>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// After, in every verification controller</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">use</span> <span class="nx">Symfony\Component\DependencyInjection\Attribute\Autowire</span><span class="p">;</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">private</span> <span class="k">readonly</span> <span class="nx">WebauthnResponseVerifier</span> <span class="nv">$verifier</span><span class="p">,</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="p">#[</span><span class="nd">Autowire</span><span class="p">(</span><span class="s1">'%app.webauthn.origins%'</span><span class="p">)]</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="k">private</span> <span class="k">readonly</span> <span class="k">array</span> <span class="nv">$origins</span><span class="p">,</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">)</span> <span class="p">{}</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/webauthn/register'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span><span class="o">:</span> <span class="nd">Response</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="p">{</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>        <span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>        <span class="o">-&gt;</span><span class="na">withAllowedOrigins</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">origins</span><span class="p">)</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>        <span class="o">-&gt;</span><span class="na">withAllowSubdomains</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>        <span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>    <span class="c1">// ...</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="p">}</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// After, in every verification controller</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">use</span> <span class="nx">Symfony\Component\DependencyInjection\Attribute\Autowire</span><span class="p">;</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">private</span> <span class="k">readonly</span> <span class="nx">WebauthnResponseVerifier</span> <span class="nv">$verifier</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="p">#[</span><span class="nd">Autowire</span><span class="p">(</span><span class="s1">'%app.webauthn.origins%'</span><span class="p">)]</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="k">private</span> <span class="k">readonly</span> <span class="k">array</span> <span class="nv">$origins</span><span class="p">,</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">)</span> <span class="p">{}</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/webauthn/register'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span><span class="o">:</span> <span class="nd">Response</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="p">{</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>        <span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>        <span class="o">-&gt;</span><span class="na">withAllowedOrigins</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">origins</span><span class="p">)</span>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>        <span class="o">-&gt;</span><span class="na">withAllowSubdomains</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>        <span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>    <span class="c1">// ...</span>
+</span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The list lives in a single Symfony parameter, the security-critical decision is visible right where it applies, and the per-route overrides become trivial.</p>
+<h3 id="doctrine-mapping-of-the-bundle">Doctrine mapping of the bundle<a class="headerlink" href="#doctrine-mapping-of-the-bundle" title="Link to this section">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Deprecated in v5.4.0</strong></p>
+</div>
+<p>The bundle maps <code>Webauthn\CredentialRecord</code>, <code>Webauthn\PublicKeyCredentialUserEntity</code> and <code>Webauthn\PublicKeyCredentialEntity</code> as Doctrine mapped superclasses. That mapping only served <code>DoctrineCredentialSourceRepository</code>, deprecated since 5.2.0, and is removed in 6.0.0. A deprecation is triggered for each entity extending one of these classes, when Doctrine loads its metadata:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Since web-auth/webauthn-symfony-bundle 5.4.0: The entity "App\Entity\WebauthnCredential" extends "Webauthn\CredentialRecord" and relies on the Doctrine mapping provided by the bundle. This mapping is deprecated and will be removed in 6.0.0. Map an entity of your application and convert it from and to "Webauthn\CredentialRecord" in your repository instead.
+</span></code></pre></div>
+<p>Map an entity of your application and convert it from and to <code>CredentialRecord</code> in your repository, as shown in <a href="../../symfony-bundle/credential-record-repository/">Credential Record Repository</a>. That entity declares the same properties as <code>CredentialRecord</code>, so it keeps your table: once the migration above has run, the switch requires no schema change. An entity that does not extend these classes is not concerned, even though the mapping is still registered.</p>
+<p>The user entity is already documented this way: see <a href="../../symfony-bundle/user-entity-repository/">User Entity Repository</a>.</p>
 <h3 id="reserved-for-future-use-accessors">Reserved-for-future-use accessors<a class="headerlink" href="#reserved-for-future-use-accessors" title="Link to this section">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -3137,7 +3214,7 @@
 <li>the <code>$reservedForFutureUse1</code> and <code>$reservedForFutureUse2</code> arguments of the <code>WebauthnToken</code> constructor</li>
 </ul>
 <p>Nothing changes at runtime in 5.4: the constructor signature, the stored values and the serialized payload are untouched, and a deprecation notice is emitted only when a getter is called. Drop the calls, there is no replacement. The raw flags byte stays available:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">$flags</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="nv">$authenticatorData</span><span class="o">-&gt;</span><span class="na">flags</span><span class="p">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">$flags</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="nv">$authenticatorData</span><span class="o">-&gt;</span><span class="na">flags</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Use <code>isBackupEligible()</code> and <code>isBackedUp()</code> to read the backup flags.</p>
 <div class="admonition danger">
@@ -3180,7 +3257,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 10, 2026 15:31:06 UTC">November 10, 2026</span>
   </span>
 
     
