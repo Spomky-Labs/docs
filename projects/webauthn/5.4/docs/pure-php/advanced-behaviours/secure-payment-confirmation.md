@@ -73,6 +73,8 @@ $credentialRecord = $authenticatorAssertionResponseValidator->check(
 );
 ```
 
+Pass the request options stored when the challenge was issued. Options rebuilt at verification time from a transaction record that has changed since no longer match what the user signed, and `PaymentClientDataCollector` rejects the assertion.
+
 For pure PHP usage, wire the new pieces into the ceremony manager factory yourself:
 
 ```php linenums="1"
@@ -107,7 +109,7 @@ All value objects live under the `Webauthn\SecurePaymentConfirmation` namespace 
 | Class | Purpose |
 | --- | --- |
 | `PaymentCurrencyAmount` | ISO 4217 currency + decimal value (`'EUR'`, `'99.99'`). |
-| `PaymentCredentialInstrument` | `displayName`, `icon`, optional `iconMustBeShown`. |
+| `PaymentCredentialInstrument` | `displayName`, `icon` (a URL), `iconMustBeShown` (`true` by default) and optional `details`. |
 | `CollectedClientAdditionalPaymentData` | Mirrors what the browser signs in `clientDataJSON.payment`. |
 | `CollectedClientPaymentData` | Top-level wrapper used by `PaymentClientDataCollector`. |
 | `PaymentEntityLogo` | Optional `paymentEntitiesLogos[]` entry. |
@@ -121,9 +123,8 @@ The Stimulus package ships a `PaymentController` that extends `AuthenticationCon
 ```html linenums="1"
 <form data-controller="webauthn--payment"
       data-action="submit->webauthn--payment#authenticate"
-      data-webauthn--payment-options-url-value="/payment/options"
-      data-webauthn--payment-result-url-value="/payment/verify"
-      data-webauthn--payment-transaction-id-value="txn_abc123def456">
+      data-webauthn--payment-options-url-value="/payment/{{ transaction.id }}/options"
+      data-webauthn--payment-result-url-value="/payment/{{ transaction.id }}/verify">
 
     <h2>Confirm payment</h2>
     <p>Amount: <strong>{{ transaction.formatted_amount }}</strong></p>
@@ -133,6 +134,8 @@ The Stimulus package ships a `PaymentController` that extends `AuthenticationCon
     <button type="submit">Confirm</button>
 </form>
 ```
+
+The controller has no value for the transaction: it only posts the `username` and `userVerification` fields of the form to the options URL. The transaction ID is therefore part of the URL, and the server looks the transaction up from it.
 
 The controller inherits every value, target, action and event from `AuthenticationController`. The defaults change to match the SPC convention:
 
@@ -149,13 +152,13 @@ The controller inherits every value, target, action and event from `Authenticati
 
 SPC is only as strong as the discipline of the relying party. Two rules matter above everything else:
 
-1. **Never trust client-side payment data.** Amounts, payees and instruments must never travel through HTML attributes or JavaScript. Build the transaction server-side, store its details indexed by an opaque ID, and only pass that ID to the page. The Stimulus `PaymentController` is intentionally designed to take a `transactionId` and let the server resolve the rest.
-2. **Re-derive the `payment` extension from the database.** When the `/payment/options` endpoint is hit, fetch the transaction by its ID, verify it belongs to the authenticated user and is still pending, then build the `PaymentExtension` from the database row.
+1. **Never trust client-side payment data.** Amounts, payees and instruments must never travel through HTML attributes or JavaScript. Build the transaction server-side, store its details indexed by an opaque ID, and only pass that ID to the page. The Stimulus `PaymentController` sends no payment data at all: the ID is part of the options URL, and the server resolves the rest.
+2. **Re-derive the `payment` extension from the database.** When the options endpoint is hit, fetch the transaction by the ID in its URL, verify it belongs to the authenticated user and is still pending, then build the `PaymentExtension` from the database row.
 
 ```php linenums="1"
-public function options(Request $request): JsonResponse
+#[Route('/payment/{transactionId}/options', methods: ['POST'])]
+public function options(string $transactionId): JsonResponse
 {
-    $transactionId = $request->toArray()['transactionId'] ?? null;
     $transaction = $this->transactionRepository->findOneBy([
         'id' => $transactionId,
         'userId' => $this->getUser()->getId(),
@@ -183,6 +186,13 @@ public function options(Request $request): JsonResponse
 ```
 
 `PaymentClientDataCollector` then verifies, field by field, that what the user signed matches what the database said the transaction was — any tampering on the wire results in validation failure.
+
+The transaction record itself carries what makes it safe to confirm only once:
+
+* an ID drawn from a secure random source, such as `bin2hex(random_bytes(16))`, never a sequence number;
+* the user it belongs to, checked on every request;
+* a short expiry, fifteen minutes for instance;
+* a status, set to completed or cancelled as soon as the assertion is verified, so that the same transaction cannot be confirmed twice.
 
 ## Browser support
 
