@@ -72,6 +72,7 @@ Everything below is removed. Each entry points to the page explaining the replac
 | `Webauthn\Bundle\Repository\PublicKeyCredentialSourceRepositoryInterface` | 5.3.0 | `CredentialRecordRepositoryInterface` |
 | `Webauthn\Bundle\Repository\CanSaveCredentialSource` and `saveCredentialSource()` | 5.3.0 | `CanSaveCredentialRecord` and `saveCredentialRecord()` |
 | `Webauthn\Bundle\Repository\DoctrineCredentialSourceRepository` | 5.2.0 | Your own Doctrine repository |
+| The Doctrine mapping of `CredentialRecord`, `PublicKeyCredentialUserEntity` and `PublicKeyCredentialEntity` | 5.4.0 | An entity of your application, see [From 5.3 to 5.4](from-v5.3-to-v5.4.md#doctrine-mapping-of-the-bundle) |
 | The `credentialSource` property and `getPublicKeyCredentialSource()` of the events | 5.3.0 | The `credentialRecord` property |
 | `CredentialRecordConverter::toPublicKeyCredentialSource()` and `toPublicKeyCredentialSources()` | 5.3.0 | Nothing, the conversion is pointless once `PublicKeyCredentialSource` is gone |
 | `PublicKeyCredentialEntity::$icon` and the `$icon` arguments | 5.1.0 | Nothing, the member left the specification |
@@ -99,6 +100,20 @@ The `$reservedForFutureUse1` and `$reservedForFutureUse2` arguments are dropped 
 ### A secret is required for the fake credentials
 
 `Webauthn\SimpleFakeCredentialGenerator` requires a non-empty secret. See [From 5.2 to 5.3](from-v5.2-to-v5.3.md) and [Fake Credentials](../symfony-bundle/advanced-behaviors/fake-credentials.md).
+
+### Entities extending the credential record are refused
+
+Without the Doctrine mapping of the bundle, an entity still extending `Webauthn\CredentialRecord` would only have the properties it declares itself, and `doctrine:migrations:diff` would propose to drop every column of your credential records. 6.0 refuses such an entity when Doctrine loads its metadata:
+
+```
+The entity "App\Entity\WebauthnCredential" extends "Webauthn\CredentialRecord" without mapping its properties. The bundle no longer provides this mapping since 6.0.0: map an entity of your application and convert it from and to "Webauthn\CredentialRecord" in your repository instead.
+```
+
+The same applies to the entities extending `PublicKeyCredentialUserEntity` or `PublicKeyCredentialEntity`.
+
+!!! danger
+
+    Move to an entity of your application on 5.4, where the switch requires no schema change, before upgrading. See [From 5.3 to 5.4](from-v5.3-to-v5.4.md#doctrine-mapping-of-the-bundle).
 
 ### PublicKeyCredentialUserEntity.name stays
 
