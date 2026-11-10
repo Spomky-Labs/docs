@@ -2,126 +2,126 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/configuring-an-application/authenticator-applications/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/configuring-an-application/qr-codes/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/configuring-an-application/the-factory/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/configuring-an-application/the-provisioning-uri/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/in-your-application/exceptions/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/in-your-application/questions-and-answers/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/in-your-application/what-to-store/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/migration/from-v10-to-v11/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/migration/from-v11-to-v12/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/migration/from-v8.3-to-v9/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/migration/from-v9-to-v10/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/one-time-passwords/creating-an-otp/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/one-time-passwords/generating-a-password/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/one-time-passwords/the-clock/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/one-time-passwords/the-window/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/one-time-passwords/totp-or-hotp/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/one-time-passwords/verifying-a-password/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/custom-parameters/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/the-counter/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/the-digest-and-the-digits/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/the-label-and-the-issuer/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/the-parameters/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/the-period-and-the-epoch/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-parameters/the-secret/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-project/contributing/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-project/installation/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-project/license/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-project/security-recommendations/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-project/the-project/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/otphp/11.6/the-project/the-release-process/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
 </urlset>

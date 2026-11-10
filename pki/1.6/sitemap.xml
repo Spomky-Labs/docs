@@ -2,182 +2,182 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/asn1/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/asn1/encoding-and-decoding/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/asn1/tagging/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/asn1/the-types/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/asn1/untrusted-input/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/attribute-certificates/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/attribute-certificates/issuing-an-attribute-certificate/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/attribute-certificates/validating-an-attribute-certificate/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certificates/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certificates/bundles-and-chains/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certificates/extensions/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certificates/issuing-a-certificate/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certificates/reading-a-certificate/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-paths/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-paths/building-a-path/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-paths/configuration/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-paths/validating-a-path/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-paths/what-validation-does-not-do/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-requests/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-requests/creating-a-request/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/certification-requests/issuing-from-a-request/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/examples/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/examples/a-self-signed-certificate/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/examples/a-small-certificate-authority/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/examples/verifying-a-tls-chain/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/introduction/contributing/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/introduction/installation/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/introduction/pre-requisite/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/introduction/provided-features/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/introduction/security-recommendations/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/keys/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/keys/algorithm-identifiers/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/keys/private-keys/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/keys/public-keys/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/keys/signatures/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/keys/the-crypto-engine/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/migration/from-the-sop-libraries/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/migration/license/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/names/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/names/attributes/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/names/comparing-names/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/names/distinguished-names/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/names/general-names/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/pki/1.6/pem/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
 </urlset>

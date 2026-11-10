@@ -2,90 +2,90 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/access-control-in-a-nutshell/combining-algorithms/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/access-control-in-a-nutshell/requesters/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/access-control-in-a-nutshell/vocabulary/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/access-control-in-a-nutshell/voters/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/migration/from-security/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/migration/known-divergences/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/migration/the-two-migrations/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/pure-php/access-policies/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/pure-php/testing/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/pure-php/the-manager/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/configuration/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/console/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/controllers/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/installation/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/profiler/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/templates/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/url-rules/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/symfony-bundle/workflow/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/the-project/contributing/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/the-project/installation/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/acf/1.0/the-project/the-project/</loc>
-         <lastmod>2026-11-09</lastmod>
+         <lastmod>2026-11-10</lastmod>
     </url>
 </urlset>
