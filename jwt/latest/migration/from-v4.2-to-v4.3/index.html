@@ -3876,8 +3876,9 @@
 
 
 <h1 id="from-v42-to-v43">From v4.2 to v4.3<a class="headerlink" href="#from-v42-to-v43" title="Link to this section">&para;</a></h1>
-<p>This is a minor version upgrade: <strong>your code keeps working</strong>. Version 4.3 introduces no breaking change, but it is the version where 5.0 is prepared, so it carries a lot of deprecations. Each of them names its replacement, and the <a href="#deprecation-summary">summary table</a> at the end lists them all.</p>
+<p>This is a minor version upgrade: <strong>your code keeps working</strong>. Version 4.3 introduces no breaking change, but it is the version where 5.0 is prepared, so it carries a lot of deprecations. Each of them names its replacement, and the <a href="#deprecation-summary">summary table</a> at the end lists them all. A few behaviours and return types change too: read <a href="#behaviour-changes">Behaviour changes</a> before you upgrade.</p>
 <p>Two algorithms move to their own packages. If your application enables <code>none</code> or <code>RSA1_5</code>, this is the only change that needs an entry in your <code>composer.json</code> — see <a href="#dangerous-algorithms-move-to-their-own-packages">Dangerous algorithms</a>.</p>
+<p>If your application requires the packages one by one — <code>web-token/jwt-library</code>, <code>web-token/jwt-bundle</code>, <code>web-token/jwt-experimental</code>… — instead of <code>web-token/jwt-framework</code>, update them together, for example with <code>composer update "web-token/*" --with-all-dependencies</code>. The bundle and the experimental package of 4.3 require the library 4.3.</p>
 <p>Coming from an earlier version, read the previous guides first: <a href="../from-v4.1-to-v4.2/">From v4.1 to v4.2</a>, then <a href="../from-v4.0-to-v4.1/">From v4.0 to v4.1</a>.</p>
 <p>Version 4.3 also contains every fix of the 4.2 patch releases, up to 4.2.7. Some of them refuse keys or tokens that an earlier 4.2 release accepted: if you upgrade from a release before 4.2.7, read <a href="../from-v4.1-to-v4.2/#changes-in-the-patch-releases">Changes in the patch releases</a> too.</p>
 <h2 id="new-features">New features<a class="headerlink" href="#new-features" title="Link to this section">&para;</a></h2>
@@ -3980,7 +3981,7 @@
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nv">$first</span>  <span class="o">=</span> <span class="nv">$base</span><span class="o">-&gt;</span><span class="na">addSignature</span><span class="p">(</span><span class="nv">$key1</span><span class="p">,</span> <span class="p">[</span><span class="s1">'alg'</span> <span class="o">=&gt;</span> <span class="s1">'HS256'</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nv">$second</span> <span class="o">=</span> <span class="nv">$base</span><span class="o">-&gt;</span><span class="na">addSignature</span><span class="p">(</span><span class="nv">$key2</span><span class="p">,</span> <span class="p">[</span><span class="s1">'alg'</span> <span class="o">=&gt;</span> <span class="s1">'RS256'</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">build</span><span class="p">();</span> <span class="c1">// $base is untouched</span>
 </span></code></pre></div>
-<p><code>create()</code> is deprecated: there is no state to reset any more. Remove the call.</p>
+<p><code>create()</code> is deprecated: there is no state to reset any more. Remove the call. Until 5.0, it returns a new, empty builder and leaves the one it is called on untouched: if your code ignores what it returns, read <a href="#behaviour-changes">Behaviour changes</a>.</p>
 <h3 id="immutable-managers">Immutable managers<a class="headerlink" href="#immutable-managers" title="Link to this section">&para;</a></h3>
 <p>A manager expresses a policy — <em>these algorithms and no others</em> — so a consumer must not be able to widen it. <code>AlgorithmManager::add()</code> mutated a service that is usually shared; it is deprecated in favour of <code>with()</code>, which returns a new manager and leaves the current one untouched:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">$restricted</span> <span class="o">=</span> <span class="nv">$algorithmManager</span><span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="k">new</span> <span class="nx">ES256</span><span class="p">(),</span> <span class="k">new</span> <span class="nx">ES384</span><span class="p">());</span>
@@ -4158,7 +4159,7 @@
 <li><code>Ed448</code> and <code>X448</code> run on OpenSSL and need <strong>PHP 8.4 or later</strong>: before that version PHP cannot ask OpenSSL for the digest-less signature or the raw key material of these curves. <code>Ed448::isSupported()</code> tells whether the platform can run the algorithm, its constructor throws a <code>MissingDependencyException</code> when it cannot, and the Symfony Bundle registers it only when it can run.</li>
 <li><code>Ed25519</code> and <code>X25519</code> still use the <code>sodium</code> extension when it is loaded. On PHP 8.4 they now fall back to OpenSSL when it is not, so <code>sodium</code> is no longer required there.</li>
 </ul>
-<p><strong>Migrating from <code>EdDSA</code></strong> — the algorithm keeps working, the tokens already in circulation still verify, and signing with it raises a deprecation notice. Register <code>Ed25519</code> next to <code>EdDSA</code> on the verifiers, switch the issuer to <code>alg: Ed25519</code> with the same key, then drop <code>EdDSA</code> once no old token is left. A key carrying <code>alg: EdDSA</code> is refused by the <code>Ed25519</code> algorithm (and the reverse), so update the <code>alg</code> of the keys with the issuer, or leave it out during the migration. See the <a href="../../the-components/signed-tokens-jws/signature-algorithms/#the-ed25519-and-ed448-algorithms">signature algorithms</a> page.</p>
+<p><strong>Migrating from <code>EdDSA</code></strong> — the algorithm keeps working, the tokens already in circulation still verify, and signing with it raises a deprecation notice. Register <code>Ed25519</code> next to <code>EdDSA</code> on the verifiers, switch the issuer to <code>alg: Ed25519</code> with the same key, then drop <code>EdDSA</code> once no old token is left. A key carrying <code>alg: EdDSA</code> is refused by the <code>Ed25519</code> algorithm (and the reverse), so update the <code>alg</code> of the keys with the issuer, or leave it out during the migration. The key analyzer reports the keys that still carry <code>alg: EdDSA</code>. See the <a href="../../the-components/signed-tokens-jws/signature-algorithms/#the-ed25519-and-ed448-algorithms">signature algorithms</a> page.</p>
 <h3 id="jwk-thumbprint-uri">JWK thumbprint URI<a class="headerlink" href="#jwk-thumbprint-uri" title="Link to this section">&para;</a></h3>
 <p><a href="https://www.rfc-editor.org/rfc/rfc9278.html">RFC 9278</a> names a key by its RFC 7638 thumbprint: <code>urn:ietf:params:oauth:jwk-thumbprint:sha-256:NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs</code>. It is the key-based <code>sub</code> or <code>kid</code> of OAuth DPoP, SIOP v2, OpenID for Verifiable Credentials and OpenID Federation, and every implementer had to build it by hand.</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="o">&lt;?</span><span class="nx">php</span>
@@ -4212,7 +4213,7 @@
 <p>The Symfony Bundle creates the services from a <code>jose.selective_disclosure</code> configuration once the package is installed. See the <a href="../../advanced-topics/selective-disclosure/">Selective Disclosure</a> page.</p>
 <h3 id="jkufactory-and-x5ufactory-stand-on-their-own">JKUFactory and X5UFactory stand on their own<a class="headerlink" href="#jkufactory-and-x5ufactory-stand-on-their-own" title="Link to this section">&para;</a></h3>
 <p><code>UrlKeySetFactory</code> is announced for removal in 5.0, yet <code>JKUFactory</code> and <code>X5UFactory</code> — the documented way to load a <code>jku</code> or a <code>x5u</code> key set, and not deprecated themselves — extended it.</p>
-<p>The fetching code moved to an internal trait the two factories use, so <strong>they no longer inherit anything from the deprecated class</strong> and neither of them emits a deprecation. <code>UrlKeySetFactory</code> now says what is deprecated — itself, as a public extension point — and extending it raises a notice.</p>
+<p>The fetching code moved to an internal trait the two factories use. They <strong>still extend <code>UrlKeySetFactory</code> in 4.3</strong>, so the code that type-hints that class keeps receiving them, but they never run its code: neither of them emits a deprecation, nor does a class of yours that extends them. <code>UrlKeySetFactory</code> now says what is deprecated — itself, as a public extension point — and extending it directly raises a notice. In 5.0, the class is removed and the two factories no longer extend it: type-hint <code>JKUFactory</code> or <code>X5UFactory</code> instead.</p>
 <p><code>enabledCache()</code>, deprecated by annotation since 4.1, raises the notice now and states its replacement: an HTTP client that caches the responses, which honours the cache directives of the endpoint where the fixed lifetime of a cache pool ignores them.</p>
 <h3 id="a-redirect-policy-for-jkufactory-and-x5ufactory">A redirect policy for JKUFactory and X5UFactory<a class="headerlink" href="#a-redirect-policy-for-jkufactory-and-x5ufactory" title="Link to this section">&para;</a></h3>
 <p><code>JKUFactory</code> and <code>X5UFactory</code> followed the redirects of the endpoint as their HTTP client does: up to 20, to any host, the last response giving the key set. Their constructor takes a redirect policy as a second argument: <code>false</code> refuses the redirects, <code>true</code> follows them. Without it, a key set fetched through a redirect raises a deprecation notice, and 5.0 refuses the redirects by default. With the Symfony bundle, set the <code>jose.jku_factory.follow_redirects</code> option.</p>
@@ -4289,10 +4290,27 @@
 </span></code></pre></div>
 <p>A support given a token it does not handle returns an object carrying two empty headers, which is what it does today by leaving the two output parameters untouched.</p>
 <h2 id="behaviour-changes">Behaviour changes<a class="headerlink" href="#behaviour-changes" title="Link to this section">&para;</a></h2>
-<p>Nothing that requires a change in your code, unless you exchange AES-CBC-HMAC tokens with an AAD: upgrade the applications that decrypt them first. The points worth knowing:</p>
+<p>Most of these changes need nothing from your code. Three of them may:</p>
+<ul>
+<li>you exchange AES-CBC-HMAC tokens with an AAD: upgrade the applications that decrypt them first;</li>
+<li>you catch the errors of a builder around a single call;</li>
+<li>you call <code>create()</code> on a builder without using what it returns.</li>
+</ul>
+<p>The points worth knowing:</p>
 <ul>
 <li><strong><code>JWEDecrypter::decrypt()</code> does not modify the JWE it receives.</strong> The deprecated <code>decryptUsingKey()</code>/<code>decryptUsingKeySet()</code> still write the payload into the object passed by reference, so both behaviours coexist until 5.0.</li>
-<li><strong>The builders no longer depend on the order of the calls.</strong> Sequences that used to fail — adding a recipient before the shared protected header carrying its <code>alg</code>, or reusing a shared builder service after a <code>b64</code> build — now succeed. Nothing that worked before stops working.</li>
+<li><strong>The builders no longer depend on the order of the calls.</strong> Sequences that used to fail — adding a recipient before the shared protected header carrying its <code>alg</code>, or reusing a shared builder service after a <code>b64</code> build — now succeed. In return, some errors are reported later. They keep their messages, and their classes are the ones thrown before or subclasses of them: a <code>try</code> block around the whole sequence still catches them, but a <code>try</code> block around the method that used to throw does not.<ul>
+<li><code>JWEBuilder</code> checks the headers, the algorithms and the keys of the recipients in <code>build()</code>. <code>withSharedProtectedHeader()</code>, <code>withSharedHeader()</code> and <code>addRecipient()</code> checked them before and throw nothing any more.</li>
+<li><code>JWSBuilder::addSignature()</code> still checks the signature it adds. The consistency of <code>b64</code> among the signatures, and with a payload set by <code>withEncodedPayload()</code>, is checked by <code>build()</code>; <code>addSignature()</code> and <code>withEncodedPayload()</code> checked it before.</li>
+</ul>
+</li>
+<li><strong><code>create()</code> no longer empties the builder it is called on.</strong> It returns a new, empty builder and leaves the receiver untouched. A call that ignores the result, such as <code>$builder-&gt;create();</code> before reusing <code>$builder</code>, used to drop the payload, the headers and the signatures or recipients of <code>$builder</code>. Now they stay: a signature or a recipient added next comes on top of the old ones. Remove the call and start from the builder service again, which nothing modifies any more, or use what <code>create()</code> returns.</li>
+<li><strong>The loaders return the interfaces of their services.</strong> <code>getJwsVerifier()</code> returns a <code>JWSVerifierInterface</code>, <code>getJweDecrypter()</code> a <code>JWEDecrypterInterface</code> and <code>getHeaderCheckerManager()</code> a <code>?HeaderCheckerManagerInterface</code>. This applies to the <code>JWSLoader</code> and <code>JWELoader</code> of the library and to those of the bundle. They return the object the loader was built with, so nothing changes when your code runs. Static analysers only know the interface, though, so call <code>verify()</code> or <code>decrypt()</code> and type-hint the interfaces. Otherwise:<ul>
+<li>a call to the deprecated <code>verifyWithKeySet()</code>, <code>decryptUsingKey()</code> or <code>decryptUsingKeySet()</code> on the returned object is reported as a call to an undefined method;</li>
+<li>passing the object where a <code>JWSVerifier</code>, a <code>JWEDecrypter</code> or a <code>HeaderCheckerManager</code> is expected is reported as a type error.</li>
+</ul>
+</li>
+<li><strong>The key analyzer reports <code>alg: EdDSA</code>.</strong> <code>AlgorithmAnalyzer</code> adds a <code>medium</code> message to a key whose <code>alg</code> is <code>EdDSA</code>: <code>The algorithm "EdDSA" is deprecated. Use the fully-specified "Ed25519" algorithm instead.</code>, or <code>"Ed448"</code> for a key on that curve. The bundle registers this analyzer, so the <code>key:analyze</code> and <code>keyset:analyze</code> commands and the profiler of the bundle report it as well. A check that rejects keys with any message, or with a <code>medium</code> one, now flags these keys. See <a href="#ed25519-ed448-and-x448">Migrating from <code>EdDSA</code></a>.</li>
 <li><strong>AES-CBC-HMAC tokens with an AAD follow RFC 7518.</strong> The authentication tag of <code>A128CBC-HS256</code>, <code>A192CBC-HS384</code> and <code>A256CBC-HS512</code> covers the length of the whole authenticated data, where earlier versions counted the protected header only. Other implementations accept the tokens of 4.3, and 4.3 accepts theirs. The tokens issued by earlier versions still decrypt, with a deprecation notice, but earlier versions cannot decrypt the tokens issued by 4.3. Only the JSON serializations with an <code>aad</code> member are concerned. See <a href="../../advanced-topics/encrypted-tokens/additional-authentication-data-aad/#aes-cbc-hmac-tokens-with-an-aad">AES-CBC-HMAC tokens with an AAD</a>.</li>
 <li><strong>The key agreement algorithms accept <code>deriveKey</code> and <code>deriveBits</code>.</strong> A key whose <code>key_ops</code> lists either operation can be used by the <code>ECDH-*</code> algorithms to build and to decrypt, as WebCrypto exports such keys with either. See <a href="../../the-components/encrypted-tokens-jwe/encryption-algorithms/#key-operations-key_ops">Key operations</a>.</li>
 <li><strong>The RSA public key operation is computed by OpenSSL.</strong> Encrypting with <code>RSA-OAEP</code>, <code>RSA-OAEP-256</code> and <code>RSA1_5</code>, and verifying <code>PS*</code> signatures, no longer depend on the GMP or BCMath extension for their speed. Decryption still does: GMP remains recommended.</li>
@@ -4335,7 +4353,7 @@
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="gd">-use Jose\Component\Encryption\Algorithm\KeyEncryption\RSA15;</span>
 </span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="gi">+use Jose\Rsa15\KeyEncryption\RSA15;</span>
 </span></code></pre></div>
-<p>The Symfony Bundle registers the classes of the new packages, so applications that never enable those algorithms are not flooded with a deprecation they cannot act on. The configuration aliases are unchanged: <code>none</code> and <code>RSA1_5</code> still name them.</p>
+<p>The Symfony Bundle registers the classes of the new packages, so applications that never enable those algorithms are not flooded with a deprecation they cannot act on. The configuration aliases are unchanged: <code>none</code> and <code>RSA1_5</code> still name them. The services of the former classes stay until 5.0 for the applications that inject them, deprecated and no longer tagged, like the experimental <code>ES256K</code> one. Injecting one raises the deprecation of the service, then the one of the class.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>If you are still using one of these two algorithms, take the opportunity to reconsider. See <a href="../../introduction/security-recommendations/#avoid-weak-algorithms">Security Recommendations</a>.</p>
@@ -4443,8 +4461,8 @@
 <td>An HTTP client that caches the responses</td>
 </tr>
 <tr>
-<td>Extending <code>UrlKeySetFactory</code></td>
-<td><code>JKUFactory</code>, <code>X5UFactory</code>, or your own implementation</td>
+<td>Extending or type-hinting <code>UrlKeySetFactory</code></td>
+<td><code>JKUFactory</code>, <code>X5UFactory</code>, or your own implementation. The two factories still extend it in 4.3, but no longer in 5.0</td>
 </tr>
 <tr>
 <td><code>JKUFactory</code> and <code>X5UFactory</code> fetching a key set through a redirect without a redirect policy</td>
@@ -4548,8 +4566,12 @@
 </thead>
 <tbody>
 <tr>
-<td>The inheritance based event dispatching services</td>
-<td>The decorators registered under the same service ids — no configuration change needed</td>
+<td>The <code>Jose\Bundle\JoseFramework\Services</code> classes that extend a service of the library: <code>JWSBuilder</code>, <code>JWSVerifier</code>, <code>JWSLoader</code>, <code>JWEBuilder</code>, <code>JWEDecrypter</code>, <code>JWELoader</code>, <code>NestedTokenBuilder</code>, <code>NestedTokenLoader</code>, <code>ClaimCheckerManager</code> and <code>HeaderCheckerManager</code></td>
+<td>Type-hint the interfaces of the library. The bundle still creates these classes in 4.3. In 5.0, it creates the <code>EventDispatching*</code> decorators under the same service ids instead, with no configuration change. The decorators are available now for the services you build yourself</td>
+</tr>
+<tr>
+<td>The <code>Jose\Component\Signature\Algorithm\None</code>, <code>Jose\Component\Encryption\Algorithm\KeyEncryption\RSA15</code> and <code>Jose\Experimental\Signature\ES256K</code> services</td>
+<td>The services of the new classes, registered under the same <code>none</code>, <code>RSA1_5</code> and <code>ES256K</code> aliases</td>
 </tr>
 <tr>
 <td>Two services tagged with the same alias (<code>jose.algorithm</code>, <code>jose.checker.header</code>, <code>jose.checker.claim</code>)</td>
@@ -4578,7 +4600,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 9, 2026 09:16:00 UTC">November 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 9, 2026 20:57:41 UTC">November 9, 2026</span>
   </span>
 
     
