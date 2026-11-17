@@ -162,9 +162,33 @@ security:
         - { path: ^/logout,  roles: PUBLIC_ACCESS}
 ```
 
-!!! info
+!!! danger
 
-    **Multiple User Providers (v5.2.1+):** The bundle now supports multiple user providers. If your application uses multiple providers, you can configure them in the security configuration and the WebauthnBadge will work correctly with all of them.
+    **Fixed in v5.3.13 only:** from v5.2.1, a custom authenticator built on `WebauthnPassport` loads the user from the chain of all the user providers of the application, not from the provider of its firewall. With two or more providers, a visitor who registers a username also known to a provider declared before the one of the firewall is signed in as that other account, with its roles ([GHSA-4485-9q39-m27g](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-4485-9q39-m27g)). No 5.2 release fixes it.
+
+    Upgrade to v5.3.13, or give the badge the user loader of the provider of the firewall. Symfony registers each provider as the `security.user.provider.concrete.<name>` service:
+
+    ```php
+    use Symfony\Component\DependencyInjection\Attribute\Autowire;
+    use Symfony\Component\Security\Core\User\UserProviderInterface;
+
+    public function __construct(
+        #[Autowire(service: 'security.user.provider.concrete.default')]
+        private readonly UserProviderInterface $userProvider,
+    ) {
+    }
+
+    public function authenticate(Request $request): Passport
+    {
+        return new WebauthnPassport(
+            new WebauthnBadge(
+                $request->getHost(),
+                $request->request->getString('_assertion'),
+                $this->userProvider->loadUserByIdentifier(...)
+            )
+        );
+    }
+    ```
 
 Also, you need to define the credential options endpoint.
 
