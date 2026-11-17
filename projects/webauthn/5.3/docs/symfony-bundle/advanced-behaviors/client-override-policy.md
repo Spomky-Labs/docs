@@ -36,7 +36,7 @@ webauthn:
                     allowed_values: ['required', 'preferred', 'discouraged']
                 attestation_conveyance:
                     enabled: true
-                    allowed_values: ['none', 'indirect', 'direct', 'enterprise']
+                    allowed_values: ['indirect', 'direct', 'enterprise']
                 extensions:
                     enabled: true
                 mediation:
@@ -51,13 +51,28 @@ webauthn:
 | `user_verification` | **disabled** | `required`, `preferred` | Whether the client can request a specific user verification level. Disabled by default to prevent downgrade attacks; `discouraged` is excluded from the defaults even when you enable the override. |
 | `authenticator_attachment` | enabled | `platform`, `cross-platform` | Whether the client can request a specific authenticator type |
 | `resident_key` | enabled | `required`, `preferred`, `discouraged` | Whether the client can request resident key behavior |
-| `attestation_conveyance` | enabled | `none`, `indirect`, `direct`, `enterprise` | Whether the client can request attestation preference |
+| `attestation_conveyance` | enabled | `indirect`, `direct`, `enterprise` | Whether the client can request attestation preference. `none` is left out of the defaults since v5.3.13, see below. |
 | `extensions` | enabled | N/A | Whether the client can provide additional extensions |
 | `mediation` | **disabled** | `default`, `conditional` | Whether the client can request the [Conditional Create](../../pure-php/advanced-behaviours/conditional-create.md) flow (auto-register) — opt-in. |
 
 !!! warning
 
     **Why `user_verification` is disabled by default.** Allowing a client to override the user verification requirement makes it possible to request `discouraged` against a profile that mandates `required`, which silently weakens the security guarantee. If you enable this override, keep `discouraged` out of `allowed_values` and **always re-check the `UV` flag at the application layer** — see [User Verification](../../webauthn-in-a-nutshell/user-verification.md#checking-the-uv-flag).
+
+!!! danger
+
+    **Changed in v5.3.13:** `none` is no longer in the default allowed values of `attestation_conveyance` ([GHSA-473f-pfcw-p4h2](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-473f-pfcw-p4h2)). Until then, a client could ask for `none` against a profile that requests an attestation: the stored options then said that no attestation was requested, the metadata checks (status reports, certificate chain, attestation type) were skipped, and the credential record still stored the attestation type, the trust path and the AAGUID sent by the authenticator.
+
+    A client that asks for `none` now gets the conveyance of the profile. `indirect`, `direct` and `enterprise` can still be requested, and each of them is verified. To let the client waive the attestation again, list `none` explicitly, and do not rely on the attestation of the resulting credential records:
+
+    ```yaml title="config/packages/webauthn.yaml"
+    webauthn:
+        creation_profiles:
+            default:
+                client_override_policy:
+                    attestation_conveyance:
+                        allowed_values: ['none', 'indirect', 'direct', 'enterprise']
+    ```
 
 ## Examples
 

@@ -77,3 +77,7 @@ By default, the User Entity Repository is not able to register any user account.
 
 * `Webauthn\Bundle\Repository\CanRegisterUserEntity`
 * `Webauthn\Bundle\Repository\CanGenerateUserEntity`
+
+!!! danger
+
+    **Changed in v5.3.13:** `RequestBodyUserEntityGuesser`, used by the registration endpoint of the firewall, always asks `CanGenerateUserEntity` for a new user entity, whether the username is taken or not, and refuses a generated entity whose user handle already belongs to a user ([GHSA-3chw-82qh-p72w](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-3chw-82qh-p72w)). The user handle you generate must be new and random: a repository that derives it from the username returns the handle of the existing account, and the registration is refused. A repository that does not implement `CanGenerateUserEntity` now gets a `MissingUserEntityException` for an existing username as well.

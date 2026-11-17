@@ -84,6 +84,16 @@ webauthn:
 
     The option `hide_existing_credentials` should be `false` when adding authenticators from a secured area. Set `true` when this action is performed by anonymous users.
 
+!!! danger
+
+    **Changed in v5.3.13:** `RequestBodyUserEntityGuesser`, which builds the user entity from the body of the request, never returns the entity of an existing account ([GHSA-3chw-82qh-p72w](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-3chw-82qh-p72w)). It used to return the stored entity when the body named an existing username, so the options could be issued for another account and redeemed at a creation controller that adds a credential to the signed-in one.
+
+    A creation controller that relied on it to add a credential to an existing account named in the request body now stores the credential under a new user handle. Identify the account with `CurrentUserEntityGuesser`, or with a guesser of your own bound to a route behind an access control, as in the examples above.
+
+!!! info
+
+    **Changed in v5.3.13:** the options issued by a creation or request controller are bound to it (`controllers.creation.<name>`, `controllers.request.<name>`), and so are those of a firewall (`firewall.<name>`). A result endpoint refuses the options issued by another endpoint, so a challenge obtained where user verification is only preferred can no longer be redeemed where it is required ([GHSA-g9ff-w9h6-7ff3](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-g9ff-w9h6-7ff3)). Options stored without scope by your own code are still accepted.
+
 ```yaml title="config/packages/security.yaml" linenums="1"
 security:
     access_control:

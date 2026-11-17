@@ -22,6 +22,13 @@ webauthn:
 
     If the metadata service is not enabled, the Attestation Statement Formats other than `None` (e.g. `Apple`, `Packed`, `TPM`...) **cannot be used**.
 
+!!! danger
+
+    **Changed in v5.3.13:** with the metadata support enabled and an attestation requested, two kinds of authenticators that used to be registered are now refused.
+
+    * An authenticator model is refused as soon as any of its status reports is a security notification or `REVOKED`, wherever the report sits in the list ([GHSA-p8cj-mmjr-5c2m](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-p8cj-mmjr-5c2m)). See [Status report repository](../../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#status-report-repository).
+    * A full attestation (basic, AttCA, AnonCA) under the null AAGUID, which FIDO U2F security keys and Apple anonymous attestations report, is verified like any other: the Metadata Statement Repository must return a statement for `00000000-0000-0000-0000-000000000000` whose attestation root certificates include their roots ([GHSA-2jv3-c2vg-rhc4](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-2jv3-c2vg-rhc4)). See [Metadata statement repository](../../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#metadata-statement-repository).
+
 !!! warning
 
     **New in v5.3.12:** some TPMs sign their attestation statement with `RS1` (RSASSA-PKCS1-v1\_5 with SHA-1), which is no longer acceptable for digital signatures. Verifying such a statement emits an `E_USER_WARNING`, which the Symfony error handler turns into an exception in the dev environment, and which `web-auth/cose-lib` v5.0.0 will replace with an exception. Declaring the `webauthn.cose.algorithm.RS1` service changes nothing here: the TPM attestation statement support does not use the algorithm manager.
