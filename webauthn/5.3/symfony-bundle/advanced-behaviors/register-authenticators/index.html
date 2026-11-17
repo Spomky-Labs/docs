@@ -2693,6 +2693,15 @@
 <p class="admonition-title">Danger</p>
 <p>The option <code>hide_existing_credentials</code> should be <code>false</code> when adding authenticators from a secured area. Set <code>true</code> when this action is performed by anonymous users.</p>
 </div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Changed in v5.3.13:</strong> <code>RequestBodyUserEntityGuesser</code>, which builds the user entity from the body of the request, never returns the entity of an existing account (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-3chw-82qh-p72w">GHSA-3chw-82qh-p72w</a>). It used to return the stored entity when the body named an existing username, so the options could be issued for another account and redeemed at a creation controller that adds a credential to the signed-in one.</p>
+<p>A creation controller that relied on it to add a credential to an existing account named in the request body now stores the credential under a new user handle. Identify the account with <code>CurrentUserEntityGuesser</code>, or with a guesser of your own bound to a route behind an access control, as in the examples above.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><strong>Changed in v5.3.13:</strong> the options issued by a creation or request controller are bound to it (<code>controllers.creation.&lt;name&gt;</code>, <code>controllers.request.&lt;name&gt;</code>), and so are those of a firewall (<code>firewall.&lt;name&gt;</code>). A result endpoint refuses the options issued by another endpoint, so a challenge obtained where user verification is only preferred can no longer be redeemed where it is required (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-g9ff-w9h6-7ff3">GHSA-g9ff-w9h6-7ff3</a>). Options stored without scope by your own code are still accepted.</p>
+</div>
 <div class="language-yaml highlight"><span class="filename">config/packages/security.yaml</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">security</span><span class="p">:</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">access_control</span><span class="p">:</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="nv">^/profile</span><span class="p p-Indicator">,</span><span class="nt">  roles</span><span class="p">:</span><span class="w"> </span><span class="nv">IS_AUTHENTICATED_FULLY</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="c1"># We protect all the /profile path</span>
@@ -2786,7 +2795,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 17, 2026 20:44:56 UTC">November 17, 2026</span>
   </span>
 
     

@@ -2792,12 +2792,22 @@
 <p class="admonition-title">Warning</p>
 <p>The library does not provide any Metadata Statement Repository. It is up to you to select the MDS suitable for your application and store them in your database.</p>
 </div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Changed in v5.3.13:</strong> a full attestation (basic, AttCA or AnonCA) under the null AAGUID <code>00000000-0000-0000-0000-000000000000</code> goes through the same verification as under any other AAGUID: the status reports, the certificate chain and the attestation type are checked (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-2jv3-c2vg-rhc4">GHSA-2jv3-c2vg-rhc4</a>). Until then these checks were skipped under the null AAGUID, which the authenticator writes itself: a software authenticator could register a packed, fido-u2f or apple attestation whose certificate it made itself, and have it recorded as basic or anonca.</p>
+<p>FIDO U2F security keys and Apple anonymous attestations report the null AAGUID. When an attestation is requested, they are now refused unless <code>findOneByAAGUID('00000000-0000-0000-0000-000000000000')</code> returns a statement whose attestation root certificates include their roots (the Yubico U2F root, the Apple WebAuthn Root CA...). Self attestation, which has no trust path, is not affected.</p>
+</div>
 <h2 id="status-report-repository">Status report repository<a class="headerlink" href="#status-report-repository" title="Link to this section">&para;</a></h2>
 <p>To prevent the use of rogue MDS or deprecated by the manufacturers, Status Reports may be used. The Status Report Repository is a simple service that implements the interface <code>Webauthn\MetadataService\StatusReportRepository</code> with a unique method:</p>
 <ul>
 <li><code>findStatusReportsByAAGUID(string $aaguid)</code>: this method returns a list of Status Reports for the given AAGUID.</li>
 </ul>
-<p>The verification's success or failure depends on the state reported in the most recent Status Report.</p>
+<p>Every report of the list is read. The registration is refused as soon as one of them is a security notification (<code>USER_VERIFICATION_BYPASS</code>, <code>ATTESTATION_KEY_COMPROMISE</code>, <code>USER_KEY_REMOTE_COMPROMISE</code>, <code>USER_KEY_PHYSICAL_COMPROMISE</code>) or <code>REVOKED</code>, wherever it sits in the list.</p>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Changed in v5.3.13:</strong> until then only the last report of the list was read, and <code>REVOKED</code> was not treated as a compromise (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-p8cj-mmjr-5c2m">GHSA-p8cj-mmjr-5c2m</a>). The FIDO Metadata Service BLOB does not keep the reports of an entry in chronological order (most entries list the newest first), so a model flagged by a compromise report placed before another report was registered, and a <code>REVOKED</code> model always was.</p>
+<p>A model is now refused even when a later report (<code>UPDATE_AVAILABLE</code>, a new certification) follows the compromise. To admit such a model, leave that report out of what your <code>StatusReportRepository</code> returns.</p>
+</div>
 <h2 id="certificate-chain-validator">Certificate chain validator<a class="headerlink" href="#certificate-chain-validator" title="Link to this section">&para;</a></h2>
 <p>When an attestation statement is received, a certificate chain is constructed. This chain combines certificates from the Metadata Service (MDS), which are trusted, with those provided by the authenticator, which are untrusted.</p>
 <p>The Certificate Chain Validator is responsible for this task. The library provides the class <code>Webauthn\MetadataService\CertificateChain\PhpCertificateChainValidator</code>  that requires a Symfony Http Client (<a href="https://en.wikipedia.org/wiki/Certificate_revocation_list">for CRL verification</a>) and a PSR-20 Clock.</p>
@@ -2810,6 +2820,11 @@
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>    <span class="nv">$clock</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="p">);</span>
 </span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Changed in v5.3.13:</strong> the <code>x5c</code> entries of an attestation statement are always decoded as DER, as the specification requires (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-c9p6-r72h-rp3x">GHSA-c9p6-r72h-rp3x</a>). An entry that contained PEM text used to be passed on as it was, and pki-framework and OpenSSL do not read such text the same way: a packed or TPM attestation signed with a software key could be recorded as an attestation of a genuine model, and a <code>file://</code> entry could block a PHP worker. The packed, TPM and Android Key supports also verify the signature with the public key of the certificate they have just validated.</p>
+<p><code>CertificateToolbox::convertDERToPEM()</code> and <code>CertificateToolbox::convertAllDERToPEM()</code> now always treat their input as DER: PEM input is no longer returned unchanged. Code of your own that passes PEM to them has to pass DER instead.</p>
+</div>
 <h2 id="ceremony-step-manager-factory">Ceremony step manager factory<a class="headerlink" href="#ceremony-step-manager-factory" title="Link to this section">&para;</a></h2>
 <p>The services described above must be set to the <a href="../../input-validation/">Ceremony Step Manager Factory</a>. The CSM you will create will verify the attestation statement sent by the authenticator.</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
@@ -2865,7 +2880,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 17, 2026 20:44:56 UTC">November 17, 2026</span>
   </span>
 
     

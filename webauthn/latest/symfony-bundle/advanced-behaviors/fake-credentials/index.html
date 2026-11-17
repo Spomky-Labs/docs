@@ -2807,14 +2807,22 @@
 <p>With an empty secret, the generated credentials depend on the username alone and become predictable: an unauthenticated requester can tell a fake response from a real one, which defeats the protection against username enumeration. Building the generator without a secret is deprecated since 5.3.5 and a non-empty secret is required in 6.0.0.</p>
 <p>The bundle injects <code>%kernel.secret%</code>, so applications using the default service are not affected. Only a manual instantiation of the generator, in a pure PHP application or in a custom service definition, needs to be fixed.</p>
 </div>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="k">use</span> <span class="nx">Webauthn\SimpleFakeCredentialGenerator</span><span class="p">;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">$generator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SimpleFakeCredentialGenerator</span><span class="p">(</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos="6 "></span></a>    <span class="nv">$cacheItemPool</span><span class="p">,</span> <span class="c1">// Optional PSR-6 cache pool</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos="7 "></span></a>    <span class="nv">$applicationSecret</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos="8 "></span></a><span class="p">);</span>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Security fix in v5.3.13</strong> (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-8gvp-8vj9-p3q7">GHSA-8gvp-8vj9-p3q7</a>)</p>
+<p>The decoys still differed from registered credentials: every decoy ID was 32 bytes long, the transports were drawn at random among six values, and the decoys were seeded with the username as posted, so two spellings of an unknown username got two different lists. Each decoy now takes one of the shapes observed on real authenticators (length of the credential ID and sorted transports). The cache key prefix changes, so the lists cached by previous versions are generated again.</p>
+<p>If your user entity repository finds an account whatever the spelling of its username (a case-insensitive collation, a lowercased lookup), declare a service implementing <code>Webauthn\UsernameNormalizer</code>, registered under that interface, that reproduces that lookup exactly. The bundle passes it to the generator, which seeds the decoys with the canonical form. Folding the case in front of a case-sensitive repository would reveal the opposite.</p>
+</div>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="k">use</span> <span class="nx">Webauthn\SimpleFakeCredentialGenerator</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">$generator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SimpleFakeCredentialGenerator</span><span class="p">(</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>    <span class="nv">$cacheItemPool</span><span class="p">,</span> <span class="c1">// Optional PSR-6 cache pool</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>    <span class="nv">$applicationSecret</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>    <span class="nv">$usernameNormalizer</span><span class="p">,</span> <span class="c1">// Optional Webauthn\UsernameNormalizer (new in v5.3.13)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>    <span class="nv">$shapes</span> <span class="c1">// Optional list of Webauthn\FakeCredentialShape replacing the built-in shapes (new in v5.3.13)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a><span class="p">);</span>
 </span></code></pre></div>
 <p>If you want to change the way the fake credentials are generated, you can create a custom service. The service shall implement the <code>Webauthn\FakeCredentialGenerator</code> interface.</p>
 <div class="language-php highlight"><span class="filename">src/CustomCredentialGenerator.php</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
@@ -2862,7 +2870,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 17, 2026 20:44:56 UTC">November 17, 2026</span>
   </span>
 
     
