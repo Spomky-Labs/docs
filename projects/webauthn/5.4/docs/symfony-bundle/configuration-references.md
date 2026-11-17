@@ -62,7 +62,7 @@ webauthn:
 #                    allowed_values: ['required', 'preferred', 'discouraged']
 #                attestation_conveyance:
 #                    enabled: true
-#                    allowed_values: ['none', 'indirect', 'direct', 'enterprise']
+#                    allowed_values: ['indirect', 'direct', 'enterprise'] # 'none' is left out by default since 5.3.13
 #                extensions:
 #                    enabled: true
 #                mediation: # Opt-in: let the client request a Conditional Create flow

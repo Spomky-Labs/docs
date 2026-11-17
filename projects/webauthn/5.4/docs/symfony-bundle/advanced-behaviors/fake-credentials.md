@@ -12,6 +12,14 @@ A very simple service is provided: `Webauthn\SimpleFakeCredentialGenerator`. It 
 
     The bundle injects `%kernel.secret%`, so applications using the default service are not affected. Only a manual instantiation of the generator, in a pure PHP application or in a custom service definition, needs to be fixed.
 
+!!! danger
+
+    **Security fix in v5.3.13** ([GHSA-8gvp-8vj9-p3q7](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-8gvp-8vj9-p3q7))
+
+    The decoys still differed from registered credentials: every decoy ID was 32 bytes long, the transports were drawn at random among six values, and the decoys were seeded with the username as posted, so two spellings of an unknown username got two different lists. Each decoy now takes one of the shapes observed on real authenticators (length of the credential ID and sorted transports). The cache key prefix changes, so the lists cached by previous versions are generated again.
+
+    If your user entity repository finds an account whatever the spelling of its username (a case-insensitive collation, a lowercased lookup), declare a service implementing `Webauthn\UsernameNormalizer`, registered under that interface, that reproduces that lookup exactly. The bundle passes it to the generator, which seeds the decoys with the canonical form. Folding the case in front of a case-sensitive repository would reveal the opposite.
+
 ```php linenums="1"
 <?php
 
@@ -19,7 +27,9 @@ use Webauthn\SimpleFakeCredentialGenerator;
 
 $generator = new SimpleFakeCredentialGenerator(
     $cacheItemPool, // Optional PSR-6 cache pool
-    $applicationSecret
+    $applicationSecret,
+    $usernameNormalizer, // Optional Webauthn\UsernameNormalizer (new in v5.3.13)
+    $shapes // Optional list of Webauthn\FakeCredentialShape replacing the built-in shapes (new in v5.3.13)
 );
 ```
 

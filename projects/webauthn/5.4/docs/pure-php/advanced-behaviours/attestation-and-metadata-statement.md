@@ -95,13 +95,25 @@ Your Metadata Statement Repository must implement the interface `Webauthn\Metada
 
     The library does not provide any Metadata Statement Repository. It is up to you to select the MDS suitable for your application and store them in your database.
 
+!!! danger
+
+    **Changed in v5.3.13:** a full attestation (basic, AttCA or AnonCA) under the null AAGUID `00000000-0000-0000-0000-000000000000` goes through the same verification as under any other AAGUID: the status reports, the certificate chain and the attestation type are checked ([GHSA-2jv3-c2vg-rhc4](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-2jv3-c2vg-rhc4)). Until then these checks were skipped under the null AAGUID, which the authenticator writes itself: a software authenticator could register a packed, fido-u2f or apple attestation whose certificate it made itself, and have it recorded as basic or anonca.
+
+    FIDO U2F security keys and Apple anonymous attestations report the null AAGUID. When an attestation is requested, they are now refused unless `findOneByAAGUID('00000000-0000-0000-0000-000000000000')` returns a statement whose attestation root certificates include their roots (the Yubico U2F root, the Apple WebAuthn Root CA...). Self attestation, which has no trust path, is not affected.
+
 ## Status report repository
 
 To prevent the use of rogue MDS or deprecated by the manufacturers, Status Reports may be used. The Status Report Repository is a simple service that implements the interface `Webauthn\MetadataService\StatusReportRepository` with a unique method:
 
 * `findStatusReportsByAAGUID(string $aaguid)`: this method returns a list of Status Reports for the given AAGUID.
 
-The verification's success or failure depends on the state reported in the most recent Status Report.
+Every report of the list is read. The registration is refused as soon as one of them is a security notification (`USER_VERIFICATION_BYPASS`, `ATTESTATION_KEY_COMPROMISE`, `USER_KEY_REMOTE_COMPROMISE`, `USER_KEY_PHYSICAL_COMPROMISE`) or `REVOKED`, wherever it sits in the list.
+
+!!! danger
+
+    **Changed in v5.3.13:** until then only the last report of the list was read, and `REVOKED` was not treated as a compromise ([GHSA-p8cj-mmjr-5c2m](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-p8cj-mmjr-5c2m)). The FIDO Metadata Service BLOB does not keep the reports of an entry in chronological order (most entries list the newest first), so a model flagged by a compromise report placed before another report was registered, and a `REVOKED` model always was.
+
+    A model is now refused even when a later report (`UPDATE_AVAILABLE`, a new certification) follows the compromise. To admit such a model, leave that report out of what your `StatusReportRepository` returns.
 
 ## Certificate chain validator
 
@@ -119,6 +131,12 @@ $certificateChainValidator = PhpCertificateChainValidator::create(
     $clock
 );
 ```
+
+!!! danger
+
+    **Changed in v5.3.13:** the `x5c` entries of an attestation statement are always decoded as DER, as the specification requires ([GHSA-c9p6-r72h-rp3x](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-c9p6-r72h-rp3x)). An entry that contained PEM text used to be passed on as it was, and pki-framework and OpenSSL do not read such text the same way: a packed or TPM attestation signed with a software key could be recorded as an attestation of a genuine model, and a `file://` entry could block a PHP worker. The packed, TPM and Android Key supports also verify the signature with the public key of the certificate they have just validated.
+
+    `CertificateToolbox::convertDERToPEM()` and `CertificateToolbox::convertAllDERToPEM()` now always treat their input as DER: PEM input is no longer returned unchanged. Code of your own that passes PEM to them has to pass DER instead.
 
 ## Ceremony step manager factory
 
