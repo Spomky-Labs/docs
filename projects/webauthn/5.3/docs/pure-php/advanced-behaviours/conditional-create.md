@@ -106,18 +106,14 @@ webauthn:
                 user_verification: preferred
 ```
 
-If you would rather decide per request — for example, only enable conditional create when the JavaScript client explicitly asks for it — opt in via the [Client Override Policy](../../symfony-bundle/advanced-behaviors/client-override-policy.md):
+If you would rather decide per request, for example to enable conditional create only when the JavaScript client explicitly asks for it, opt in via the [Client Override Policy](../../symfony-bundle/advanced-behaviors/client-override-policy.md). The policy is a root node of the bundle configuration, so it applies to every creation profile:
 
 ```yaml title="config/packages/webauthn.yaml" linenums="1"
 webauthn:
-    creation_profiles:
-        passkey_upgrade:
-            rp:
-                id: 'example.com'
-            client_override_policy:
-                mediation:
-                    enabled: true
-                    allowed_values: ['default', 'conditional']
+    client_override_policy:
+        mediation:
+            enabled: true
+            allowed_values: ['default', 'conditional']
 ```
 
 ## Frontend integration
