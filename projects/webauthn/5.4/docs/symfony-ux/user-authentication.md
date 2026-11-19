@@ -155,3 +155,24 @@ document.addEventListener('webauthn:authentication:connect', (event) => {
 | `username` | Input field for the username |
 | `userVerification` | Input field for user verification preference |
 | `result` | Hidden input for the assertion response |
+
+### Authentication controller events
+
+The controller dispatches the following events on its element. They bubble, so a listener on `document` receives them. When `submitViaForm` is enabled and the controller has a `result` target, the form is submitted instead of the `verify` request, so the three `verify` events are not dispatched.
+
+| Event | Detail | Dispatched |
+|-------|--------|------------|
+| `webauthn:authentication:connect` | `optionsUrl`, `resultUrl`, `supportsPlatformAuthenticator`, `capabilities` | When the controller connects |
+| `webauthn:unsupported` | none | When the `authenticate` action runs in a browser without WebAuthn support |
+| `webauthn:authentication:options:request` | `data` | Before the options are requested from `optionsUrl` |
+| `webauthn:authentication:options:success` | `options` | When the options are received |
+| `webauthn:authentication:options:error` | `response` or `error` | When the options request fails |
+| `webauthn:authentication:credential` | `credential` | When the authenticator answers, before anything is sent |
+| `webauthn:authentication:verify:request` | `credential` | Before the credential is sent to `resultUrl`, as it is sent: without `prf.results` since v5.3.15 |
+| `webauthn:authentication:verify:success` | `result` | When `resultUrl` accepts the credential |
+| `webauthn:authentication:verify:error` | `response` or `error` | When `resultUrl` refuses the credential or cannot be reached |
+| `webauthn:authentication:error` | `error`, plus `code` and `name` for a WebAuthn error | When the ceremony fails |
+
+#### PRF results
+
+When the options carry the `prf` extension, the controller encodes `clientExtensionResults.prf.results.first` (and `second`) as base64url strings on the credential of the `webauthn:authentication:credential` event, and leaves them out of what it sends to the server. Read them from that event, see [PRF extension](../pure-php/advanced-behaviours/prf-extension.md#stimulus-integration).

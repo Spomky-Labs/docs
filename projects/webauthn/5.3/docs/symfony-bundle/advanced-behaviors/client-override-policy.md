@@ -68,6 +68,21 @@ webauthn:
                 allowed_values: ['none', 'indirect', 'direct', 'enterprise']
     ```
 
+!!! danger
+
+    **Changed in v5.3.15:** overriding one member of `authenticatorSelection` keeps the other members of the profile ([GHSA-2989-5cjp-qc2p](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-2989-5cjp-qc2p)). Until then, a request that carried `authenticatorAttachment` or `residentKey`, two members the client can override by default, made the bundle rebuild the criteria from the client values alone: `userVerification` fell back to `preferred`, and `residentKey` to the client value or to no value at all. The stored options then said `preferred`, so a profile configured with `user_verification: required` accepted a credential created without user verification. The hardening of v5.3.1 ([GHSA-h4fw-6r7f-w494](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-h4fw-6r7f-w494)) only covered the `userVerification` member.
+
+    Each member now keeps the value of the profile, unless the client sent a value that the policy allows for that very member. On a profile that requires user verification, a registration without user verification is refused whatever the client sends. On earlier versions, disable the two overrides to get the same result:
+
+    ```yaml title="config/packages/webauthn.yaml"
+    webauthn:
+        client_override_policy:
+            authenticator_attachment:
+                enabled: false
+            resident_key:
+                enabled: false
+    ```
+
 ## Examples
 
 ### Restrict to platform authenticators only
@@ -145,6 +160,8 @@ The `ClientOverridePolicy` class determines the effective value for each field:
 2. If the override is disabled for that field, the profile default is used
 3. If the request value is not in the `allowed_values` list, the profile default is used
 4. Otherwise, the request value is used
+
+The members of `authenticatorSelection` (`user_verification`, `authenticator_attachment` and `resident_key`) go through these rules one by one: a client that overrides one of them leaves the others to the profile. Until v5.3.15, overriding one member reset the others, see the warning above.
 
 This ensures that the server always maintains control over the final options, while allowing controlled flexibility for client-side customization.
 

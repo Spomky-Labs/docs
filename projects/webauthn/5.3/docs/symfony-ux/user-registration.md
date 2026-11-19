@@ -243,18 +243,41 @@ The dedicated `registration-controller` provides a focused controller for creden
 | `authenticatorAttachment` | Select field for authenticator attachment preference |
 | `result` | Hidden input for the attestation response |
 
+### Registration controller events
+
+The controller dispatches the following events on its element. They bubble, so a listener on `document` receives them. When `submitViaForm` is enabled and the controller has a `result` target, the form is submitted instead of the `verify` request, so the three `verify` events are not dispatched.
+
+| Event | Detail | Dispatched |
+|-------|--------|------------|
+| `webauthn:registration:connect` | `optionsUrl`, `resultUrl`, `supportsPlatformAuthenticator` | When the controller connects |
+| `webauthn:unsupported` | none | When the `register` action runs in a browser without WebAuthn support |
+| `webauthn:registration:options:request` | `data` | Before the options are requested from `optionsUrl` |
+| `webauthn:registration:options:success` | `options` | When the options are received |
+| `webauthn:registration:options:error` | `response` or `error` | When the options request fails |
+| `webauthn:registration:credential` | `credential` | When the authenticator answers, before anything is sent |
+| `webauthn:registration:verify:request` | `credential` | Before the credential is sent to `resultUrl`, as it is sent: without `prf.results` since v5.3.15 |
+| `webauthn:registration:verify:success` | `result` | When `resultUrl` accepts the credential |
+| `webauthn:registration:verify:error` | `response` or `error` | When `resultUrl` refuses the credential or cannot be reached |
+| `webauthn:registration:error` | `error`, plus `code` and `name` for a WebAuthn error | When the ceremony fails |
+
+When the options carry the `prf` extension, the PRF results are on the credential of the `webauthn:registration:credential` event and are not sent to the server. See [PRF results](user-authentication.md#prf-results), including the change of v5.3.15.
+
 ## Error handling
 
-Handle registration errors in your custom event listeners:
+Handle the registration outcome in your custom event listeners. A refusal of the server comes with the `verify:error` event, a failure of the ceremony itself with the `error` event:
 
 ```javascript linenums="1"
 document.addEventListener('webauthn:registration:error', (event) => {
-    console.error('Registration failed:', event.detail);
-    alert('Could not register authenticator: ' + event.detail.message);
+    console.error('Registration failed:', event.detail.error);
+    alert('Could not register authenticator: ' + event.detail.error.message);
 });
 
-document.addEventListener('webauthn:registration:success', (event) => {
-    console.log('Registration successful!');
+document.addEventListener('webauthn:registration:verify:error', (event) => {
+    console.error('The server refused the authenticator:', event.detail.response ?? event.detail.error);
+});
+
+document.addEventListener('webauthn:registration:verify:success', (event) => {
+    console.log('Registration successful!', event.detail.result);
 });
 ```
 
