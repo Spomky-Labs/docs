@@ -2638,6 +2638,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#malformed-serial-number-extension-of-the-packed-attestations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Malformed serial number extension of the packed attestations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pseudorandomfunctioninputextensionbuilderrequireshmacsecretmc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2650,6 +2661,28 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-controller-origins-are-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-controller origins are enforced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#an-empty-prf-extension-is-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An empty PRF extension is refused
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2980,6 +3013,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#malformed-serial-number-extension-of-the-packed-attestations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Malformed serial number extension of the packed attestations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pseudorandomfunctioninputextensionbuilderrequireshmacsecretmc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2992,6 +3036,28 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-controller-origins-are-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-controller origins are enforced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#an-empty-prf-extension-is-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An empty PRF extension is refused
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3034,7 +3100,7 @@
 <h1 id="from-53-to-54">From 5.3 to 5.4<a class="headerlink" href="#from-53-to-54" title="Link to this section">&para;</a></h1>
 <div class="admonition success">
 <p class="admonition-title">Success</p>
-<p>No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0. The only exception concerns the applications overriding the type of the counter column of the Doctrine mapping, see <a href="#database-schema-the-counter-column">the counter column</a>.</p>
+<p>No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0. The exceptions concern the applications overriding the type of the counter column of the Doctrine mapping, see <a href="#database-schema-the-counter-column">the counter column</a>, those declaring origins in a <code>webauthn.controllers</code> block, see <a href="#per-controller-origins-are-enforced">per-controller origins</a>, and those building a PRF extension without input, see <a href="#an-empty-prf-extension-is-refused">the PRF extension</a>.</p>
 </div>
 <p>Version 5.4 is the preparation step for 6.0: the profile-driven YAML configuration of the Symfony bundle is superseded by autowired helpers called from controllers you write yourself. The whole configuration surface that goes away in 6.0 is deprecated here, so you can migrate progressively while staying on the 5.x line.</p>
 <h2 id="database-schema-the-new-rpid-column">Database schema: the new <code>rpId</code> column<a class="headerlink" href="#database-schema-the-new-rpid-column" title="Link to this section">&para;</a></h2>
@@ -3120,7 +3186,7 @@
 </span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <h4 id="webauthncontrollers"><code>webauthn.controllers</code><a class="headerlink" href="#webauthncontrollers" title="Link to this section">&para;</a></h4>
-<p>Replace each <code>controllers.creation[name]</code> and <code>controllers.request[name]</code> block by a pair of user controllers, one for the options endpoint and one for the response endpoint. The routes move to <code>#[Route]</code> attributes; the per-controller <code>host</code>, <code>allowed_origins</code>, <code>allow_subdomains</code>, <code>hide_existing_credentials</code>, <code>user_entity_guesser</code> and the other options all have a direct <code>with*()</code> equivalent on the helpers.</p>
+<p>Replace each <code>controllers.creation[name]</code> and <code>controllers.request[name]</code> block by a pair of user controllers, one for the options endpoint and one for the response endpoint. The paths, the methods and the <code>host</code> move to <code>#[Route]</code> attributes. <code>user_entity_guesser</code> becomes the second argument of <code>forCreation()</code>, <code>allowed_origins</code> and <code>allow_subdomains</code> become <code>withAllowedOrigins()</code> and <code>withAllowSubdomains()</code> on the verifier, <code>hide_existing_credentials</code> becomes <code>withHideExistingCredentials()</code>, and the success, failure and options handlers move into the body of your controllers.</p>
 <p>The full refactored example is on the <a href="../../symfony-bundle/verification-helpers/">Verification Helpers</a> page.</p>
 <h4 id="webauthnclient_override_policy"><code>webauthn.client_override_policy</code><a class="headerlink" href="#webauthnclient_override_policy" title="Link to this section">&para;</a></h4>
 <p>Build a <code>ClientOverridePolicy</code> inline in the controller and attach it to the helper. 5.4 ships a typed <code>ClientOverrideRule</code> value object that makes the call site much clearer than the legacy nested-array form (both shapes stay supported as first-class APIs):</p>
@@ -3156,7 +3222,7 @@
 <p>See <a href="../../symfony-bundle/advanced-behaviors/client-override-policy/">Client Override Policy</a>.</p>
 <h4 id="webauthnallowed_origins-webauthnallow_subdomains"><code>webauthn.allowed_origins</code> / <code>webauthn.allow_subdomains</code><a class="headerlink" href="#webauthnallowed_origins-webauthnallow_subdomains" title="Link to this section">&para;</a></h4>
 <p>Two migration paths, depending on your topology.</p>
-<p><strong>Single-origin app (most common)</strong>: drop the YAML node entirely. The verifier falls back to the W3C-recommended same-origin check against the request host. Nothing else to do.</p>
+<p><strong>Single-origin app (most common)</strong>: drop the YAML node entirely. The verifier then accepts an HTTPS origin whose host is the Relying Party ID or one of its subdomains. Nothing else to do.</p>
 <p><strong>Multi-origin app</strong>: inject a Symfony parameter into the helper.</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Before (deprecated)</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">webauthn</span><span class="p">:</span>
@@ -3192,6 +3258,10 @@
 </span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The list lives in a single Symfony parameter, the security-critical decision is visible right where it applies, and the per-route overrides become trivial.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code>/.well-known/webauthn</code> endpoint of <a href="../../symfony-bundle/advanced-behaviors/cross-origin-authentication/">Related Origin Requests</a> is only served when <code>webauthn.allowed_origins</code> is set, and the helpers have no equivalent for it in 5.4. If your application publishes that endpoint, keep the node for now.</p>
+</div>
 <h3 id="doctrine-mapping-of-the-bundle">Doctrine mapping of the bundle<a class="headerlink" href="#doctrine-mapping-of-the-bundle" title="Link to this section">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -3221,21 +3291,52 @@
 <p class="admonition-title">Danger</p>
 <p>In 6.0.0 the serialized payload of <code>WebauthnToken</code> loses two entries, so a session created by a 5.x application cannot be unserialized by a 6.0 one. Plan to invalidate the existing sessions when you upgrade.</p>
 </div>
+<h3 id="malformed-serial-number-extension-of-the-packed-attestations">Malformed serial number extension of the packed attestations<a class="headerlink" href="#malformed-serial-number-extension-of-the-packed-attestations" title="Link to this section">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Deprecated in v5.4.0</strong></p>
+</div>
+<p>The specification requires the <code>id-fido-gen-ce-sernum</code> extension (<code>1.3.6.1.4.1.45724.1.1.2</code>) of a packed attestation certificate not to be marked critical, and its value to be an OCTET STRING. A packed attestation whose certificate carries a malformed extension is still accepted: the extension is ignored and a deprecation is triggered.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Since web-auth/webauthn-lib 5.4.0: Verifying a packed attestation whose certificate carries the serial number extension (1.3.6.1.4.1.45724.1.1.2) marked critical or with a value that is not an OCTET STRING is deprecated and "Webauthn\AttestationStatement\PackedAttestationStatementSupport" will refuse it in 6.0.0. Until then, the extension is ignored.
+</span></code></pre></div>
+<p>Nothing to change in your code: such attestations are refused in 6.0.0. See <a href="../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#serial-number-of-the-authenticator">Enterprise attestation</a>.</p>
 <h3 id="pseudorandomfunctioninputextensionbuilderrequireshmacsecretmc">PseudoRandomFunctionInputExtensionBuilder::requiresHmacSecretMc<a class="headerlink" href="#pseudorandomfunctioninputextensionbuilderrequireshmacsecretmc" title="Link to this section">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><strong>Deprecated in v5.4.0</strong></p>
 </div>
 <p>The method named the CTAP <code>hmac-secret-mc</code> extension in an API that is abstract over the authenticator implementation. Use <code>requiresMultipleCredentialEvaluation()</code>, which describes the input shape the method actually detects. The old name delegates to the new one until 6.0.0. See the <a href="../../pure-php/advanced-behaviours/prf-extension/">PRF Extension</a> page.</p>
+<h2 id="per-controller-origins-are-enforced">Per-controller origins are enforced<a class="headerlink" href="#per-controller-origins-are-enforced" title="Link to this section">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Changed in v5.4.0</strong></p>
+</div>
+<p>The <code>allowed_origins</code> and <code>allow_subdomains</code> options of the <code>webauthn.controllers.creation.&lt;name&gt;</code> and <code>webauthn.controllers.request.&lt;name&gt;</code> blocks, and their deprecated <code>secured_rp_ids</code> alias, were ignored by the previous 5.x releases: only the root <code>webauthn.allowed_origins</code> applied. They are applied from 5.4.0. If one of your controllers declares its own list, check that it contains every origin the controller receives responses from, otherwise these responses are now refused.</p>
+<h2 id="an-empty-prf-extension-is-refused">An empty PRF extension is refused<a class="headerlink" href="#an-empty-prf-extension-is-refused" title="Link to this section">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Changed in v5.4.0</strong></p>
+</div>
+<p><code>PseudoRandomFunctionInputExtensionBuilder::build()</code> throws an <code>AuthenticationExtensionException</code> when no input was given: <code>Cannot build a PRF extension without any input. Call withInputs() or withCredentialInputs() first.</code> It used to return a <code>prf</code> extension without input, which the clients cannot evaluate. Call <code>withInputs()</code> or <code>withCredentialInputs()</code> before <code>build()</code>, or leave the extension out.</p>
 <h2 id="other-changes">Other changes<a class="headerlink" href="#other-changes" title="Link to this section">&para;</a></h2>
 <p>Opt-in features, nothing to do on your side unless you want them:</p>
 <ul>
+<li><strong>Scopes of the helper options</strong>: the options stored by the helpers are bound to a scope (<code>helpers</code> by default), and only a verifier of the same scope redeems them. Give each pair of endpoints with different requirements its own scope with <code>withScope()</code>. See <a href="../../symfony-bundle/verification-helpers/#scopes">Verification Helpers</a>.</li>
+<li><strong>Authenticators without a metadata statement</strong>: <code>enableMetadataStatementSupport()</code> takes a fourth argument, <code>$requireStatement</code>, and the bundle a <code>webauthn.metadata.require_statement</code> node. With <code>false</code>, a full attestation whose AAGUID has no Metadata Statement is accepted unverified, and the <code>AttestationCheckedAgainstMetadata</code> event says so. See <a href="../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#authenticators-without-a-metadata-statement">Attestation and Metadata Statement</a>.</li>
+<li><strong>Admitting a compromised authenticator</strong>: a listener of <code>CompromisedAuthenticatorDetected</code> can admit a model flagged by its status reports, instead of filtering the <code>StatusReportRepository</code>. See <a href="../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#admitting-a-compromised-authenticator">Attestation and Metadata Statement</a>.</li>
+<li><strong>Enterprise attestation</strong>: the trust anchors of the organization can be pinned (<code>setEnterpriseAttestationTrustAnchors()</code>, <code>webauthn.metadata.enterprise_attestation_trust_anchors</code>, <code>withEnterpriseAttestationTrustAnchors()</code>), the packed format accepts the <code>Enterprise Attestation</code> unit on a certificate carrying the serial number extension, and <code>CertificateTrustPath::authenticatorSerialNumber()</code> reads that serial number. See <a href="../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#enterprise-attestation">Enterprise attestation</a>.</li>
 <li><strong>Ceremony origin pinning</strong>: the options request records its own origin next to the challenge, and the verifier can require the response to be produced on that very origin, on top of the allow list. Enable it with <code>withCeremonyOriginPinning()</code> or the <code>webauthn.ceremony_origin_pinning</code> node. It fails closed on a ceremony stored without an origin, which is why it defaults to <code>false</code>. See <a href="../../symfony-bundle/verification-helpers/">Verification Helpers</a>.</li>
-<li><strong>Related Origin Requests</strong>: the <code>/.well-known/webauthn</code> endpoint warns when the published origins resolve to more than five distinct eTLD+1 labels, because the clients silently ignore the extra ones. Configure it under <code>webauthn.related_origins</code>.</li>
+<li><strong>Related Origin Requests</strong>: when a public suffix resolver is configured under <code>webauthn.related_origins</code>, the bundle logs a warning at cache warmup if the origins published on <code>/.well-known/webauthn</code> resolve to more than five distinct eTLD+1 labels, because the clients silently ignore the extra ones. See <a href="../../symfony-bundle/advanced-behaviors/cross-origin-authentication/#related-origin-requests">Cross origin authentication</a>.</li>
 <li><strong>Signal API helpers</strong>: a factory and a JSON envelope for the WebAuthn Level 3 signal methods. See <a href="../../pure-php/advanced-behaviours/signal-api/">Signal API</a>.</li>
 <li><strong>CTAP 2.1 authenticator extensions</strong>: <code>credProtect</code>, <code>credBlob</code>, <code>getCredBlob</code> and <code>minPinLength</code>. See <a href="../../pure-php/advanced-behaviours/authenticator-extensions/">Authenticator Extensions</a>.</li>
 <li><strong>Fully-specified COSE algorithm identifiers</strong> from RFC 9864 are accepted.</li>
-<li><strong>Immediate mediation</strong> is supported on <code>navigator.credentials.get()</code>, and the Stimulus controllers use the native <code>parseCreationOptionsFromJSON</code>, <code>parseRequestOptionsFromJSON</code> and <code>toJSON</code> helpers along with <code>PublicKeyCredential.getClientCapabilities()</code>.</li>
+<li><strong>Immediate UI mode</strong>: <code>uiMode: immediate</code> (<code>PublicKeyCredentialRequestOptions::UI_MODE_IMMEDIATE</code>, <code>withUiMode()</code> on the request helper) is supported on <code>navigator.credentials.get()</code>, and the Stimulus controllers use the native <code>parseCreationOptionsFromJSON</code>, <code>parseRequestOptionsFromJSON</code> and <code>toJSON</code> helpers along with <code>PublicKeyCredential.getClientCapabilities()</code>.</li>
+<li><strong>Attestation on the request options</strong>: <code>PublicKeyCredentialRequestOptions</code> accepts <code>attestation</code> and <code>attestationFormats</code>, and <code>attestationFormats</code> is also available on the creation options. See <a href="../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#attestation-on-requestoptions-v540">Attestation and Metadata Statement</a>.</li>
+<li><strong>Secure Payment Confirmation</strong>: see <a href="../../pure-php/advanced-behaviours/secure-payment-confirmation/">Secure Payment Confirmation</a>.</li>
+<li><strong>PRF extension</strong>: the builder refuses an empty input, and <code>requiresMultipleCredentialEvaluation()</code> tells whether <code>evalByCredential</code> carries inputs for several credentials, which needs an authenticator able to answer several evaluations in one assertion. See <a href="../../pure-php/advanced-behaviours/prf-extension/">PRF Extension</a>.</li>
+<li><strong><code>credProps.authenticatorDisplayName</code></strong> is parsed. See <a href="../../pure-php/advanced-behaviours/authenticator-extensions/">Authenticator Extensions</a>.</li>
+<li><strong><code>UvInitializedChangedEvent</code></strong> is dispatched when the <code>uvInitialized</code> indicator of a credential record changes during an assertion. See <a href="../../pure-php/advanced-behaviours/backup-events/#uvinitializedchangedevent">Backup Events</a>.</li>
+<li><strong>Relying Party name</strong>: the creation helper defaults <code>rp.name</code> to the Relying Party ID, and <code>withRpName()</code> sets another one.</li>
 </ul>
 
 
@@ -3257,7 +3358,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 10, 2026 15:31:06 UTC">November 10, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
   </span>
 
     

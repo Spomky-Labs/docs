@@ -2201,6 +2201,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#authenticators-without-a-metadata-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authenticators without a metadata statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#admitting-a-compromised-authenticator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admitting a compromised authenticator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enterprise-attestation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise attestation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2842,6 +2875,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#authenticators-without-a-metadata-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authenticators without a metadata statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#admitting-a-compromised-authenticator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admitting a compromised authenticator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enterprise-attestation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise attestation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2894,6 +2960,7 @@
 <li>An authenticator model is refused as soon as any of its status reports is a security notification or <code>REVOKED</code>, wherever the report sits in the list (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-p8cj-mmjr-5c2m">GHSA-p8cj-mmjr-5c2m</a>). See <a href="../../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#status-report-repository">Status report repository</a>.</li>
 <li>A full attestation (basic, AttCA, AnonCA) under the null AAGUID, which FIDO U2F security keys and Apple anonymous attestations report, is verified like any other: the Metadata Statement Repository must return a statement for <code>00000000-0000-0000-0000-000000000000</code> whose attestation root certificates include their roots (<a href="https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-2jv3-c2vg-rhc4">GHSA-2jv3-c2vg-rhc4</a>). See <a href="../../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#metadata-statement-repository">Metadata statement repository</a>.</li>
 </ul>
+<p>Since v5.4.0, a listener can admit a flagged model, and <code>require_statement: false</code> accepts, unverified, the attestations whose AAGUID has no statement, the null AAGUID included. See <a href="#admitting-a-compromised-authenticator">Admitting a compromised authenticator</a> and <a href="#authenticators-without-a-metadata-statement">Authenticators without a metadata statement</a>.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -2907,25 +2974,141 @@
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">status_report_repository</span><span class="p">:</span><span class="w"> </span><span class="s">'App\Repository\MyStatusReportRepository'</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">        </span><span class="nt">tpm_acknowledge_insecure_algorithm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></code></pre></div>
-<h3 id="credential-creation-options">Credential creation options<a class="headerlink" href="#credential-creation-options" title="Link to this section">&para;</a></h3>
+<h2 id="credential-creation-options">Credential creation options<a class="headerlink" href="#credential-creation-options" title="Link to this section">&para;</a></h2>
 <p>By default, no Attestation Statement is asked to the Authenticators (type = <code>none</code>). To change this behavior, you just have to set the corresponding parameter in the <code>Webauthn\PublicKeyCredentialCreationOptions</code> object.</p>
-<p>There are 3 conveyance modes available using PHP constants provided by the class <code>Webauthn\PublicKeyCredentialCreationOptions</code>:</p>
+<p>There are 4 conveyance modes available using PHP constants provided by the class <code>Webauthn\PublicKeyCredentialCreationOptions</code>:</p>
 <ul>
 <li><code>ATTESTATION_CONVEYANCE_PREFERENCE_NONE</code>: the Relying Party is not interested in authenticator attestation (default)</li>
 <li><code>ATTESTATION_CONVEYANCE_PREFERENCE_INDIRECT</code>: the Relying Party prefers an attestation conveyance yielding verifiable attestation statements, but allows the client to decide how to obtain such attestation statements.</li>
 <li><code>ATTESTATION_CONVEYANCE_PREFERENCE_DIRECT</code>: the Relying Party wants to receive the attestation statement as generated by the authenticator.</li>
-<li><code>ATTESTATION_CONVEYANCE_PREFERENCE_ENTERPRISE</code>: the Relying Party wants to receive uniquely identifying information from authenticators.</li>
+<li><code>ATTESTATION_CONVEYANCE_PREFERENCE_ENTERPRISE</code>: the Relying Party wants to receive uniquely identifying information from authenticators. See <a href="#enterprise-attestation">Enterprise attestation</a>.</li>
 </ul>
-<div class="language-yaml highlight"><span class="filename">config/packages/webauthn.yaml</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">webauthn</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">credential_repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">user_repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">creation_profiles</span><span class="p">:</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="nt">acme</span><span class="p">:</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">            </span><span class="nt">attestation_conveyance</span><span class="p">:</span><span class="w"> </span><span class="kt">!php/const</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Webauthn\PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_DIRECT</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">            </span><span class="nt">rp</span><span class="p">:</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">'My</span><span class="nv"> </span><span class="s">application'</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">                </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">'example.com'</span>
+<p>Set the preference on the <a href="../../options-helpers/">options helper</a> of your registration endpoint:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="k">use</span> <span class="nx">Webauthn\PublicKeyCredentialCreationOptions</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>    <span class="o">-&gt;</span><span class="na">forCreation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">userEntityGuesser</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>    <span class="o">-&gt;</span><span class="na">withAttestation</span><span class="p">(</span><span class="nx">PublicKeyCredentialCreationOptions</span><span class="o">::</span><span class="na">ATTESTATION_CONVEYANCE_PREFERENCE_DIRECT</span><span class="p">)</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Deprecated in v5.4.0:</strong> the creation profiles, and their <code>attestation_conveyance</code> node, are superseded by the options helpers and removed in 6.0.0. See <a href="../../../migration/from-v5.3-to-v5.4/">From 5.3 to 5.4</a>.</p>
+</div>
+<div class="language-yaml highlight"><span class="filename">config/packages/webauthn.yaml</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">webauthn</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">credential_repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">user_repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">creation_profiles</span><span class="p">:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="nt">acme</span><span class="p">:</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">            </span><span class="nt">attestation_conveyance</span><span class="p">:</span><span class="w"> </span><span class="kt">!php/const</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Webauthn\PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_DIRECT</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">            </span><span class="nt">rp</span><span class="p">:</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">                </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">'example.com'</span>
+</span></code></pre></div>
+<h2 id="authenticators-without-a-metadata-statement">Authenticators without a metadata statement<a class="headerlink" href="#authenticators-without-a-metadata-statement" title="Link to this section">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><strong>New in v5.4.0</strong></p>
+</div>
+<p>A full attestation (basic, AttCA or AnonCA) whose AAGUID has no Metadata Statement is refused by default. Set <code>require_statement</code> to <code>false</code> to accept it without its certificate chain being verified. The status reports of the AAGUID still apply, and the AAGUIDs that have a statement are verified as before.</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/webauthn.yaml</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">webauthn</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">mds_repository</span><span class="p">:</span><span class="w"> </span><span class="s">'App\Repository\MyMetadataStatementRepository'</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">status_report_repository</span><span class="p">:</span><span class="w"> </span><span class="s">'App\Repository\MyStatusReportRepository'</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">        </span><span class="nt">require_statement</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span></code></pre></div>
+<p>The <code>Webauthn\Event\AttestationCheckedAgainstMetadata</code> event tells whether the model was verified against its statement or only declared by the authenticator:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos=" 2 "></span></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos=" 4 "></span></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="k">namespace</span> <span class="nx">App\EventListener</span><span class="p">;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="k">use</span> <span class="nx">Symfony\Component\EventDispatcher\Attribute\AsEventListener</span><span class="p">;</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8"></a><a href="#__codelineno-5-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="k">use</span> <span class="nx">Webauthn\Event\AttestationCheckedAgainstMetadata</span><span class="p">;</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a><span class="p">#[</span><span class="nd">AsEventListener</span><span class="p">(</span><span class="nx">AttestationCheckedAgainstMetadata</span><span class="o">::</span><span class="na">class</span><span class="p">)]</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><a href="#__codelineno-5-11"><span class="linenos" data-linenos="11 "></span></a><span class="k">final</span> <span class="k">readonly</span> <span class="k">class</span> <span class="nc">RecordAuthenticatorModel</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a><span class="p">{</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><a href="#__codelineno-5-13"><span class="linenos" data-linenos="13 "></span></a>    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><a href="#__codelineno-5-14"><span class="linenos" data-linenos="14 "></span></a>        <span class="k">private</span> <span class="nx">AuthenticatorModelRepository</span> <span class="nv">$authenticatorModels</span><span class="p">,</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><a href="#__codelineno-5-15"><span class="linenos" data-linenos="15 "></span></a>    <span class="p">)</span> <span class="p">{</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><a href="#__codelineno-5-16"><span class="linenos" data-linenos="16 "></span></a>    <span class="p">}</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17"></a><a href="#__codelineno-5-17"><span class="linenos" data-linenos="17 "></span></a>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18"></a><a href="#__codelineno-5-18"><span class="linenos" data-linenos="18 "></span></a>    <span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">AttestationCheckedAgainstMetadata</span> <span class="nv">$event</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19"></a><a href="#__codelineno-5-19"><span class="linenos" data-linenos="19 "></span></a>    <span class="p">{</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20"></a><a href="#__codelineno-5-20"><span class="linenos" data-linenos="20 "></span></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">authenticatorModels</span><span class="o">-&gt;</span><span class="na">record</span><span class="p">(</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21"></a><a href="#__codelineno-5-21"><span class="linenos" data-linenos="21 "></span></a>            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">credentialRecord</span><span class="o">-&gt;</span><span class="na">publicKeyCredentialId</span><span class="p">,</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22"></a><a href="#__codelineno-5-22"><span class="linenos" data-linenos="22 "></span></a>            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">credentialRecord</span><span class="o">-&gt;</span><span class="na">aaguid</span><span class="o">-&gt;</span><span class="na">toRfc4122</span><span class="p">(),</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23"></a><a href="#__codelineno-5-23"><span class="linenos" data-linenos="23 "></span></a>            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">isVerified</span><span class="p">()</span>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24"></a><a href="#__codelineno-5-24"><span class="linenos" data-linenos="24 "></span></a>        <span class="p">);</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25"></a><a href="#__codelineno-5-25"><span class="linenos" data-linenos="25 "></span></a>    <span class="p">}</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26"></a><a href="#__codelineno-5-26"><span class="linenos" data-linenos="26 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<p>See <a href="../../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#authenticators-without-a-metadata-statement">Authenticators without a metadata statement</a> for the details and the limits of an unverified attestation.</p>
+<h2 id="admitting-a-compromised-authenticator">Admitting a compromised authenticator<a class="headerlink" href="#admitting-a-compromised-authenticator" title="Link to this section">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><strong>New in v5.4.0</strong></p>
+</div>
+<p>Before refusing a model flagged by a status report, the bundle dispatches <code>Webauthn\Event\CompromisedAuthenticatorDetected</code>. The registration goes on only when a listener calls <code>admit()</code>:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="k">namespace</span> <span class="nx">App\EventListener</span><span class="p">;</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="k">use</span> <span class="nx">DateTimeImmutable</span><span class="p">;</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="k">use</span> <span class="nx">Psr\Clock\ClockInterface</span><span class="p">;</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="k">use</span> <span class="nx">Symfony\Component\DependencyInjection\Attribute\Autowire</span><span class="p">;</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a><span class="k">use</span> <span class="nx">Symfony\Component\EventDispatcher\Attribute\AsEventListener</span><span class="p">;</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11"></a><a href="#__codelineno-6-11"><span class="linenos" data-linenos="11 "></span></a><span class="k">use</span> <span class="nx">Webauthn\Event\CompromisedAuthenticatorDetected</span><span class="p">;</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12"></a><a href="#__codelineno-6-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13"></a><a href="#__codelineno-6-13"><span class="linenos" data-linenos="13 "></span></a><span class="p">#[</span><span class="nd">AsEventListener</span><span class="p">(</span><span class="nx">CompromisedAuthenticatorDetected</span><span class="o">::</span><span class="na">class</span><span class="p">)]</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14"></a><a href="#__codelineno-6-14"><span class="linenos" data-linenos="14 "></span></a><span class="k">final</span> <span class="k">readonly</span> <span class="k">class</span> <span class="nc">AdmitFleetUntilReplacement</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15"></a><a href="#__codelineno-6-15"><span class="linenos" data-linenos="15 "></span></a><span class="p">{</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16"></a><a href="#__codelineno-6-16"><span class="linenos" data-linenos="16 "></span></a>    <span class="k">public</span> <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17"></a><a href="#__codelineno-6-17"><span class="linenos" data-linenos="17 "></span></a>        <span class="k">private</span> <span class="nx">ClockInterface</span> <span class="nv">$clock</span><span class="p">,</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18"></a><a href="#__codelineno-6-18"><span class="linenos" data-linenos="18 "></span></a>        <span class="p">#[</span><span class="nd">Autowire</span><span class="p">(</span><span class="s1">'%app.webauthn.fleet_model%'</span><span class="p">)]</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19"></a><a href="#__codelineno-6-19"><span class="linenos" data-linenos="19 "></span></a>        <span class="k">private</span> <span class="nx">string</span> <span class="nv">$fleetModel</span><span class="p">,</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20"></a><a href="#__codelineno-6-20"><span class="linenos" data-linenos="20 "></span></a>        <span class="p">#[</span><span class="nd">Autowire</span><span class="p">(</span><span class="s1">'%app.webauthn.fleet_replacement_deadline%'</span><span class="p">)]</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21"></a><a href="#__codelineno-6-21"><span class="linenos" data-linenos="21 "></span></a>        <span class="k">private</span> <span class="nx">string</span> <span class="nv">$replacementDeadline</span><span class="p">,</span>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22"></a><a href="#__codelineno-6-22"><span class="linenos" data-linenos="22 "></span></a>    <span class="p">)</span> <span class="p">{</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23"></a><a href="#__codelineno-6-23"><span class="linenos" data-linenos="23 "></span></a>    <span class="p">}</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24"></a><a href="#__codelineno-6-24"><span class="linenos" data-linenos="24 "></span></a>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25"></a><a href="#__codelineno-6-25"><span class="linenos" data-linenos="25 "></span></a>    <span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">CompromisedAuthenticatorDetected</span> <span class="nv">$event</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26"></a><a href="#__codelineno-6-26"><span class="linenos" data-linenos="26 "></span></a>    <span class="p">{</span>
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27"></a><a href="#__codelineno-6-27"><span class="linenos" data-linenos="27 "></span></a>        <span class="k">if</span> <span class="p">(</span><span class="nv">$event</span><span class="o">-&gt;</span><span class="na">credentialRecord</span><span class="o">-&gt;</span><span class="na">aaguid</span><span class="o">-&gt;</span><span class="na">toRfc4122</span><span class="p">()</span> <span class="o">===</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">fleetModel</span>
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28"></a><a href="#__codelineno-6-28"><span class="linenos" data-linenos="28 "></span></a>            <span class="o">&amp;&amp;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">clock</span><span class="o">-&gt;</span><span class="na">now</span><span class="p">()</span> <span class="o">&lt;</span> <span class="k">new</span> <span class="nx">DateTimeImmutable</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">replacementDeadline</span><span class="p">)</span>
+</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29"></a><a href="#__codelineno-6-29"><span class="linenos" data-linenos="29 "></span></a>        <span class="p">)</span> <span class="p">{</span>
+</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30"></a><a href="#__codelineno-6-30"><span class="linenos" data-linenos="30 "></span></a>            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">admit</span><span class="p">();</span>
+</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31"></a><a href="#__codelineno-6-31"><span class="linenos" data-linenos="31 "></span></a>        <span class="p">}</span>
+</span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32"></a><a href="#__codelineno-6-32"><span class="linenos" data-linenos="32 "></span></a>    <span class="p">}</span>
+</span><span id="__span-6-33"><a id="__codelineno-6-33" name="__codelineno-6-33"></a><a href="#__codelineno-6-33"><span class="linenos" data-linenos="33 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The two parameters hold the AAGUID of the admitted model and the date its authenticators are replaced. See <a href="../../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#admitting-a-compromised-authenticator">Admitting a compromised authenticator</a> for the content of the event.</p>
+<h2 id="enterprise-attestation">Enterprise attestation<a class="headerlink" href="#enterprise-attestation" title="Link to this section">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><strong>New in v5.4.0</strong></p>
+</div>
+<p>An enterprise attestation chains to a root certificate of the organization, which no Metadata Statement lists. Pin these trust anchors, as PEM or Base64-encoded DER certificates, under <code>metadata</code>:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/webauthn.yaml</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">webauthn</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">mds_repository</span><span class="p">:</span><span class="w"> </span><span class="s">'App\Repository\MyMetadataStatementRepository'</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">status_report_repository</span><span class="p">:</span><span class="w"> </span><span class="s">'App\Repository\MyStatusReportRepository'</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">        </span><span class="nt">enterprise_attestation_trust_anchors</span><span class="p">:</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'%env(file:ORGANIZATION_ROOT_CA)%'</span>
+</span></code></pre></div>
+<p>When the creation options ask for <code>enterprise</code>, a full attestation must then chain up to one of these anchors, whether its AAGUID has a Metadata Statement or not. The status reports of the AAGUID still apply.</p>
+<p>An application serving several organizations pins the anchors of the organization a registration belongs to, for that verification only. The devices another organization manages are then refused:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>    <span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a>    <span class="o">-&gt;</span><span class="na">withEnterpriseAttestationTrustAnchors</span><span class="p">(</span><span class="nv">$organization</span><span class="o">-&gt;</span><span class="na">attestationTrustAnchors</span><span class="p">)</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>    <span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</span></code></pre></div>
+<p>The serial number of the authenticator is available on the trust path of the credential record. See <a href="../../../pure-php/advanced-behaviours/attestation-and-metadata-statement/#enterprise-attestation">Enterprise attestation</a> for the rules applied and for reading the serial number.</p>
 
 
 
@@ -2946,7 +3129,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 17, 2026 20:44:56 UTC">November 17, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
   </span>
 
     

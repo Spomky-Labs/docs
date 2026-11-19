@@ -3314,7 +3314,7 @@
 <p class="admonition-title">Info</p>
 <p><strong>New in v5.4.0</strong></p>
 </div>
-<p>The bundle ships an autowired helper that lets you write your own attestation/assertion <em>options</em> controllers without touching a single line of bundle configuration. This is the recommended path going forward: the controllers shipped with the bundle (<code>AttestationRequestController</code> / <code>AssertionRequestController</code>, driven by <code>creation_profiles</code> / <code>request_profiles</code>) stay available for backwards compatibility but the helper is more flexible and clearer.</p>
+<p>The bundle ships an autowired helper that lets you write your own attestation/assertion <em>options</em> controllers without touching a single line of bundle configuration. This is the recommended path going forward: the controllers shipped with the bundle (<code>AttestationRequestController</code> / <code>AssertionRequestController</code>, driven by <code>creation_profiles</code> / <code>request_profiles</code>) are deprecated since 5.4.0 and removed in 6.0.0. They keep working in 5.4, but the helper is more flexible and clearer.</p>
 <h2 id="the-entry-point">The entry point<a class="headerlink" href="#the-entry-point" title="Link to this section">&para;</a></h2>
 <p><code>Webauthn\Bundle\Service\WebauthnOptionsResponse</code> is autowired and public. It exposes two factory methods, one per ceremony, returning a fluent builder:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span><span class="o">-&gt;</span><span class="na">forCreation</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$rpId</span><span class="p">,</span> <span class="nx">PublicKeyCredentialUserEntity</span><span class="o">|</span><span class="nx">UserEntityGuesser</span> <span class="nv">$user</span><span class="p">)</span><span class="o">:</span> <span class="nx">WebauthnCreationOptionsBuilder</span>
@@ -3418,7 +3418,7 @@
 </tr>
 <tr>
 <td><code>withExtensions(array)</code></td>
-<td>none — pass a <code>list&lt;AuthenticationExtension&gt;</code>; the builder wraps it as <code>AuthenticationExtensions</code></td>
+<td>none; pass a <code>list&lt;AuthenticationExtension&gt;</code>, the builder wraps it as <code>AuthenticationExtensions</code></td>
 </tr>
 <tr>
 <td><code>withHints(array)</code></td>
@@ -3435,6 +3435,10 @@
 <tr>
 <td><code>withCredentialRepository(CredentialRecordRepositoryInterface)</code></td>
 <td>the global <code>webauthn.credential_repository</code></td>
+</tr>
+<tr>
+<td><code>withScope(string)</code></td>
+<td><code>helpers</code>, see <a href="#storage">Storage</a></td>
 </tr>
 </tbody>
 </table>
@@ -3457,6 +3461,10 @@
 <tr>
 <td><code>withAuthenticatorSelectionCriteria(AuthenticatorSelectionCriteria)</code></td>
 <td>none</td>
+</tr>
+<tr>
+<td><code>withRpName(string)</code></td>
+<td>the RP ID passed to <code>forCreation()</code></td>
 </tr>
 <tr>
 <td><code>withPubKeyCredParams(array)</code></td>
@@ -3508,19 +3516,33 @@
 </tbody>
 </table>
 <h4 id="username-enumeration-protection">Username-enumeration protection<a class="headerlink" href="#username-enumeration-protection" title="Link to this section">&para;</a></h4>
-<p>When the JSON body carries a <code>username</code> (typical login form post: <code>{"username":"alice"}</code>) but <code>alice</code> does not resolve to a known user, the request builder consults the autowired <code>FakeCredentialGenerator</code> and emits <strong>fake</strong> <code>allowCredentials</code> instead of an empty list. From the client's standpoint, the response shape is identical whether or not the username matches a real account, so an attacker cannot probe for valid usernames.</p>
-<p>Default behaviour (no setup needed):</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+<p>When no credential can be listed in <code>allowCredentials</code> (no user attached with <code>withUser()</code>, or a user without any credential) and the JSON body carries a non-empty <code>username</code> (typical login form post: <code>{"username":"alice"}</code>), the request builder asks the <code>FakeCredentialGenerator</code> for <strong>fake</strong> <code>allowCredentials</code> instead of returning an empty list. From the client's standpoint, the response has the same shape whether or not the username matches an account that has credentials, so an attacker cannot probe for valid usernames.</p>
+<p>The builder does not look the username up itself. Resolve the user in your controller and attach it when it exists, otherwise a known user receives fake credentials and cannot log in:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/webauthn/login/options'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">public</span> <span class="k">function</span> <span class="fm">__invoke</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span><span class="o">:</span> <span class="nd">JsonResponse</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">{</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span><span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">);</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="nv">$username</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getPayload</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getString</span><span class="p">(</span><span class="s1">'username'</span><span class="p">);</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$username</span> <span class="o">===</span> <span class="s1">''</span> <span class="o">?</span> <span class="nd">null</span> <span class="o">:</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">userEntityRepository</span><span class="o">-&gt;</span><span class="na">findOneByUsername</span><span class="p">(</span><span class="nv">$username</span><span class="p">);</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="nd">if</span> <span class="p">(</span><span class="nv">$user</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">withUser</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="p">}</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="nd">return</span> <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Opt out (response will be a true userless / empty <code>allowCredentials</code> ceremony when the username is unknown):</p>
+<p>Attach the user entity, not a <code>UserEntityGuesser</code> that throws for an unknown username: the exception would leave <code>build()</code> and reveal that the account does not exist.</p>
+<p>The generator is the <code>webauthn.fake_credential_generator</code> service (<code>SimpleFakeCredentialGenerator</code> by default). No fake credential is produced when the list is set with <code>withAllowCredentials()</code> or when <code>withDeriveAllowCredentialsFromUser(false)</code> is called. To opt out entirely:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="o">-&gt;</span><span class="na">withFakeCredentialGenerator</span><span class="p">(</span><span class="k">null</span><span class="p">)</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Or swap with a custom implementation of <code>Webauthn\FakeCredentialGenerator</code> (e.g. a hash-keyed deterministic generator backed by your <code>kernel.secret</code>) by passing it to <code>withFakeCredentialGenerator($custom)</code>.</p>
+<p>Or swap with a custom implementation of <code>Webauthn\FakeCredentialGenerator</code> (e.g. a hash-keyed deterministic generator backed by your <code>kernel.secret</code>) by passing it to <code>withFakeCredentialGenerator($custom)</code>. See <a href="../advanced-behaviors/fake-credentials/">Fake Credentials</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>To read the <code>username</code>, the request builder parses the body as soon as a fake credential generator is set, which is the default, and the creation builder does the same when a client override policy is attached. The request must then be sent with <code>Content-Type: application/json</code>, even when its body is empty: otherwise the builder answers with a 400 <code>Only JSON content type allowed</code>.</p>
+</div>
 <h2 id="client-overrides">Client overrides<a class="headerlink" href="#client-overrides" title="Link to this section">&para;</a></h2>
 <p>By default, <strong>anything in the client request body is ignored</strong>: the server alone decides every field. To let the client influence specific fields, attach a <code>Webauthn\Bundle\Policy\ClientOverridePolicy</code>. Two equivalent build paths are supported as first-class APIs.</p>
 <h3 id="typed-factory-recommended">Typed factory (recommended)<a class="headerlink" href="#typed-factory-recommended" title="Link to this section">&para;</a></h3>
@@ -3539,8 +3561,8 @@
 </span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12"></a><a href="#__codelineno-7-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
 <ul>
-<li><code>ClientOverrideRule::any()</code> — accepts any value the client submits</li>
-<li><code>ClientOverrideRule::restrictTo($allowedValues)</code> — restricts the client value to a list</li>
+<li><code>ClientOverrideRule::any()</code>: accepts any value the client submits</li>
+<li><code>ClientOverrideRule::restrictTo($allowedValues)</code>: restricts the client value to a list</li>
 <li>Pass <code>null</code> (the default) for fields the client must NOT be able to override</li>
 </ul>
 <h3 id="nested-array-form">Nested-array form<a class="headerlink" href="#nested-array-form" title="Link to this section">&para;</a></h3>
@@ -3559,10 +3581,16 @@
 </span></code></pre></div>
 <p>The constructor also accepts a mix of typed <code>ClientOverrideRule</code> entries and legacy <code>{enabled, allowed_values?}</code> arrays in the same call.</p>
 <h3 id="behaviour">Behaviour<a class="headerlink" href="#behaviour" title="Link to this section">&para;</a></h3>
-<p>If the client posts <code>{"userVerification": "required"}</code>, the merged options carry <code>required</code>. If it posts <code>"discouraged"</code>, the policy rejects it (not in the allow-list) and the default (<code>preferred</code>) wins. Anything outside the policy keys is ignored regardless of what the body contains.</p>
+<p>If the client posts <code>{"userVerification": "required"}</code>, the merged options carry <code>required</code>. If it posts <code>"discouraged"</code>, the policy rejects it (not in the allow-list) and the value set on the builder wins. Anything outside the policy keys is ignored regardless of what the body contains.</p>
+<ul>
+<li>A policy built in PHP has no defaults: a field without a rule cannot be overridden. In the nested-array form, <code>['enabled' =&gt; true]</code> without <code>allowed_values</code> accepts any value.</li>
+<li>The request builder honours <code>user_verification</code> and <code>extensions</code> only. <code>authenticator_attachment</code>, <code>resident_key</code>, <code>attestation_conveyance</code> and <code>mediation</code> apply to the creation builder.</li>
+<li>The extensions sent by the client <strong>replace</strong> those set with <code>withExtensions()</code>, they are not merged. <code>allowed_values</code> does not apply to <code>extensions</code>: the rule only says whether the client can override them.</li>
+</ul>
 <p>See <a href="../advanced-behaviors/client-override-policy/">Client Override Policy</a> for the full list of overridable fields.</p>
 <h2 id="storage">Storage<a class="headerlink" href="#storage" title="Link to this section">&para;</a></h2>
 <p>The helper persists the produced options in the bundle's <code>OptionsStorage</code> automatically before returning the response. Forgetting to store options is a frequent source of <em>"challenge mismatch"</em> errors when the response controller validates the assertion later: the helper removes that risk.</p>
+<p>The stored options carry a scope, <code>helpers</code> by default, and only a <a href="../verification-helpers/#scopes">verifier</a> bound to the same scope redeems them. When two pairs of endpoints have different requirements, for instance a login and a step-up that requires user verification, give each pair a scope of its own with <code>withScope()</code>, on the options builder and on the verifier alike.</p>
 <p>If you want to bypass the helper's storage and call <code>OptionsStorage</code> yourself (e.g. to attach extra metadata), you can build the options classes directly using the lib API and skip the helper entirely.</p>
 <h2 id="why-a-single-entry-point">Why a single entry point?<a class="headerlink" href="#why-a-single-entry-point" title="Link to this section">&para;</a></h2>
 <p><code>WebauthnOptionsResponse</code> is the only service you inject in your controller. The two builders it returns are typed (<code>WebauthnCreationOptionsBuilder</code> and <code>WebauthnRequestOptionsBuilder</code>), so the IDE autocomplete only proposes the setters that make sense for the ceremony at hand.</p>
@@ -3572,7 +3600,7 @@
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span><span class="o">-&gt;</span><span class="na">forCreation</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">withUiMode</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>       <span class="c1">// ❌ does not exist on creation</span>
 </span></code></pre></div>
 <h2 id="migration-from-creation_profiles-request_profiles">Migration from <code>creation_profiles</code> / <code>request_profiles</code><a class="headerlink" href="#migration-from-creation_profiles-request_profiles" title="Link to this section">&para;</a></h2>
-<p>If you are still using the bundle's profile-driven controllers, the migration path is straightforward: write a controller of your own that calls the helper, then drop the matching <code>webauthn.controllers.creation.&lt;name&gt;</code> / <code>webauthn.controllers.request.&lt;name&gt;</code> config block. The route name(s) you previously had can be re-bound to your controller via the <code>#[Route]</code> attribute.</p>
+<p>The profile-driven controllers are deprecated since 5.4.0 and removed in 6.0.0. The migration path is straightforward: write a controller of your own that calls the helper, then drop the matching <code>webauthn.controllers.creation.&lt;name&gt;</code> / <code>webauthn.controllers.request.&lt;name&gt;</code> config block. The route name(s) you previously had can be re-bound to your controller via the <code>#[Route]</code> attribute.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Link to this section">&para;</a></h2>
 <ul>
 <li><a href="../advanced-behaviors/client-override-policy/">Client Override Policy</a>: what the client can request when a policy is set</li>
@@ -3599,7 +3627,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
   </span>
 
     

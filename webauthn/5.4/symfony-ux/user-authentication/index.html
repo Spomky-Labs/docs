@@ -3107,6 +3107,18 @@
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a>    <span class="nv">conditionalUi</span><span class="o">:</span> <span class="kp">true</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos="6 "></span></a><span class="o">})</span> <span class="cp">}}</span>
 </span></code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><strong>Changed in v5.4.0:</strong> on connect, the controller reads the client capabilities with <code>PublicKeyCredential.getClientCapabilities()</code> and starts the conditional UI only when <code>conditionalGet</code> is <code>true</code>. On the browsers that do not ship that method yet, the capability is derived from SimpleWebAuthn's <code>browserSupportsWebAuthnAutofill()</code>. When the capability is missing, <code>conditionalUi: true</code> starts nothing and the user signs in with the <code>authenticate</code> action.</p>
+</div>
+<p>The capability map is exposed as <code>capabilities</code> in the detail of the <code>webauthn:authentication:connect</code> event (and of <code>webauthn:registration:connect</code> for the registration controller), next to <code>optionsUrl</code>, <code>resultUrl</code> and <code>supportsPlatformAuthenticator</code>. The events bubble, so a listener on <code>document</code> receives them:</p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'webauthn:authentication:connect'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">capabilities</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">capabilities</span><span class="p">.</span><span class="nx">conditionalGet</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="c1">// Show a "Sign in with a passkey" button instead of relying on autofill</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos="6 "></span></a><span class="p">});</span>
+</span></code></pre></div>
 <h3 id="authentication-controller-options">Authentication controller options<a class="headerlink" href="#authentication-controller-options" title="Link to this section">&para;</a></h3>
 <table>
 <thead>
@@ -3146,7 +3158,7 @@
 <td><code>conditionalUi</code></td>
 <td>boolean</td>
 <td><code>false</code></td>
-<td>Enable conditional UI (autofill)</td>
+<td>Enable conditional UI (autofill) on connect, when the browser reports the <code>conditionalGet</code> capability</td>
 </tr>
 <tr>
 <td><code>verifyAutofillInput</code></td>
@@ -3199,7 +3211,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
   </span>
 
     

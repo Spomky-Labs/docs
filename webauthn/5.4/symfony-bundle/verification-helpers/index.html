@@ -2071,6 +2071,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Storage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scopes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scopes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3127,6 +3144,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Storage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scopes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scopes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3192,7 +3226,7 @@
 <p class="admonition-title">Info</p>
 <p><strong>New in v5.4.0</strong></p>
 </div>
-<p>Companion of the <a href="../options-helpers/">Options Helpers</a> for the <strong>response side</strong>: instead of routing your <code>/attestation/response</code> and <code>/assertion/response</code> endpoints through the bundle's <code>AttestationResponseController</code> / <code>AssertionResponseController</code> (driven by <code>creation_profiles</code> / <code>request_profiles</code> config), you write your own controllers and call a single helper to deserialise the body, validate the ceremony and return a typed result. Your controller stays in charge of what to do with that result (login, redirect, JSON envelope, Signal API payload, etc.).</p>
+<p>Companion of the <a href="../options-helpers/">Options Helpers</a> for the <strong>response side</strong>: instead of routing your <code>/attestation/response</code> and <code>/assertion/response</code> endpoints through the bundle's <code>AttestationResponseController</code> / <code>AssertionResponseController</code> (driven by the <code>controllers</code> configuration, deprecated since 5.4.0 and removed in 6.0.0), you write your own controllers and call a single helper to deserialise the body, validate the ceremony and return a typed result. Your controller stays in charge of what to do with that result (login, redirect, JSON envelope, Signal API payload, etc.).</p>
 <h2 id="the-entry-point">The entry point<a class="headerlink" href="#the-entry-point" title="Link to this section">&para;</a></h2>
 <p><code>Webauthn\Bundle\Service\WebauthnResponseVerifier</code> is autowired and public. It exposes two factory methods, one per ceremony, returning a fluent verifier:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span><span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$rpId</span><span class="p">)</span><span class="o">:</span> <span class="nx">WebauthnAttestationVerifier</span>
@@ -3285,7 +3319,7 @@
 </tr>
 <tr>
 <td><code>withAllowSubdomains(bool = true)</code></td>
-<td>the global <code>webauthn.allow_subdomains</code> configuration</td>
+<td><code>false</code> when <code>withAllowedOrigins()</code> is called; ignored otherwise</td>
 </tr>
 <tr>
 <td><code>withCeremonyOriginPinning(bool = true)</code></td>
@@ -3303,9 +3337,13 @@
 <td><code>withCredentialRepository(CredentialRecordRepositoryInterface)</code></td>
 <td>the global <code>webauthn.credential_repository</code></td>
 </tr>
+<tr>
+<td><code>withScope(string)</code></td>
+<td><code>helpers</code>, see <a href="#scopes">Scopes</a></td>
+</tr>
 </tbody>
 </table>
-<p><code>withAllowedOrigins(...)</code> / <code>withAllowSubdomains(bool)</code> override the accepted origins. When set, the verifier asks the autowired <code>CeremonyStepManagerFactory</code> to produce a fresh <code>CeremonyStepManager</code> and a fresh validator on top, so the singleton factory's state stays untouched. Use it when one route accepts a different list of origins than the rest of the application (multi-tenant, internal-vs-public, staging vs production, etc.).</p>
+<p><code>withAllowedOrigins(...)</code> / <code>withAllowSubdomains(bool)</code> override the accepted origins. <code>withAllowSubdomains()</code> only applies together with <code>withAllowedOrigins()</code>: called alone, it is ignored and the global settings apply, and the global <code>webauthn.allow_subdomains</code> does not apply to a list set with <code>withAllowedOrigins()</code>. When set, the verifier asks the autowired <code>CeremonyStepManagerFactory</code> to produce a fresh <code>CeremonyStepManager</code> and a fresh validator on top, so the singleton factory's state stays untouched. Use it when one route accepts a different list of origins than the rest of the application (multi-tenant, internal-vs-public, staging vs production, etc.).</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="o">-&gt;</span><span class="na">withAllowedOrigins</span><span class="p">([</span><span class="s1">'https://app.example.com'</span><span class="p">,</span> <span class="s1">'https://admin.example.com'</span><span class="p">])</span>
@@ -3345,16 +3383,20 @@
 <td><code>true</code> (auto-persist via <code>CanSaveCredentialRecord</code>)</td>
 </tr>
 <tr>
-<td><code>withMetadata(MetadataStatementRepository, StatusReportRepository, CertificateChainValidator)</code></td>
+<td><code>withMetadata(MetadataStatementRepository, StatusReportRepository, CertificateChainValidator, bool $requireStatement = true)</code></td>
 <td>inherits the global <code>webauthn.metadata</code> config</td>
 </tr>
 <tr>
 <td><code>withoutMetadata()</code></td>
 <td>inherits the global <code>webauthn.metadata</code> config</td>
 </tr>
+<tr>
+<td><code>withEnterpriseAttestationTrustAnchors(array)</code></td>
+<td>the global <code>webauthn.metadata.enterprise_attestation_trust_anchors</code></td>
+</tr>
 </tbody>
 </table>
-<p>If your <code>CredentialRecordRepositoryInterface</code> does not implement <code>CanSaveCredentialRecord</code>, calling <code>verify()</code> with the default behaviour throws <code>Webauthn\Bundle\Exception\MissingFeatureException</code>. Implement the interface or pass <code>withSaveCredential(false)</code> and persist yourself.</p>
+<p>If your <code>CredentialRecordRepositoryInterface</code> does not implement <code>CanSaveCredentialRecord</code>, calling <code>verify()</code> with the default behaviour fails with a <code>WebauthnAuthenticationFailureException</code> whose previous exception is a <code>Webauthn\Bundle\Exception\MissingFeatureException</code>. Implement the interface or pass <code>withSaveCredential(false)</code> and persist yourself.</p>
 <h4 id="metadata-statement-validation">Metadata statement validation<a class="headerlink" href="#metadata-statement-validation" title="Link to this section">&para;</a></h4>
 <p>When <code>webauthn.metadata.enabled: true</code> is set in YAML, every attestation verifier inherits the configured <code>MetadataStatementRepository</code> / <code>StatusReportRepository</code> / <code>CertificateChainValidator</code> services and runs the <code>CheckMetadataStatement</code> step. Most apps stop there.</p>
 <p>Two setters layer per-verifier overrides on top of that default:</p>
@@ -3366,6 +3408,7 @@
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="o">-&gt;</span><span class="na">withMetadata</span><span class="p">(</span><span class="nv">$strictMds</span><span class="p">,</span> <span class="nv">$strictStatus</span><span class="p">,</span> <span class="nv">$strictCertChain</span><span class="p">)</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
+<p>The fourth argument, <code>$requireStatement</code>, does not inherit <code>webauthn.metadata.require_statement</code>: it is <code>true</code> unless you pass <code>false</code>. See <a href="../advanced-behaviors/attestation-and-metadata-statement/#authenticators-without-a-metadata-statement">Authenticators without a metadata statement</a>.</p>
 <ul>
 <li><strong><code>withoutMetadata()</code></strong> opts the current verification out of metadata validation, even when the global toggle is on. Useful when a registration route has to accept authenticators that don't publish a Metadata Statement:</li>
 </ul>
@@ -3375,6 +3418,7 @@
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Both setters clone the autowired <code>CeremonyStepManagerFactory</code> before reconfiguring it, so the singleton's global state is untouched.</p>
+<p><code>withEnterpriseAttestationTrustAnchors(array)</code> pins the trust anchors of the enterprise attestations for this verification only, for instance those of the organization a registration belongs to. See <a href="../advanced-behaviors/attestation-and-metadata-statement/#enterprise-attestation">Enterprise attestation</a>.</p>
 <h3 id="assertion-only">Assertion only<a class="headerlink" href="#assertion-only" title="Link to this section">&para;</a></h3>
 <table>
 <thead>
@@ -3400,7 +3444,7 @@
 <p><code>verify()</code> throws in two well-defined ways:</p>
 <ul>
 <li><code>Symfony\Component\HttpKernel\Exception\BadRequestHttpException</code> for <strong>malformed inputs</strong>: wrong content type, empty body, deserialisation failure, unknown challenge in <code>OptionsStorage</code>, response type mismatch (assertion body posted to the attestation verifier or vice-versa), Relying Party ID mismatch. Symfony's HTTP layer turns these into HTTP 400 automatically; you don't have to catch them.</li>
-<li><code>Webauthn\Bundle\Security\Authentication\Exception\WebauthnAuthenticationFailureException</code> for <strong>ceremony validation failures</strong>: signature invalid, user handle mismatch, attestation rejected, etc. The exception carries the deserialised <code>PublicKeyCredential</code>, the underlying <code>AuthenticatorResponse</code>, the <code>PublicKeyCredentialOptions</code> it was checked against and the user entity (when known), so your controller can build a contextual response, including the <a href="../../pure-php/advanced-behaviours/signal-api/">Signal API</a> <code>signalUnknownCredential</code> payload to drop a stale passkey from the platform UI.</li>
+<li><code>Webauthn\Bundle\Security\Authentication\Exception\WebauthnAuthenticationFailureException</code> for <strong>ceremony validation failures</strong>: signature invalid, user handle mismatch, attestation rejected, etc. The errors raised while the credential is saved arrive the same way, as the previous exception: a repository that cannot save, or a credential that already exists. The exception carries the deserialised <code>PublicKeyCredential</code>, the underlying <code>AuthenticatorResponse</code>, the <code>PublicKeyCredentialOptions</code> it was checked against and the user entity (when known), so your controller can build a contextual response, including the <a href="../../pure-php/advanced-behaviours/signal-api/">Signal API</a> <code>signalUnknownCredential</code> payload to drop a stale passkey from the platform UI.</li>
 </ul>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">try</span> <span class="p">{</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span><span class="o">-&gt;</span><span class="na">forAssertion</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
@@ -3415,13 +3459,34 @@
 </span></code></pre></div>
 <h2 id="storage">Storage<a class="headerlink" href="#storage" title="Link to this section">&para;</a></h2>
 <p>The helper reads ceremony options from the bundle's <code>OptionsStorage</code> automatically (the same one <a href="../options-helpers/">Options Helpers</a> write to). Use the bundle's helpers on both ends and you don't have to manage challenge storage at all.</p>
+<h3 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Link to this section">&para;</a></h3>
+<p>The options helpers store the options with a scope, <code>helpers</code> unless <code>withScope()</code> names another one, and the verifier only redeems the options issued under its own scope. Options issued under another scope are refused with a 400 <code>The options were not issued by this endpoint.</code> A challenge obtained from one endpoint therefore cannot be redeemed against the requirements of another (user verification, attestation conveyance, allowed credentials):</p>
+<ul>
+<li>the verifiers refuse the options issued by the firewall and by the <code>webauthn.controllers</code> endpoints, and those endpoints refuse the options issued by the helpers;</li>
+<li>options stored without a scope, by code of your own, are still accepted.</li>
+</ul>
+<p>Give each pair of endpoints whose requirements differ a scope of its own. Two pairs that share a scope accept each other's challenges.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Options endpoint</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">options</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="o">-&gt;</span><span class="na">forRequest</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="o">-&gt;</span><span class="na">withUserVerification</span><span class="p">(</span><span class="nx">AuthenticatorSelectionCriteria</span><span class="o">::</span><span class="na">USER_VERIFICATION_REQUIREMENT_REQUIRED</span><span class="p">)</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="o">-&gt;</span><span class="na">withScope</span><span class="p">(</span><span class="s1">'step_up'</span><span class="p">)</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="o">-&gt;</span><span class="na">build</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="c1">// Result endpoint</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="o">-&gt;</span><span class="na">forAssertion</span><span class="p">(</span><span class="s1">'example.com'</span><span class="p">)</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>    <span class="o">-&gt;</span><span class="na">withScope</span><span class="p">(</span><span class="s1">'step_up'</span><span class="p">)</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</span></code></pre></div>
+<p>An empty scope throws a <code>LogicException</code>. An <code>OptionsStorage</code> of your own must keep the scope of each <code>Item</code> (<code>getScope()</code>) and restore it with <code>withScope()</code>: options read back without a scope are accepted by every endpoint.</p>
 <h2 id="why-a-single-entry-point">Why a single entry point?<a class="headerlink" href="#why-a-single-entry-point" title="Link to this section">&para;</a></h2>
 <p><code>WebauthnResponseVerifier</code> is the only service you inject in your controllers. The two verifiers it returns are typed (<code>WebauthnAttestationVerifier</code> and <code>WebauthnAssertionVerifier</code>), so the IDE autocomplete only proposes the methods that make sense for the ceremony at hand.</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span><span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">withSaveCredential</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>    <span class="c1">// OK: attestation has it</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span><span class="o">-&gt;</span><span class="na">forAssertion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">withSaveCredential</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>      <span class="c1">// ERROR: not on assertion</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span><span class="o">-&gt;</span><span class="na">forAttestation</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">withSaveCredential</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>    <span class="c1">// OK: attestation has it</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">verifier</span><span class="o">-&gt;</span><span class="na">forAssertion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">withSaveCredential</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>      <span class="c1">// ERROR: not on assertion</span>
 </span></code></pre></div>
 <h2 id="migration-from-attestationresponsecontroller-assertionresponsecontroller">Migration from <code>AttestationResponseController</code> / <code>AssertionResponseController</code><a class="headerlink" href="#migration-from-attestationresponsecontroller-assertionresponsecontroller" title="Link to this section">&para;</a></h2>
-<p>If you are still routing <code>/attestation/response</code> and <code>/assertion/response</code> through the bundle's controllers via <code>webauthn.controllers.creation.&lt;name&gt;</code> / <code>webauthn.controllers.request.&lt;name&gt;</code>, the migration path is straightforward:</p>
+<p>If you are still routing <code>/attestation/response</code> and <code>/assertion/response</code> through the bundle's controllers via <code>webauthn.controllers.creation.&lt;name&gt;</code> / <code>webauthn.controllers.request.&lt;name&gt;</code>, deprecated since 5.4.0 and removed in 6.0.0, the migration path is straightforward:</p>
 <ol>
 <li>Write a controller of your own that calls <code>WebauthnResponseVerifier</code>.</li>
 <li>Re-bind the existing route(s) to your controller via the <code>#[Route]</code> attribute.</li>
@@ -3454,7 +3519,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
   </span>
 
     

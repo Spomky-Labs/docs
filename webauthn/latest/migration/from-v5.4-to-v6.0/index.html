@@ -2705,6 +2705,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#malformed-serial-number-extensions-are-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Malformed serial number extensions are refused
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#publickeycredentialuserentityname-stays" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3047,6 +3058,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#malformed-serial-number-extensions-are-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Malformed serial number extensions are refused
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#publickeycredentialuserentityname-stays" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3134,7 +3156,7 @@
 <tr>
 <td>Allowed origins</td>
 <td><code>allowed_origins</code> (root + per-controller)</td>
-<td><code>withAllowedOrigins(...)</code> on the verifier (or omit for the W3C same-origin fallback on single-domain apps)</td>
+<td><code>withAllowedOrigins(...)</code> on the verifier, or nothing on single-domain apps, see <a href="../from-v5.3-to-v5.4/#webauthnallowed_origins-webauthnallow_subdomains">From 5.3 to 5.4</a></td>
 </tr>
 <tr>
 <td>Client overrides</td>
@@ -3314,6 +3336,8 @@
 <p class="admonition-title">Danger</p>
 <p>Move to an entity of your application on 5.4, where the switch requires no schema change, before upgrading. See <a href="../from-v5.3-to-v5.4/#doctrine-mapping-of-the-bundle">From 5.3 to 5.4</a>.</p>
 </div>
+<h3 id="malformed-serial-number-extensions-are-refused">Malformed serial number extensions are refused<a class="headerlink" href="#malformed-serial-number-extensions-are-refused" title="Link to this section">&para;</a></h3>
+<p>A packed attestation whose certificate carries the serial number extension (<code>1.3.6.1.4.1.45724.1.1.2</code>) marked critical or with a value that is not an OCTET STRING is refused. 5.4 accepts it, ignores the extension and triggers a deprecation. See <a href="../from-v5.3-to-v5.4/#malformed-serial-number-extension-of-the-packed-attestations">From 5.3 to 5.4</a>.</p>
 <h3 id="publickeycredentialuserentityname-stays">PublicKeyCredentialUserEntity.name stays<a class="headerlink" href="#publickeycredentialuserentityname-stays" title="Link to this section">&para;</a></h3>
 <p><code>PublicKeyCredentialUserEntity::$name</code> is <strong>not</strong> removed: the property moves from the abstract parent class down to the user entity and keeps working exactly as before. Only the Relying Party name goes away.</p>
 
@@ -3336,7 +3360,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 10, 2026 15:31:06 UTC">November 10, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
   </span>
 
     
