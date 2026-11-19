@@ -127,29 +127,30 @@ $value = $minPinLength?->minPinLength;  // int|null
 
 ## credProps and `authenticatorDisplayName` (WebAuthn L3 §10.1.3)
 
-WebAuthn Level 3 adds an `authenticatorDisplayName` field next to the existing `rk` flag in the `credProps` client extension output. The framework now exposes a typed value object plus a checker that structurally validates the output when the extension was requested.
+WebAuthn Level 3 adds an `authenticatorDisplayName` field next to the existing `rk` flag in the `credProps` client extension output. The framework exposes a typed value object.
 
 ```php linenums="1"
+<?php
+
+declare(strict_types=1);
+
 use Webauthn\AuthenticationExtensions\AuthenticationExtension;
 use Webauthn\AuthenticationExtensions\AuthenticationExtensions;
 use Webauthn\AuthenticationExtensions\CredentialPropertiesOutput;
-use Webauthn\AuthenticationExtensions\CredentialPropertiesOutputChecker;
 
-// Request the extension
 $extensions = AuthenticationExtensions::create([
     AuthenticationExtension::create('credProps', true),
 ]);
 
-// After validation, read the typed view from the client extension results
-// $data is the JSON payload posted by the browser
-$payload = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
-$clientExtensionResults = AuthenticationExtensions::create($payload['clientExtensionResults'] ?? []);
-$credProps = CredentialPropertiesOutput::fromExtensions($clientExtensionResults);
-$isPasskey         = $credProps?->rk;                       // bool|null
-$authenticatorName = $credProps?->authenticatorDisplayName; // string|null
+$clientExtensionResults = $publicKeyCredential->response->clientExtensionResults;
+$credProps = $clientExtensionResults === null
+    ? null
+    : CredentialPropertiesOutput::fromExtensions($clientExtensionResults);
+$isPasskey = $credProps?->rk;
+$authenticatorName = $credProps?->authenticatorDisplayName;
 ```
 
-Register `CredentialPropertiesOutputChecker` with your `ExtensionOutputCheckerHandler` (see [Extensions](extensions.md)) to enforce the `boolean rk` / `string authenticatorDisplayName` shape automatically when the extension is in use.
+`credProps` is a client extension result: the browser computes it, it is not part of the authenticator data, and the authenticator does not sign it. The serializer attaches the client extension results of the credential to `$publicKeyCredential->response`, so the client must send `clientExtensionResults` with the credential, as the Stimulus controllers do. `fromExtensions()` throws an `AuthenticationExtensionException` when `rk` is not a boolean or `authenticatorDisplayName` is not a string.
 
 ## See also
 

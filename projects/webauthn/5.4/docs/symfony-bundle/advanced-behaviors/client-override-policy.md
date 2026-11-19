@@ -77,8 +77,12 @@ webauthn:
 | `authenticator_attachment` | enabled | `platform`, `cross-platform` | Whether the client can request a specific authenticator type |
 | `resident_key` | enabled | `required`, `preferred`, `discouraged` | Whether the client can request resident key behavior |
 | `attestation_conveyance` | enabled | `indirect`, `direct`, `enterprise` | Whether the client can request attestation preference. `none` is left out of the defaults since v5.3.13, see below. |
-| `extensions` | enabled | N/A | Whether the extensions sent by the client replace those of the profile |
+| `extensions` | enabled | N/A | Whether the client can add extensions to those of the profile. The extensions of the profile are never removed nor replaced. |
 | `mediation` | **disabled** | `default`, `conditional` | Whether the client can request the [Conditional Create](../../pure-php/advanced-behaviours/conditional-create.md) flow (auto-register), opt-in. |
+
+!!! info
+
+    **Changed in v5.4.0:** the client can no longer remove nor replace the extensions of the profile. The extensions it sends are added to them, and an extension the profile already sets keeps the value of the profile. Until then, the extensions sent by the client replaced those of the profile: a client that posted `{"extensions": {}}` received options without any of them.
 
 !!! warning
 

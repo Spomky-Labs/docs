@@ -88,16 +88,21 @@ $publicKeyCredentialCreationOptions = PublicKeyCredentialCreationOptions::create
 );
 ```
 
-After registration, check the extension outputs:
+After registration, read the extension outputs. The outputs of the extensions processed by the authenticator are in the authenticator data, which the authenticator signs. The outputs of the extensions processed by the browser, such as `credProps`, are the client extension results, which the client must send with the credential and which nothing signs:
 
 ```php linenums="1"
-// After successful registration
-$extensionOutputs = $publicKeyCredential->response->getAuthenticatorData()->extensions;
+<?php
 
-// Check if credential is discoverable (resident key)
-if (isset($extensionOutputs['credProps']['rk'])) {
-    $isDiscoverable = $extensionOutputs['credProps']['rk'];
-    echo $isDiscoverable ? 'Resident key created' : 'Non-resident key';
+declare(strict_types=1);
+
+use Webauthn\AuthenticationExtensions\CredentialPropertiesOutput;
+
+$authenticatorOutputs = $publicKeyCredential->response->attestationObject->authData->extensions;
+$clientOutputs = $publicKeyCredential->response->clientExtensionResults;
+
+$credProps = $clientOutputs === null ? null : CredentialPropertiesOutput::fromExtensions($clientOutputs);
+if ($credProps?->rk !== null) {
+    echo $credProps->rk ? 'Resident key created' : 'Non-resident key';
 }
 ```
 
@@ -127,8 +132,8 @@ $extensions = AuthenticationExtensions::create([
     AuthenticationExtension::create('credProps', true)
 ]);
 
-// After registration, check:
-$rk = $extensionOutputs['credProps']['rk'] ?? false;
+// After registration, see above:
+$rk = $credProps?->rk ?? false;
 ```
 
 ### 3. Large blob storage (largeBlob extension)
