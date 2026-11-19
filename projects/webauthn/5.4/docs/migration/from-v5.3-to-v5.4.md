@@ -296,6 +296,14 @@ The `allowed_origins` and `allow_subdomains` options of the `webauthn.controller
 
 `PseudoRandomFunctionInputExtensionBuilder::build()` throws an `AuthenticationExtensionException` when no input was given: `Cannot build a PRF extension without any input. Call withInputs() or withCredentialInputs() first.` It used to return a `prf` extension without input, which the clients cannot evaluate. Call `withInputs()` or `withCredentialInputs()` before `build()`, or leave the extension out.
 
+## The client can no longer remove the server extensions
+
+!!! info
+
+    **Changed in v5.4.0**
+
+When the `extensions` client override is enabled, which is the default of the deprecated `client_override_policy` node, the extensions sent by the client used to replace those of the profile. They are now added to them: an extension the profile sets keeps its value, and the client can neither remove nor replace it. The options helpers apply the same rule to the extensions set with `withExtensions()`. A client that relied on removing an extension of the profile gets it from now on: leave the extension out of the profile instead.
+
 ## Other changes
 
 Opt-in features, nothing to do on your side unless you want them:

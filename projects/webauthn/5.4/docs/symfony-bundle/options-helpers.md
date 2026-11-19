@@ -244,7 +244,7 @@ If the client posts `{"userVerification": "required"}`, the merged options carry
 * A policy built in PHP has no defaults: a field without a rule cannot be overridden. In the nested-array form, `['enabled' => true]` without `allowed_values` accepts any value.
 * The request builder honours `user_verification` and `extensions` only. `authenticator_attachment`, `resident_key`, `attestation_conveyance` and `mediation` apply to the creation builder.
 * The creation builder resolves the members of `authenticatorSelection` one by one. `user_verification`, `authenticator_attachment` and `resident_key` each keep the value set with `withAuthenticatorSelectionCriteria()`, or the WebAuthn default when no criteria were set (no attachment, `preferred`, no resident key preference), unless the client sent a value that the policy allows for that very member. Overriding the attachment or the resident key therefore never resets the user verification requirement. When the client changes no member, the criteria set on the builder are kept as they are, and a builder without criteria still issues options without `authenticatorSelection`.
-* The extensions sent by the client **replace** those set with `withExtensions()`, they are not merged. `allowed_values` does not apply to `extensions`: the rule only says whether the client can override them.
+* The extensions sent by the client are **added** to those set with `withExtensions()`: an extension set on the builder keeps its value, and the client can neither remove nor replace it. `allowed_values` does not apply to `extensions`: the rule only says whether the client can add extensions.
 
 See [Client Override Policy](advanced-behaviors/client-override-policy.md) for the full list of overridable fields.
 

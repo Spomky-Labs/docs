@@ -6,14 +6,14 @@
 
 [Secure Payment Confirmation](https://www.w3.org/TR/secure-payment-confirmation/) is a W3C Web API that lets the relying party authenticate a payment with WebAuthn while having the user agent display the transaction details (amount, payee, instrument) in its own trusted UI. It is the building block recommended by EMV 3DS v2.3.1.1 §6.1.4.1.5 for FIDO-based SCA.
 
-The framework ships SPC support out of the box: a `payment` extension, a dedicated client-data collector, an output checker for the browser-bound signature, and a Stimulus controller.
+The framework ships SPC support out of the box: a `payment` extension, a dedicated client-data collector, the verification of the browser-bound signature, and a Stimulus controller.
 
 ## How the pieces fit together
 
-W3C SPC §5.1 splits the verification work in two — the framework wires both:
+W3C SPC splits the verification work in two, and the framework wires both:
 
 1. **`clientDataJSON.payment`** carries the transaction the user actually confirmed in the browser SPC dialog. It is signed by the authenticator and validated server-side by `PaymentClientDataCollector`, which compares each field (`rpId`, `topOrigin`, `total`, `instrument`, `payee*`) with the request options. This closes the threat of a compromised client substituting the amount the user signs.
-2. **`clientExtensionResults.payment.browserBoundSignature`** carries the browser-bound signature. Its structural presence is enforced by `PaymentExtensionOutputChecker`. Cryptographic verification against the `BrowserBoundPublicKey` returned at registration is performed by `BrowserBoundSignatureVerifier`, wired into the assertion ceremony as `CheckBrowserBoundSignature`.
+2. **The browser-bound key** binds the payment to the device. The user agent puts its public key, a base64url COSE key, in `clientDataJSON.payment.browserBoundPublicKey`, and the signature it makes with the private key over the raw `clientDataJSON` in `clientExtensionResults.payment.browserBoundSignature.signature`, at registration and at authentication. `CheckBrowserBoundSignature` verifies them in every ceremony built by `CeremonyStepManagerFactory` whose options carry the `payment` extension. See [Browser-bound key](#browser-bound-key).
 
 ## Building a payment authentication request
 
@@ -61,7 +61,7 @@ For registration, use `PaymentExtension::register()` — the registration form o
 
 ## Validating the assertion
 
-The Symfony bundle auto-registers `PaymentClientDataCollector` and `PaymentExtensionOutputChecker`, so a regular `AuthenticatorAssertionResponseValidator::check(...)` call performs full SPC validation:
+The Symfony bundle auto-registers `PaymentClientDataCollector` and `PaymentExtensionOutputChecker`, and the ceremony always verifies the browser-bound signature, so a regular `AuthenticatorAssertionResponseValidator::check(...)` call performs full SPC validation:
 
 ```php linenums="1"
 $credentialRecord = $authenticatorAssertionResponseValidator->check(
@@ -75,7 +75,9 @@ $credentialRecord = $authenticatorAssertionResponseValidator->check(
 
 Pass the request options stored when the challenge was issued. Options rebuilt at verification time from a transaction record that has changed since no longer match what the user signed, and `PaymentClientDataCollector` rejects the assertion.
 
-For pure PHP usage, wire the new pieces into the ceremony manager factory yourself:
+The browser-bound signature is a client extension result: the client must send `clientExtensionResults` with the credential, as the Stimulus controllers do. Deserialize the whole credential with the serializer of the library, which attaches these results to `$publicKeyCredential->response`.
+
+For pure PHP usage, wire the new pieces into the ceremony manager factory yourself. `PaymentExtensionOutputChecker` is optional: it only rejects a `payment` entry in the authenticator data, where a conforming authenticator never puts one.
 
 ```php linenums="1"
 <?php
@@ -102,6 +104,31 @@ $factory->setClientDataCollectorManager($clientDataManager);
 $factory->setExtensionOutputCheckerHandler($extensionHandler);
 ```
 
+## Browser-bound key
+
+The user agent creates the browser-bound key when the credential is registered with `PaymentExtension::register()`, and returns its outputs at registration and at each payment. It may also return none: when it supports none of the algorithms of `browserBoundPubKeyCredParams`, or when it cannot store the key. `CheckBrowserBoundSignature` therefore applies these rules:
+
+| Outputs returned | Outcome |
+| --- | --- |
+| Neither the public key nor the signature | Accepted: the ceremony relies on the passkey signature alone, as the specification allows |
+| Both | The signature must verify over the raw `clientDataJSON` with the public key, otherwise the ceremony fails |
+| Only one of them, or a malformed value | The ceremony fails. At authentication, the public key is part of the client data signed by the authenticator, so a missing signature means that the client dropped it, typically by not sending `clientExtensionResults` |
+
+After a successful ceremony, a public key found in the client data has proven possession of its private key. To bind payments to a device, store it at registration and compare it on the next authentications:
+
+```php linenums="1"
+<?php
+
+declare(strict_types=1);
+
+$payment = $publicKeyCredential->response->clientDataJSON->has('payment')
+    ? $publicKeyCredential->response->clientDataJSON->get('payment')
+    : [];
+$browserBoundPublicKey = $payment['browserBoundPublicKey'] ?? null;
+```
+
+The specification leaves this comparison to the relying party: the library verifies each signature, it does not keep the key.
+
 ## Data structures
 
 All value objects live under the `Webauthn\SecurePaymentConfirmation` namespace and validate their inputs in the constructor (ISO 4217 currencies, W3C decimal monetary regex, URL validation on origins, non-empty strings on names).
@@ -113,12 +140,12 @@ All value objects live under the `Webauthn\SecurePaymentConfirmation` namespace 
 | `CollectedClientAdditionalPaymentData` | Mirrors what the browser signs in `clientDataJSON.payment`. |
 | `CollectedClientPaymentData` | Top-level wrapper used by `PaymentClientDataCollector`. |
 | `PaymentEntityLogo` | Optional `paymentEntitiesLogos[]` entry. |
-| `BrowserBoundPublicKey` / `BrowserBoundSignature` | The COSE-encoded browser-bound key returned at registration and the signature returned at assertion. |
-| `BrowserBoundSignatureVerifier` | CBOR-decodes the COSE key, looks up the matching `Cose\Algorithm\Signature\Signature` and verifies the signature against raw `clientDataJSON`. |
+| `BrowserBoundPublicKey` / `BrowserBoundSignature` | The browser-bound public key and signature. |
+| `BrowserBoundSignatureVerifier` | CBOR-decodes the COSE key, looks up the matching `Cose\Algorithm\Signature\Signature` and verifies the signature against raw `clientDataJSON`. ECDSA signatures are accepted in DER form, as the platform key stores produce them, or in the raw COSE form. |
 
 ## Stimulus controller
 
-The Stimulus package ships a `PaymentController` that extends `AuthenticationController`. It forwards the server-issued `payment` extension input to the user agent untouched and base64url-encodes `browserBoundSignature.signature` on the way back so the credential is JSON-transportable.
+The Stimulus package ships a `PaymentController` that extends `AuthenticationController`. It forwards the server-issued `payment` extension input to the user agent untouched. On the way back, the controllers base64url-encode `browserBoundSignature.signature` and send it with the credential, at authentication and, through the registration controller, at registration.
 
 ```html linenums="1"
 <form data-controller="webauthn--payment"
