@@ -2902,6 +2902,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#registration-controller-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registration controller events
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3151,6 +3162,17 @@
     <span class="md-ellipsis">
       
         Registration controller targets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#registration-controller-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registration controller events
       
     </span>
   </a>
@@ -3490,16 +3512,84 @@
 </tr>
 </tbody>
 </table>
+<h3 id="registration-controller-events">Registration controller events<a class="headerlink" href="#registration-controller-events" title="Link to this section">&para;</a></h3>
+<p>The controller dispatches the following events on its element. They bubble, so a listener on <code>document</code> receives them. When <code>submitViaForm</code> is enabled and the controller has a <code>result</code> target, the form is submitted instead of the <code>verify</code> request, so the three <code>verify</code> events are not dispatched.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Detail</th>
+<th>Dispatched</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>webauthn:registration:connect</code></td>
+<td><code>optionsUrl</code>, <code>resultUrl</code>, <code>supportsPlatformAuthenticator</code>, <code>capabilities</code></td>
+<td>When the controller connects</td>
+</tr>
+<tr>
+<td><code>webauthn:unsupported</code></td>
+<td>none</td>
+<td>When the <code>register</code> action runs in a browser without WebAuthn support</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:options:request</code></td>
+<td><code>data</code></td>
+<td>Before the options are requested from <code>optionsUrl</code></td>
+</tr>
+<tr>
+<td><code>webauthn:registration:options:success</code></td>
+<td><code>options</code></td>
+<td>When the options are received</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:options:error</code></td>
+<td><code>response</code> or <code>error</code></td>
+<td>When the options request fails</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:credential</code></td>
+<td><code>credential</code></td>
+<td>When the authenticator answers, before anything is sent</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:verify:request</code></td>
+<td><code>credential</code></td>
+<td>Before the credential is sent to <code>resultUrl</code>, as it is sent: without <code>prf.results</code> since v5.3.15</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:verify:success</code></td>
+<td><code>result</code></td>
+<td>When <code>resultUrl</code> accepts the credential</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:verify:error</code></td>
+<td><code>response</code> or <code>error</code></td>
+<td>When <code>resultUrl</code> refuses the credential or cannot be reached</td>
+</tr>
+<tr>
+<td><code>webauthn:registration:error</code></td>
+<td><code>error</code>, plus <code>code</code> and <code>name</code> for a WebAuthn error</td>
+<td>When the ceremony fails</td>
+</tr>
+</tbody>
+</table>
+<p>When the options carry the <code>prf</code> extension, the PRF results are on the credential of the <code>webauthn:registration:credential</code> event and are not sent to the server. See <a href="../../pure-php/advanced-behaviours/prf-extension/#stimulus-integration">PRF extension</a>.</p>
 <h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Link to this section">&para;</a></h2>
-<p>Handle registration errors in your custom event listeners:</p>
-<div class="language-javascript highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'webauthn:registration:error'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Registration failed:'</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">);</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nx">alert</span><span class="p">(</span><span class="s1">'Could not register authenticator: '</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a><span class="p">});</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos="6 "></span></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'webauthn:registration:success'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Registration successful!'</span><span class="p">);</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos="8 "></span></a><span class="p">});</span>
+<p>Handle the registration outcome in your custom event listeners. A refusal of the server comes with the <code>verify:error</code> event, a failure of the ceremony itself with the <code>error</code> event:</p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'webauthn:registration:error'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Registration failed:'</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="nx">alert</span><span class="p">(</span><span class="s1">'Could not register authenticator: '</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="p">});</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'webauthn:registration:verify:error'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'The server refused the authenticator:'</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">response</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="p">});</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10"></a><a href="#__codelineno-7-10"><span class="linenos" data-linenos="10 "></span></a><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'webauthn:registration:verify:success'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11"></a><a href="#__codelineno-7-11"><span class="linenos" data-linenos="11 "></span></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Registration successful!'</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12"></a><a href="#__codelineno-7-12"><span class="linenos" data-linenos="12 "></span></a><span class="p">});</span>
 </span></code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Link to this section">&para;</a></h2>
 <ul>
@@ -3527,7 +3617,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 11:45:21 UTC">November 19, 2026</span>
   </span>
 
     
