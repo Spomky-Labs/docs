@@ -127,6 +127,8 @@ $payment = $publicKeyCredential->response->clientDataJSON->has('payment')
 $browserBoundPublicKey = $payment['browserBoundPublicKey'] ?? null;
 ```
 
+The value is the base64url encoding of a COSE_Key, the same at registration and at authentication. At authentication, `CollectedClientAdditionalPaymentData::$browserBoundPublicKey`, denormalized from the same `payment` member, gives it as a `BrowserBoundPublicKey` that holds the decoded COSE_Key.
+
 The specification leaves this comparison to the relying party: the library verifies each signature, it does not keep the key.
 
 ## Data structures
@@ -140,12 +142,13 @@ All value objects live under the `Webauthn\SecurePaymentConfirmation` namespace 
 | `CollectedClientAdditionalPaymentData` | Mirrors what the browser signs in `clientDataJSON.payment`. |
 | `CollectedClientPaymentData` | Top-level wrapper used by `PaymentClientDataCollector`. |
 | `PaymentEntityLogo` | Optional `paymentEntitiesLogos[]` entry. |
-| `BrowserBoundPublicKey` / `BrowserBoundSignature` | The browser-bound public key and signature. |
+| `BrowserBoundPublicKey` | The browser-bound public key: the decoded COSE_Key, whose `alg` member gives the algorithm. The serializer reads and writes it as the base64url string of the client data. |
+| `BrowserBoundSignature` | The browser-bound signature bytes. |
 | `BrowserBoundSignatureVerifier` | CBOR-decodes the COSE key, looks up the matching `Cose\Algorithm\Signature\Signature` and verifies the signature against raw `clientDataJSON`. ECDSA signatures are accepted in DER form, as the platform key stores produce them, or in the raw COSE form. |
 
 ## Stimulus controller
 
-The Stimulus package ships a `PaymentController` that extends `AuthenticationController`. It forwards the server-issued `payment` extension input to the user agent untouched. On the way back, the controllers base64url-encode `browserBoundSignature.signature` and send it with the credential, at authentication and, through the registration controller, at registration.
+The Stimulus package ships a `PaymentController` that extends `AuthenticationController`. It forwards the server-issued `payment` extension input to the user agent untouched. On the way back, the controllers base64url-encode `browserBoundSignature.signature` and send it with the credential, at authentication and, through the registration controller, at registration. The deprecated `webauthn` controller does the same.
 
 ```html linenums="1"
 <form data-controller="webauthn--payment"
