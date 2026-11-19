@@ -169,6 +169,8 @@ $publicKeyCredentialRequestOptions = PublicKeyCredentialRequestOptions::create(
 );
 ```
 
+The browser returns the PRF results in `clientExtensionResults.prf.results` of the credential. They are secrets meant to stay on the client: read them in the page, for instance from the `credential` events of the Stimulus controllers, see [PRF results](../symfony-ux/user-authentication.md#prf-results). Since v5.3.15, these controllers no longer send them to the server.
+
 ## Implementation considerations
 
 ### Check extension support

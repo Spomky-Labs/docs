@@ -109,6 +109,8 @@ if ($builder->requiresMultipleCredentialEvaluation()) {
 
 The browser surfaces the PRF result in the assertion's `clientExtensionResults.prf.results.first` (and optionally `.second`) as `ArrayBuffer`. Verifying the assertion through `AuthenticatorAssertionResponseValidator::check(...)` does not consume the output: the page reads it from `credential.getClientExtensionResults().prf.results` and pipes it into your application-level KDF, typically with Web Crypto.
 
+With the Stimulus controllers, read the results from the `credential` events, see [Stimulus integration](#stimulus-integration). They are never sent to the server.
+
 ### PRF results never reach the server
 
 WebAuthn Level 3 states that authenticator extension outputs must not contain cleartext PRF outputs: the authenticator data is signed, so the client cannot strip anything from it before the credential is sent to the Relying Party. A conforming authenticator therefore exchanges the results outside of the authenticator data, and a `prf` entry appearing in the authenticator extension outputs signals a broken or hostile authenticator. Its value must not be treated as key material.
@@ -136,16 +138,35 @@ services:
 
 ## Stimulus integration
 
-The new `authentication-controller` and `registration-controller` (and the framework's `BaseController` they extend) handle PRF transparently:
+The `authentication` and `registration` controllers (and the `BaseController` they extend) handle PRF transparently:
 
 - **On the way out**, `extensions.prf.eval.{first,second}` and `extensions.prf.evalByCredential[*]` are decoded from base64url to `ArrayBuffer` before the `navigator.credentials.create()` / `get()` call.
-- **On the way back**, `clientExtensionResults.prf.results.{first,second}` are re-encoded to base64url on the credential dispatched via the controller event so your verifier receives a clean JSON payload.
+- **On the way back**, `clientExtensionResults.prf.results.{first,second}` are encoded as base64url strings on the credential of the `webauthn:authentication:credential` and `webauthn:registration:credential` events. The credential sent to `resultUrl`, or written into the `result` field with `submitViaForm`, leaves `prf.results` out: the results stay in the page.
 
-No additional configuration is required — return options with a `prf` extension and the controllers do the right thing.
+No additional configuration is required: return options with a `prf` extension and read the results from the event.
+
+```javascript linenums="1"
+document.addEventListener('webauthn:authentication:credential', (event) => {
+    const results = event.detail.credential.clientExtensionResults?.prf?.results;
+    if (results === undefined) {
+        return;
+    }
+
+    unlockVault(results.first, results.second);
+});
+```
+
+`unlockVault()` stands for your own code: `first` and `second` are base64url strings, typically decoded and fed through HKDF with Web Crypto, and `second` is only present when a second salt was sent. The events bubble, so a listener on `document` receives them, and they are dispatched before the credential is sent.
+
+!!! danger
+
+    **Changed in v5.3.15:** the `authentication` and `registration` controllers no longer send `clientExtensionResults.prf.results` to the server ([GHSA-79w9-wmw2-9hh3](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-79w9-wmw2-9hh3)). Until then they sent the whole credential to `resultUrl`, or wrote it into the `result` field, with the PRF results encoded as base64url strings: every ceremony that evaluated PRF handed these secrets to the backend and to anything reading its requests (access logs, traces, error reports).
+
+    The request body, the `result` field and the `webauthn:authentication:verify:request` and `webauthn:registration:verify:request` events now carry a copy of the credential without `prf.results`. The other outputs, such as `prf.enabled`, are kept, and the `credential` events still carry the results. The library never read them on the server side: code of your own that did has to read them from the `credential` events instead.
 
 !!! warning
 
-    The legacy combined controller (`@web-auth/webauthn-stimulus`) had two bugs in the legacy code path that were fixed in v5.4.0: it passed the wrong sub-object to the PRF input importer, and it read `prf.result` (singular) instead of `prf.results`. Make sure you are on v5.4.0 if you depend on PRF on the legacy controller; the dedicated `authentication`/`registration` controllers were always correct.
+    The legacy combined controller (`@web-auth/webauthn-stimulus`) had two bugs in the legacy code path that were fixed in v5.4.0: it passed the wrong sub-object to the PRF input importer, and it read `prf.result` (singular) instead of `prf.results`. Make sure you are on v5.4.0 if you depend on PRF on the legacy controller. It then hands the encoded results to the `webauthn:authenticator:response` listeners (`event.detail.response.clientExtensionResults.prf.results`) and, like the dedicated controllers, leaves them out of the requests and of the result fields.
 
 ## Symfony bundle
 

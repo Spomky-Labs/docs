@@ -140,3 +140,43 @@ The dedicated controller supports conditional UI natively:
 | `username` | Input field for the username |
 | `userVerification` | Input field for user verification preference |
 | `result` | Hidden input for the assertion response |
+
+### Authentication controller events
+
+The controller dispatches the following events on its element. They bubble, so a listener on `document` receives them. When `submitViaForm` is enabled and the controller has a `result` target, the form is submitted instead of the `verify` request, so the three `verify` events are not dispatched.
+
+| Event | Detail | Dispatched |
+|-------|--------|------------|
+| `webauthn:authentication:connect` | `optionsUrl`, `resultUrl`, `supportsPlatformAuthenticator` | When the controller connects |
+| `webauthn:unsupported` | none | When the `authenticate` action runs in a browser without WebAuthn support |
+| `webauthn:authentication:options:request` | `data` | Before the options are requested from `optionsUrl` |
+| `webauthn:authentication:options:success` | `options` | When the options are received |
+| `webauthn:authentication:options:error` | `response` or `error` | When the options request fails |
+| `webauthn:authentication:credential` | `credential` | When the authenticator answers, before anything is sent |
+| `webauthn:authentication:verify:request` | `credential` | Before the credential is sent to `resultUrl`, as it is sent: without `prf.results` since v5.3.15 |
+| `webauthn:authentication:verify:success` | `result` | When `resultUrl` accepts the credential |
+| `webauthn:authentication:verify:error` | `response` or `error` | When `resultUrl` refuses the credential or cannot be reached |
+| `webauthn:authentication:error` | `error`, plus `code` and `name` for a WebAuthn error | When the ceremony fails |
+
+#### PRF results
+
+When the options carry the [`prf` extension](../webauthn-in-a-nutshell/extensions.md#4-pseudo-random-function-prf-extension), the controller encodes `clientExtensionResults.prf.results.first` (and `second`) as base64url strings on the credential of the `webauthn:authentication:credential` event. Read them there: they are not sent to the server.
+
+```javascript linenums="1"
+document.addEventListener('webauthn:authentication:credential', (event) => {
+    const results = event.detail.credential.clientExtensionResults?.prf?.results;
+    if (results === undefined) {
+        return;
+    }
+
+    unlockVault(results.first, results.second);
+});
+```
+
+`unlockVault()` stands for your own code: the values are base64url strings, typically decoded and fed through HKDF with Web Crypto, and `second` is only present when a second salt was sent. The registration controller does the same with its `webauthn:registration:credential` event.
+
+!!! danger
+
+    **Changed in v5.3.15:** the `authentication` and `registration` controllers no longer send `clientExtensionResults.prf.results` to the server ([GHSA-79w9-wmw2-9hh3](https://github.com/web-auth/webauthn-framework/security/advisories/GHSA-79w9-wmw2-9hh3)). Until then they sent the whole credential to `resultUrl`, or wrote it into the `result` field, with the PRF results encoded as base64url strings: every ceremony that evaluated PRF handed these secrets to the backend and to anything reading its requests (access logs, traces, error reports).
+
+    The request body, the `result` field and the `verify:request` events now carry a copy of the credential without `prf.results`. The other outputs, such as `prf.enabled`, are kept, and the `credential` events still carry the results. The library never read them on the server side: code of your own that did has to read them from the `credential` events instead.

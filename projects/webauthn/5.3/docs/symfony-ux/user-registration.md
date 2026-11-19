@@ -161,25 +161,8 @@ The registration controller accepts the following options:
 |--------|------|----------|-------------|
 | `creationOptionsUrl` | string | Yes | URL to fetch credential creation options |
 | `creationResultField` | string | Yes | CSS selector for the hidden attestation field |
-| `autoRegister` | boolean | No | Automatically trigger registration on page load (default: false) |
 
-### Auto-register example
-
-Automatically start the registration process when the page loads:
-
-```twig linenums="1"
-{{ stimulus_controller('@web-auth/webauthn-stimulus',
-    {
-        autoRegister: true,
-        creationOptionsUrl: path('webauthn.controller.creation.request.new_user'),
-        creationResultField: 'input[name="attestation"]'
-    }
-) }}
-```
-
-!!! warning
-
-    Use `autoRegister` carefully as it immediately prompts the user for biometric authentication or security key interaction.
+The combined controller has no `autoRegister` option: Conditional Create is only available on the [dedicated registration controller](#conditional-create).
 
 ## Dedicated registration controller
 
@@ -230,7 +213,21 @@ The dedicated `registration-controller` provides a focused controller for creden
 | `resultUrl` | string | `/registration/verify` | URL to submit the attestation response |
 | `submitViaForm` | boolean | `false` | Submit via form instead of fetch |
 | `successRedirectUri` | string | - | URL to redirect after successful registration |
-| `autoRegister` | boolean | `false` | Auto-start registration on page load |
+| `autoRegister` | boolean | `false` | Request a Conditional Create (`mediation: 'conditional'`) when the `register` action runs |
+
+### Conditional Create
+
+`autoRegister: true` does not start anything when the page loads: the controller only dispatches its `webauthn:registration:connect` event there, and the ceremony still starts when the `register` action runs. The option turns that ceremony into a Conditional Create (`mediation: 'conditional'`), so the browser may create the passkey without prompting a user who has just signed in with a saved password.
+
+```twig linenums="1"
+{{ stimulus_controller('@web-auth/webauthn-stimulus/registration', {
+    optionsUrl: path('webauthn.controller.creation.request.new_user'),
+    resultUrl: path('app_register'),
+    autoRegister: true
+}) }}
+```
+
+The creation options must be built for conditional mediation on the server side too, otherwise the user presence check can reject the response. See [Conditional Create](../pure-php/advanced-behaviours/conditional-create.md).
 
 ### Registration controller targets
 
@@ -243,18 +240,41 @@ The dedicated `registration-controller` provides a focused controller for creden
 | `authenticatorAttachment` | Select field for authenticator attachment preference |
 | `result` | Hidden input for the attestation response |
 
+### Registration controller events
+
+The controller dispatches the following events on its element. They bubble, so a listener on `document` receives them. When `submitViaForm` is enabled and the controller has a `result` target, the form is submitted instead of the `verify` request, so the three `verify` events are not dispatched.
+
+| Event | Detail | Dispatched |
+|-------|--------|------------|
+| `webauthn:registration:connect` | `optionsUrl`, `resultUrl`, `supportsPlatformAuthenticator` | When the controller connects |
+| `webauthn:unsupported` | none | When the `register` action runs in a browser without WebAuthn support |
+| `webauthn:registration:options:request` | `data` | Before the options are requested from `optionsUrl` |
+| `webauthn:registration:options:success` | `options` | When the options are received |
+| `webauthn:registration:options:error` | `response` or `error` | When the options request fails |
+| `webauthn:registration:credential` | `credential` | When the authenticator answers, before anything is sent |
+| `webauthn:registration:verify:request` | `credential` | Before the credential is sent to `resultUrl`, as it is sent: without `prf.results` since v5.3.15 |
+| `webauthn:registration:verify:success` | `result` | When `resultUrl` accepts the credential |
+| `webauthn:registration:verify:error` | `response` or `error` | When `resultUrl` refuses the credential or cannot be reached |
+| `webauthn:registration:error` | `error`, plus `code` and `name` for a WebAuthn error | When the ceremony fails |
+
+When the options carry the `prf` extension, the PRF results are on the credential of the `webauthn:registration:credential` event and are not sent to the server. See [PRF results](user-authentication.md#prf-results), including the change of v5.3.15.
+
 ## Error handling
 
-Handle registration errors in your custom event listeners:
+Handle the registration outcome in your custom event listeners. A refusal of the server comes with the `verify:error` event, a failure of the ceremony itself with the `error` event:
 
 ```javascript linenums="1"
 document.addEventListener('webauthn:registration:error', (event) => {
-    console.error('Registration failed:', event.detail);
-    alert('Could not register authenticator: ' + event.detail.message);
+    console.error('Registration failed:', event.detail.error);
+    alert('Could not register authenticator: ' + event.detail.error.message);
 });
 
-document.addEventListener('webauthn:registration:success', (event) => {
-    console.log('Registration successful!');
+document.addEventListener('webauthn:registration:verify:error', (event) => {
+    console.error('The server refused the authenticator:', event.detail.response ?? event.detail.error);
+});
+
+document.addEventListener('webauthn:registration:verify:success', (event) => {
+    console.log('Registration successful!', event.detail.result);
 });
 ```
 
