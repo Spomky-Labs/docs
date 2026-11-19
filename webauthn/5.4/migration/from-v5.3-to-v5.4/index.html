@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -2687,6 +2687,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-client-can-no-longer-remove-the-server-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The client can no longer remove the server extensions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#other-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3062,6 +3073,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-client-can-no-longer-remove-the-server-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The client can no longer remove the server extensions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#other-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3318,6 +3340,12 @@
 <p><strong>Changed in v5.4.0</strong></p>
 </div>
 <p><code>PseudoRandomFunctionInputExtensionBuilder::build()</code> throws an <code>AuthenticationExtensionException</code> when no input was given: <code>Cannot build a PRF extension without any input. Call withInputs() or withCredentialInputs() first.</code> It used to return a <code>prf</code> extension without input, which the clients cannot evaluate. Call <code>withInputs()</code> or <code>withCredentialInputs()</code> before <code>build()</code>, or leave the extension out.</p>
+<h2 id="the-client-can-no-longer-remove-the-server-extensions">The client can no longer remove the server extensions<a class="headerlink" href="#the-client-can-no-longer-remove-the-server-extensions" title="Link to this section">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><strong>Changed in v5.4.0</strong></p>
+</div>
+<p>When the <code>extensions</code> client override is enabled, which is the default of the deprecated <code>client_override_policy</code> node, the extensions sent by the client used to replace those of the profile. They are now added to them: an extension the profile sets keeps its value, and the client can neither remove nor replace it. The options helpers apply the same rule to the extensions set with <code>withExtensions()</code>. A client that relied on removing an extension of the profile gets it from now on: leave the extension out of the profile instead.</p>
 <h2 id="other-changes">Other changes<a class="headerlink" href="#other-changes" title="Link to this section">&para;</a></h2>
 <p>Opt-in features, nothing to do on your side unless you want them:</p>
 <ul>
@@ -3335,6 +3363,7 @@
 <li><strong>Secure Payment Confirmation</strong>: see <a href="../../pure-php/advanced-behaviours/secure-payment-confirmation/">Secure Payment Confirmation</a>.</li>
 <li><strong>PRF extension</strong>: the builder refuses an empty input, and <code>requiresMultipleCredentialEvaluation()</code> tells whether <code>evalByCredential</code> carries inputs for several credentials, which needs an authenticator able to answer several evaluations in one assertion. See <a href="../../pure-php/advanced-behaviours/prf-extension/">PRF Extension</a>.</li>
 <li><strong><code>credProps.authenticatorDisplayName</code></strong> is parsed. See <a href="../../pure-php/advanced-behaviours/authenticator-extensions/">Authenticator Extensions</a>.</li>
+<li><strong>Client extension results</strong> are deserialized with the credential: <code>$publicKeyCredential-&gt;response-&gt;clientExtensionResults</code> gives the outputs of the extensions processed by the browser, such as <code>credProps</code>, the PRF results or the Secure Payment Confirmation browser-bound signature. See <a href="../../pure-php/advanced-behaviours/authenticator-extensions/#credprops-and-authenticatordisplayname-webauthn-l3-1013">Authenticator Extensions</a>.</li>
 <li><strong><code>UvInitializedChangedEvent</code></strong> is dispatched when the <code>uvInitialized</code> indicator of a credential record changes during an assertion. See <a href="../../pure-php/advanced-behaviours/backup-events/#uvinitializedchangedevent">Backup Events</a>.</li>
 <li><strong>Relying Party name</strong>: the creation helper defaults <code>rp.name</code> to the Relying Party ID, and <code>withRpName()</code> sets another one.</li>
 </ul>
@@ -3358,7 +3387,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 08:10:48 UTC">November 19, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 19:48:58 UTC">November 19, 2026</span>
   </span>
 
     

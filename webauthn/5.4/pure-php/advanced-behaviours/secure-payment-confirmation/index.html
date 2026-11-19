@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/brand/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -1666,6 +1666,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#browser-bound-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Browser-bound key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#data-structures" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2953,6 +2964,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#browser-bound-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Browser-bound key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#data-structures" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3049,12 +3071,12 @@
 <p><strong>New in v5.4.0</strong></p>
 </div>
 <p><a href="https://www.w3.org/TR/secure-payment-confirmation/">Secure Payment Confirmation</a> is a W3C Web API that lets the relying party authenticate a payment with WebAuthn while having the user agent display the transaction details (amount, payee, instrument) in its own trusted UI. It is the building block recommended by EMV 3DS v2.3.1.1 §6.1.4.1.5 for FIDO-based SCA.</p>
-<p>The framework ships SPC support out of the box: a <code>payment</code> extension, a dedicated client-data collector, an output checker for the browser-bound signature, and a Stimulus controller.</p>
+<p>The framework ships SPC support out of the box: a <code>payment</code> extension, a dedicated client-data collector, the verification of the browser-bound signature, and a Stimulus controller.</p>
 <h2 id="how-the-pieces-fit-together">How the pieces fit together<a class="headerlink" href="#how-the-pieces-fit-together" title="Link to this section">&para;</a></h2>
-<p>W3C SPC §5.1 splits the verification work in two — the framework wires both:</p>
+<p>W3C SPC splits the verification work in two, and the framework wires both:</p>
 <ol>
 <li><strong><code>clientDataJSON.payment</code></strong> carries the transaction the user actually confirmed in the browser SPC dialog. It is signed by the authenticator and validated server-side by <code>PaymentClientDataCollector</code>, which compares each field (<code>rpId</code>, <code>topOrigin</code>, <code>total</code>, <code>instrument</code>, <code>payee*</code>) with the request options. This closes the threat of a compromised client substituting the amount the user signs.</li>
-<li><strong><code>clientExtensionResults.payment.browserBoundSignature</code></strong> carries the browser-bound signature. Its structural presence is enforced by <code>PaymentExtensionOutputChecker</code>. Cryptographic verification against the <code>BrowserBoundPublicKey</code> returned at registration is performed by <code>BrowserBoundSignatureVerifier</code>, wired into the assertion ceremony as <code>CheckBrowserBoundSignature</code>.</li>
+<li><strong>The browser-bound key</strong> binds the payment to the device. The user agent puts its public key, a base64url COSE key, in <code>clientDataJSON.payment.browserBoundPublicKey</code>, and the signature it makes with the private key over the raw <code>clientDataJSON</code> in <code>clientExtensionResults.payment.browserBoundSignature.signature</code>, at registration and at authentication. <code>CheckBrowserBoundSignature</code> verifies them in every ceremony built by <code>CeremonyStepManagerFactory</code> whose options carry the <code>payment</code> extension. See <a href="#browser-bound-key">Browser-bound key</a>.</li>
 </ol>
 <h2 id="building-a-payment-authentication-request">Building a payment authentication request<a class="headerlink" href="#building-a-payment-authentication-request" title="Link to this section">&para;</a></h2>
 <p>Attach a <code>PaymentExtension</code> to your <code>PublicKeyCredentialRequestOptions</code>. The extension takes the rpId, the merchant top-level origin, the amount, the instrument and the payee fields:</p>
@@ -3096,7 +3118,7 @@
 <p>Always derive the amount, instrument and payee fields from a server-side transaction record, <strong>never</strong> from request input. See <a href="#security-model">Security Model</a> below.</p>
 </div>
 <h2 id="validating-the-assertion">Validating the assertion<a class="headerlink" href="#validating-the-assertion" title="Link to this section">&para;</a></h2>
-<p>The Symfony bundle auto-registers <code>PaymentClientDataCollector</code> and <code>PaymentExtensionOutputChecker</code>, so a regular <code>AuthenticatorAssertionResponseValidator::check(...)</code> call performs full SPC validation:</p>
+<p>The Symfony bundle auto-registers <code>PaymentClientDataCollector</code> and <code>PaymentExtensionOutputChecker</code>, and the ceremony always verifies the browser-bound signature, so a regular <code>AuthenticatorAssertionResponseValidator::check(...)</code> call performs full SPC validation:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">$credentialRecord</span> <span class="o">=</span> <span class="nv">$authenticatorAssertionResponseValidator</span><span class="o">-&gt;</span><span class="na">check</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>    <span class="nx">credentialRecord</span><span class="o">:</span> <span class="nv">$storedCredentialRecord</span><span class="p">,</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>    <span class="nx">authenticatorAssertionResponse</span><span class="o">:</span> <span class="nv">$publicKeyCredential</span><span class="o">-&gt;</span><span class="na">response</span><span class="p">,</span>
@@ -3106,7 +3128,8 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Pass the request options stored when the challenge was issued. Options rebuilt at verification time from a transaction record that has changed since no longer match what the user signed, and <code>PaymentClientDataCollector</code> rejects the assertion.</p>
-<p>For pure PHP usage, wire the new pieces into the ceremony manager factory yourself:</p>
+<p>The browser-bound signature is a client extension result: the client must send <code>clientExtensionResults</code> with the credential, as the Stimulus controllers do. Deserialize the whole credential with the serializer of the library, which attaches these results to <code>$publicKeyCredential-&gt;response</code>.</p>
+<p>For pure PHP usage, wire the new pieces into the ceremony manager factory yourself. <code>PaymentExtensionOutputChecker</code> is optional: it only rejects a <code>payment</code> entry in the authenticator data, where a conforming authenticator never puts one.</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos=" 2 "></span></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
@@ -3130,6 +3153,42 @@
 </span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21"></a><a href="#__codelineno-2-21"><span class="linenos" data-linenos="21 "></span></a><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">setClientDataCollectorManager</span><span class="p">(</span><span class="nv">$clientDataManager</span><span class="p">);</span>
 </span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22"></a><a href="#__codelineno-2-22"><span class="linenos" data-linenos="22 "></span></a><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">setExtensionOutputCheckerHandler</span><span class="p">(</span><span class="nv">$extensionHandler</span><span class="p">);</span>
 </span></code></pre></div>
+<h2 id="browser-bound-key">Browser-bound key<a class="headerlink" href="#browser-bound-key" title="Link to this section">&para;</a></h2>
+<p>The user agent creates the browser-bound key when the credential is registered with <code>PaymentExtension::register()</code>, and returns its outputs at registration and at each payment. It may also return none: when it supports none of the algorithms of <code>browserBoundPubKeyCredParams</code>, or when it cannot store the key. <code>CheckBrowserBoundSignature</code> therefore applies these rules:</p>
+<table>
+<thead>
+<tr>
+<th>Outputs returned</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Neither the public key nor the signature</td>
+<td>Accepted: the ceremony relies on the passkey signature alone, as the specification allows</td>
+</tr>
+<tr>
+<td>Both</td>
+<td>The signature must verify over the raw <code>clientDataJSON</code> with the public key, otherwise the ceremony fails</td>
+</tr>
+<tr>
+<td>Only one of them, or a malformed value</td>
+<td>The ceremony fails. At authentication, the public key is part of the client data signed by the authenticator, so a missing signature means that the client dropped it, typically by not sending <code>clientExtensionResults</code></td>
+</tr>
+</tbody>
+</table>
+<p>After a successful ceremony, a public key found in the client data has proven possession of its private key. To bind payments to a device, store it at registration and compare it on the next authentications:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a><span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos="4 "></span></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">$payment</span> <span class="o">=</span> <span class="nv">$publicKeyCredential</span><span class="o">-&gt;</span><span class="na">response</span><span class="o">-&gt;</span><span class="na">clientDataJSON</span><span class="o">-&gt;</span><span class="na">has</span><span class="p">(</span><span class="s1">'payment'</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos="6 "></span></a>    <span class="o">?</span> <span class="nv">$publicKeyCredential</span><span class="o">-&gt;</span><span class="na">response</span><span class="o">-&gt;</span><span class="na">clientDataJSON</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'payment'</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos="7 "></span></a>    <span class="o">:</span> <span class="p">[];</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos="8 "></span></a><span class="nv">$browserBoundPublicKey</span> <span class="o">=</span> <span class="nv">$payment</span><span class="p">[</span><span class="s1">'browserBoundPublicKey'</span><span class="p">]</span> <span class="o">??</span> <span class="k">null</span><span class="p">;</span>
+</span></code></pre></div>
+<p>The value is the base64url encoding of a COSE_Key, the same at registration and at authentication. At authentication, <code>CollectedClientAdditionalPaymentData::$browserBoundPublicKey</code>, denormalized from the same <code>payment</code> member, gives it as a <code>BrowserBoundPublicKey</code> that holds the decoded COSE_Key.</p>
+<p>The specification leaves this comparison to the relying party: the library verifies each signature, it does not keep the key.</p>
 <h2 id="data-structures">Data structures<a class="headerlink" href="#data-structures" title="Link to this section">&para;</a></h2>
 <p>All value objects live under the <code>Webauthn\SecurePaymentConfirmation</code> namespace and validate their inputs in the constructor (ISO 4217 currencies, W3C decimal monetary regex, URL validation on origins, non-empty strings on names).</p>
 <table>
@@ -3161,29 +3220,33 @@
 <td>Optional <code>paymentEntitiesLogos[]</code> entry.</td>
 </tr>
 <tr>
-<td><code>BrowserBoundPublicKey</code> / <code>BrowserBoundSignature</code></td>
-<td>The COSE-encoded browser-bound key returned at registration and the signature returned at assertion.</td>
+<td><code>BrowserBoundPublicKey</code></td>
+<td>The browser-bound public key: the decoded COSE_Key, whose <code>alg</code> member gives the algorithm. The serializer reads and writes it as the base64url string of the client data.</td>
+</tr>
+<tr>
+<td><code>BrowserBoundSignature</code></td>
+<td>The browser-bound signature bytes.</td>
 </tr>
 <tr>
 <td><code>BrowserBoundSignatureVerifier</code></td>
-<td>CBOR-decodes the COSE key, looks up the matching <code>Cose\Algorithm\Signature\Signature</code> and verifies the signature against raw <code>clientDataJSON</code>.</td>
+<td>CBOR-decodes the COSE key, looks up the matching <code>Cose\Algorithm\Signature\Signature</code> and verifies the signature against raw <code>clientDataJSON</code>. ECDSA signatures are accepted in DER form, as the platform key stores produce them, or in the raw COSE form.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="stimulus-controller">Stimulus controller<a class="headerlink" href="#stimulus-controller" title="Link to this section">&para;</a></h2>
-<p>The Stimulus package ships a <code>PaymentController</code> that extends <code>AuthenticationController</code>. It forwards the server-issued <code>payment</code> extension input to the user agent untouched and base64url-encodes <code>browserBoundSignature.signature</code> on the way back so the credential is JSON-transportable.</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">data-controller</span><span class="o">=</span><span class="s">"webauthn--payment"</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>      <span class="na">data-action</span><span class="o">=</span><span class="s">"submit-&gt;webauthn--payment#authenticate"</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>      <span class="na">data-webauthn--payment-options-url-value</span><span class="o">=</span><span class="s">"/payment/{{ transaction.id }}/options"</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>      <span class="na">data-webauthn--payment-result-url-value</span><span class="o">=</span><span class="s">"/payment/{{ transaction.id }}/verify"</span><span class="p">&gt;</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Confirm payment<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Amount: <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>{{ transaction.formatted_amount }}<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Merchant: <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>{{ transaction.payee_name }}<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a>    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"hidden"</span> <span class="na">data-webauthn--payment-target</span><span class="o">=</span><span class="s">"result"</span><span class="p">&gt;</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">"submit"</span><span class="p">&gt;</span>Confirm<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+<p>The Stimulus package ships a <code>PaymentController</code> that extends <code>AuthenticationController</code>. It forwards the server-issued <code>payment</code> extension input to the user agent untouched. On the way back, the controllers base64url-encode <code>browserBoundSignature.signature</code> and send it with the credential, at authentication and, through the registration controller, at registration. The deprecated <code>webauthn</code> controller does the same.</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">data-controller</span><span class="o">=</span><span class="s">"webauthn--payment"</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos=" 2 "></span></a>      <span class="na">data-action</span><span class="o">=</span><span class="s">"submit-&gt;webauthn--payment#authenticate"</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos=" 3 "></span></a>      <span class="na">data-webauthn--payment-options-url-value</span><span class="o">=</span><span class="s">"/payment/{{ transaction.id }}/options"</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos=" 4 "></span></a>      <span class="na">data-webauthn--payment-result-url-value</span><span class="o">=</span><span class="s">"/payment/{{ transaction.id }}/verify"</span><span class="p">&gt;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos=" 5 "></span></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos=" 6 "></span></a>    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Confirm payment<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7"></a><a href="#__codelineno-4-7"><span class="linenos" data-linenos=" 7 "></span></a>    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Amount: <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>{{ transaction.formatted_amount }}<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8"></a><a href="#__codelineno-4-8"><span class="linenos" data-linenos=" 8 "></span></a>    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Merchant: <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>{{ transaction.payee_name }}<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9"></a><a href="#__codelineno-4-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10"></a><a href="#__codelineno-4-10"><span class="linenos" data-linenos="10 "></span></a>    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"hidden"</span> <span class="na">data-webauthn--payment-target</span><span class="o">=</span><span class="s">"result"</span><span class="p">&gt;</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11"></a><a href="#__codelineno-4-11"><span class="linenos" data-linenos="11 "></span></a>    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">"submit"</span><span class="p">&gt;</span>Confirm<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12"></a><a href="#__codelineno-4-12"><span class="linenos" data-linenos="12 "></span></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p>The controller has no value for the transaction: it only posts the <code>username</code> and <code>userVerification</code> fields of the form to the options URL. The transaction ID is therefore part of the URL, and the server looks the transaction up from it.</p>
 <p>The controller inherits every value, target, action and event from <code>AuthenticationController</code>. The defaults change to match the SPC convention:</p>
@@ -3215,33 +3278,33 @@
 <li><strong>Never trust client-side payment data.</strong> Amounts, payees and instruments must never travel through HTML attributes or JavaScript. Build the transaction server-side, store its details indexed by an opaque ID, and only pass that ID to the page. The Stimulus <code>PaymentController</code> sends no payment data at all: the ID is part of the options URL, and the server resolves the rest.</li>
 <li><strong>Re-derive the <code>payment</code> extension from the database.</strong> When the options endpoint is hit, fetch the transaction by the ID in its URL, verify it belongs to the authenticated user and is still pending, then build the <code>PaymentExtension</code> from the database row.</li>
 </ol>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/payment/{transactionId}/options'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="k">public</span> <span class="k">function</span> <span class="nf">options</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$transactionId</span><span class="p">)</span><span class="o">:</span> <span class="nd">JsonResponse</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="p">{</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos=" 4 "></span></a>    <span class="nv">$transaction</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">transactionRepository</span><span class="o">-&gt;</span><span class="na">findOneBy</span><span class="p">([</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos=" 5 "></span></a>        <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="nv">$transactionId</span><span class="p">,</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos=" 6 "></span></a>        <span class="s1">'userId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7"></a><a href="#__codelineno-4-7"><span class="linenos" data-linenos=" 7 "></span></a>        <span class="s1">'status'</span> <span class="o">=&gt;</span> <span class="s1">'pending'</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8"></a><a href="#__codelineno-4-8"><span class="linenos" data-linenos=" 8 "></span></a>    <span class="p">]);</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9"></a><a href="#__codelineno-4-9"><span class="linenos" data-linenos=" 9 "></span></a>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10"></a><a href="#__codelineno-4-10"><span class="linenos" data-linenos="10 "></span></a>    <span class="k">if</span> <span class="p">(</span><span class="nv">$transaction</span> <span class="o">===</span> <span class="k">null</span> <span class="o">||</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">isExpired</span><span class="p">())</span> <span class="p">{</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11"></a><a href="#__codelineno-4-11"><span class="linenos" data-linenos="11 "></span></a>        <span class="k">return</span> <span class="k">new</span> <span class="nx">JsonResponse</span><span class="p">([</span><span class="s1">'error'</span> <span class="o">=&gt;</span> <span class="s1">'Invalid transaction'</span><span class="p">],</span> <span class="mi">400</span><span class="p">);</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12"></a><a href="#__codelineno-4-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="p">}</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13"></a><a href="#__codelineno-4-13"><span class="linenos" data-linenos="13 "></span></a>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14"></a><a href="#__codelineno-4-14"><span class="linenos" data-linenos="14 "></span></a>    <span class="nv">$paymentExtension</span> <span class="o">=</span> <span class="nd">PaymentExtension</span><span class="o">::</span><span class="na">authenticate</span><span class="p">(</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15"></a><a href="#__codelineno-4-15"><span class="linenos" data-linenos="15 "></span></a>        <span class="nx">rpId</span><span class="o">:</span> <span class="s1">'bank.example.com'</span><span class="p">,</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16"></a><a href="#__codelineno-4-16"><span class="linenos" data-linenos="16 "></span></a>        <span class="nx">topOrigin</span><span class="o">:</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getMerchantOrigin</span><span class="p">(),</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17"></a><a href="#__codelineno-4-17"><span class="linenos" data-linenos="17 "></span></a>        <span class="nx">total</span><span class="o">:</span> <span class="nx">PaymentCurrencyAmount</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getCurrency</span><span class="p">(),</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getAmount</span><span class="p">()),</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18"></a><a href="#__codelineno-4-18"><span class="linenos" data-linenos="18 "></span></a>        <span class="nx">instrument</span><span class="o">:</span> <span class="nx">PaymentCredentialInstrument</span><span class="o">::</span><span class="na">create</span><span class="p">(</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19"></a><a href="#__codelineno-4-19"><span class="linenos" data-linenos="19 "></span></a>            <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getInstrumentDisplayName</span><span class="p">(),</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20"></a><a href="#__codelineno-4-20"><span class="linenos" data-linenos="20 "></span></a>            <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getInstrumentIconUrl</span><span class="p">(),</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21"></a><a href="#__codelineno-4-21"><span class="linenos" data-linenos="21 "></span></a>        <span class="p">),</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22"></a><a href="#__codelineno-4-22"><span class="linenos" data-linenos="22 "></span></a>        <span class="nd">payeeName</span><span class="o">:</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getPayeeName</span><span class="p">(),</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23"></a><a href="#__codelineno-4-23"><span class="linenos" data-linenos="23 "></span></a>        <span class="nd">payeeOrigin</span><span class="o">:</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getPayeeOrigin</span><span class="p">(),</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24"></a><a href="#__codelineno-4-24"><span class="linenos" data-linenos="24 "></span></a>    <span class="p">);</span>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25"></a><a href="#__codelineno-4-25"><span class="linenos" data-linenos="25 "></span></a>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26"></a><a href="#__codelineno-4-26"><span class="linenos" data-linenos="26 "></span></a>    <span class="c1">// ...build the request options and store the challenge in the session</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27"></a><a href="#__codelineno-4-27"><span class="linenos" data-linenos="27 "></span></a><span class="p">}</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/payment/{transactionId}/options'</span><span class="p">,</span> <span class="nx">methods</span><span class="o">:</span> <span class="p">[</span><span class="s1">'POST'</span><span class="p">])]</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="k">public</span> <span class="k">function</span> <span class="nf">options</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$transactionId</span><span class="p">)</span><span class="o">:</span> <span class="nd">JsonResponse</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="p">{</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos=" 4 "></span></a>    <span class="nv">$transaction</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">transactionRepository</span><span class="o">-&gt;</span><span class="na">findOneBy</span><span class="p">([</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos=" 5 "></span></a>        <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="nv">$transactionId</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos=" 6 "></span></a>        <span class="s1">'userId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos=" 7 "></span></a>        <span class="s1">'status'</span> <span class="o">=&gt;</span> <span class="s1">'pending'</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8"></a><a href="#__codelineno-5-8"><span class="linenos" data-linenos=" 8 "></span></a>    <span class="p">]);</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a>    <span class="k">if</span> <span class="p">(</span><span class="nv">$transaction</span> <span class="o">===</span> <span class="k">null</span> <span class="o">||</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">isExpired</span><span class="p">())</span> <span class="p">{</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><a href="#__codelineno-5-11"><span class="linenos" data-linenos="11 "></span></a>        <span class="k">return</span> <span class="k">new</span> <span class="nx">JsonResponse</span><span class="p">([</span><span class="s1">'error'</span> <span class="o">=&gt;</span> <span class="s1">'Invalid transaction'</span><span class="p">],</span> <span class="mi">400</span><span class="p">);</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="p">}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><a href="#__codelineno-5-13"><span class="linenos" data-linenos="13 "></span></a>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><a href="#__codelineno-5-14"><span class="linenos" data-linenos="14 "></span></a>    <span class="nv">$paymentExtension</span> <span class="o">=</span> <span class="nd">PaymentExtension</span><span class="o">::</span><span class="na">authenticate</span><span class="p">(</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><a href="#__codelineno-5-15"><span class="linenos" data-linenos="15 "></span></a>        <span class="nx">rpId</span><span class="o">:</span> <span class="s1">'bank.example.com'</span><span class="p">,</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><a href="#__codelineno-5-16"><span class="linenos" data-linenos="16 "></span></a>        <span class="nx">topOrigin</span><span class="o">:</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getMerchantOrigin</span><span class="p">(),</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17"></a><a href="#__codelineno-5-17"><span class="linenos" data-linenos="17 "></span></a>        <span class="nx">total</span><span class="o">:</span> <span class="nx">PaymentCurrencyAmount</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getCurrency</span><span class="p">(),</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getAmount</span><span class="p">()),</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18"></a><a href="#__codelineno-5-18"><span class="linenos" data-linenos="18 "></span></a>        <span class="nx">instrument</span><span class="o">:</span> <span class="nx">PaymentCredentialInstrument</span><span class="o">::</span><span class="na">create</span><span class="p">(</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19"></a><a href="#__codelineno-5-19"><span class="linenos" data-linenos="19 "></span></a>            <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getInstrumentDisplayName</span><span class="p">(),</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20"></a><a href="#__codelineno-5-20"><span class="linenos" data-linenos="20 "></span></a>            <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getInstrumentIconUrl</span><span class="p">(),</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21"></a><a href="#__codelineno-5-21"><span class="linenos" data-linenos="21 "></span></a>        <span class="p">),</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22"></a><a href="#__codelineno-5-22"><span class="linenos" data-linenos="22 "></span></a>        <span class="nd">payeeName</span><span class="o">:</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getPayeeName</span><span class="p">(),</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23"></a><a href="#__codelineno-5-23"><span class="linenos" data-linenos="23 "></span></a>        <span class="nd">payeeOrigin</span><span class="o">:</span> <span class="nv">$transaction</span><span class="o">-&gt;</span><span class="na">getPayeeOrigin</span><span class="p">(),</span>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24"></a><a href="#__codelineno-5-24"><span class="linenos" data-linenos="24 "></span></a>    <span class="p">);</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25"></a><a href="#__codelineno-5-25"><span class="linenos" data-linenos="25 "></span></a>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26"></a><a href="#__codelineno-5-26"><span class="linenos" data-linenos="26 "></span></a>    <span class="c1">// ...build the request options and store the challenge in the session</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27"></a><a href="#__codelineno-5-27"><span class="linenos" data-linenos="27 "></span></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>PaymentClientDataCollector</code> then verifies, field by field, that what the user signed matches what the database said the transaction was — any tampering on the wire results in validation failure.</p>
 <p>The transaction record itself carries what makes it safe to confirm only once:</p>
@@ -3287,7 +3350,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 10, 2026 15:02:59 UTC">November 10, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 19, 2026 19:48:58 UTC">November 19, 2026</span>
   </span>
 
     
