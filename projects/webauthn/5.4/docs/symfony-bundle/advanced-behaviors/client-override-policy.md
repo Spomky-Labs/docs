@@ -8,7 +8,7 @@ The Client Override Policy provides granular control over which WebAuthn options
 
 !!! warning
 
-    **5.4 helper-side API recommended.** When you build options through the [Options Helpers](../options-helpers.md), attach the policy with `withClientOverrides(...)` and use the typed `ClientOverridePolicy::fromRules()` factory documented under *Client overrides* on that page. The YAML `creation_profiles[].client_override_policy` form below stays supported but is deprecated alongside `creation_profiles` in 5.4.
+    **Deprecated in v5.4.0:** the `webauthn.client_override_policy` YAML node is removed in 6.0.0, together with the profiles it applies to. When you build options through the [Options Helpers](../options-helpers.md), attach the policy with `withClientOverrides(...)` and use the typed `ClientOverridePolicy::fromRules()` factory documented under *Client overrides* on that page. The YAML node keeps working in 5.4.
 
 ## Overview
 
@@ -20,7 +20,7 @@ Each policy field has:
 
 ## Helper-side, typed API (5.4)
 
-`ClientOverridePolicy::fromRules()` and `ClientOverrideRule` give you a named-argument, typed alternative to the YAML / nested-array form. Both shapes are first-class — pick whichever fits your use case best.
+`ClientOverridePolicy::fromRules()` and `ClientOverrideRule` give you a named-argument, typed alternative to the YAML / nested-array form. Both shapes are first-class: pick whichever fits your use case best.
 
 ```php
 use Webauthn\Bundle\Policy\ClientOverridePolicy;
@@ -39,38 +39,34 @@ return $this->options
     ->build($request);
 ```
 
-* Pass `null` (the default) for fields the client must NOT be able to override.
+* Pass `null` (the default) for fields the client must NOT be able to override. A policy built in PHP has no defaults: the defaults listed below only apply to the YAML node.
 * `ClientOverrideRule::any()` accepts any value the client submits.
 * `ClientOverrideRule::restrictTo($allowedValues)` restricts to a list.
 
 ## Configuration
 
-The example below shows every field with an explicit value. You only need to declare the fields you want to change — the rest fall back to the [defaults](#configurable-fields) listed in the next section.
+The example below shows every field with an explicit value. You only need to declare the fields you want to change, the rest fall back to the [defaults](#configurable-fields) listed in the next section. The `client_override_policy` node sits at the root of the configuration and applies to every creation and request profile.
 
 ```yaml title="config/packages/webauthn.yaml" linenums="1"
 webauthn:
-    creation_profiles:
-        default:
-            rp:
-                id: 'example.com'
-            client_override_policy:
-                user_verification:
-                    enabled: true
-                    allowed_values: ['required', 'preferred']
-                authenticator_attachment:
-                    enabled: true
-                    allowed_values: ['platform', 'cross-platform']
-                resident_key:
-                    enabled: true
-                    allowed_values: ['required', 'preferred', 'discouraged']
-                attestation_conveyance:
-                    enabled: true
-                    allowed_values: ['indirect', 'direct', 'enterprise']
-                extensions:
-                    enabled: true
-                mediation:
-                    enabled: false   # disabled by default; opt-in
-                    allowed_values: ['default', 'conditional']
+    client_override_policy:
+        user_verification:
+            enabled: true
+            allowed_values: ['required', 'preferred']
+        authenticator_attachment:
+            enabled: true
+            allowed_values: ['platform', 'cross-platform']
+        resident_key:
+            enabled: true
+            allowed_values: ['required', 'preferred', 'discouraged']
+        attestation_conveyance:
+            enabled: true
+            allowed_values: ['indirect', 'direct', 'enterprise']
+        extensions:
+            enabled: true
+        mediation:
+            enabled: false   # disabled by default; opt-in
+            allowed_values: ['default', 'conditional']
 ```
 
 ## Configurable fields
@@ -81,8 +77,8 @@ webauthn:
 | `authenticator_attachment` | enabled | `platform`, `cross-platform` | Whether the client can request a specific authenticator type |
 | `resident_key` | enabled | `required`, `preferred`, `discouraged` | Whether the client can request resident key behavior |
 | `attestation_conveyance` | enabled | `indirect`, `direct`, `enterprise` | Whether the client can request attestation preference. `none` is left out of the defaults since v5.3.13, see below. |
-| `extensions` | enabled | N/A | Whether the client can provide additional extensions |
-| `mediation` | **disabled** | `default`, `conditional` | Whether the client can request the [Conditional Create](../../pure-php/advanced-behaviours/conditional-create.md) flow (auto-register) — opt-in. |
+| `extensions` | enabled | N/A | Whether the extensions sent by the client replace those of the profile |
+| `mediation` | **disabled** | `default`, `conditional` | Whether the client can request the [Conditional Create](../../pure-php/advanced-behaviours/conditional-create.md) flow (auto-register), opt-in. |
 
 !!! warning
 
@@ -96,11 +92,9 @@ webauthn:
 
     ```yaml title="config/packages/webauthn.yaml"
     webauthn:
-        creation_profiles:
-            default:
-                client_override_policy:
-                    attestation_conveyance:
-                        allowed_values: ['none', 'indirect', 'direct', 'enterprise']
+        client_override_policy:
+            attestation_conveyance:
+                allowed_values: ['none', 'indirect', 'direct', 'enterprise']
     ```
 
 ## Examples
@@ -117,9 +111,9 @@ webauthn:
                 id: 'example.com'
             authenticator_selection_criteria:
                 authenticator_attachment: platform
-            client_override_policy:
-                authenticator_attachment:
-                    enabled: false  # Client cannot change this
+    client_override_policy:
+        authenticator_attachment:
+            enabled: false  # Client cannot change this
 ```
 
 ### Lock down all options
@@ -135,17 +129,17 @@ webauthn:
             authenticator_selection_criteria:
                 user_verification: required
                 require_resident_key: true
-            client_override_policy:
-                user_verification:
-                    enabled: false
-                authenticator_attachment:
-                    enabled: false
-                resident_key:
-                    enabled: false
-                attestation_conveyance:
-                    enabled: false
-                extensions:
-                    enabled: false
+    client_override_policy:
+        user_verification:
+            enabled: false
+        authenticator_attachment:
+            enabled: false
+        resident_key:
+            enabled: false
+        attestation_conveyance:
+            enabled: false
+        extensions:
+            enabled: false
 ```
 
 ### Allow only specific verification levels
@@ -154,30 +148,22 @@ Allow the client to choose between `required` and `preferred`, but not `discoura
 
 ```yaml title="config/packages/webauthn.yaml" linenums="1"
 webauthn:
-    creation_profiles:
-        default:
-            rp:
-                id: 'example.com'
-            client_override_policy:
-                user_verification:
-                    enabled: true
-                    allowed_values: ['required', 'preferred']
+    client_override_policy:
+        user_verification:
+            enabled: true
+            allowed_values: ['required', 'preferred']
 ```
 
 ### Opt-in conditional create from the client
 
-Conditional mediation is the only override that is **disabled by default**. Enable it on a per-profile basis if you want the JavaScript client to request the [Conditional Create](../../pure-php/advanced-behaviours/conditional-create.md) flow without the profile being permanently configured for it:
+Conditional mediation is one of the two overrides **disabled by default**, with `user_verification`. Enable it if you want the JavaScript client to request the [Conditional Create](../../pure-php/advanced-behaviours/conditional-create.md) flow without the profile being permanently configured for it:
 
 ```yaml title="config/packages/webauthn.yaml" linenums="1"
 webauthn:
-    creation_profiles:
-        default:
-            rp:
-                id: 'example.com'
-            client_override_policy:
-                mediation:
-                    enabled: true
-                    allowed_values: ['default', 'conditional']
+    client_override_policy:
+        mediation:
+            enabled: true
+            allowed_values: ['default', 'conditional']
 ```
 
 ## How it works

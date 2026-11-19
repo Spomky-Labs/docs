@@ -122,6 +122,21 @@ The dedicated controller supports conditional UI natively:
 }) }}
 ```
 
+!!! info
+
+    **Changed in v5.4.0:** on connect, the controller reads the client capabilities with `PublicKeyCredential.getClientCapabilities()` and starts the conditional UI only when `conditionalGet` is `true`. On the browsers that do not ship that method yet, the capability is derived from SimpleWebAuthn's `browserSupportsWebAuthnAutofill()`. When the capability is missing, `conditionalUi: true` starts nothing and the user signs in with the `authenticate` action.
+
+The capability map is exposed as `capabilities` in the detail of the `webauthn:authentication:connect` event (and of `webauthn:registration:connect` for the registration controller), next to `optionsUrl`, `resultUrl` and `supportsPlatformAuthenticator`. The events bubble, so a listener on `document` receives them:
+
+```javascript linenums="1"
+document.addEventListener('webauthn:authentication:connect', (event) => {
+    const { capabilities } = event.detail;
+    if (capabilities.conditionalGet !== true) {
+        // Show a "Sign in with a passkey" button instead of relying on autofill
+    }
+});
+```
+
 ### Authentication controller options
 
 | Option | Type | Default | Description |
@@ -130,7 +145,7 @@ The dedicated controller supports conditional UI natively:
 | `resultUrl` | string | `/authentication/verify` | URL to submit the assertion response |
 | `submitViaForm` | boolean | `false` | Submit via form instead of fetch |
 | `successRedirectUri` | string | - | URL to redirect after successful auth |
-| `conditionalUi` | boolean | `false` | Enable conditional UI (autofill) |
+| `conditionalUi` | boolean | `false` | Enable conditional UI (autofill) on connect, when the browser reports the `conditionalGet` capability |
 | `verifyAutofillInput` | boolean | `true` | Verify autofill input fields exist |
 
 ### Authentication controller targets

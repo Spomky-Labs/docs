@@ -1,6 +1,8 @@
 # Fake credentials
 
-In order to prevent username enumeration, random credentials are set when a username is passed but no user entity is found.
+In order to prevent username enumeration, random credentials are set when a username is passed but no credential can be listed: the user is unknown, or has no credential.
+
+With the [options helpers](../options-helpers.md#username-enumeration-protection), the request builder uses the generator by default. Use `withFakeCredentialGenerator()` to replace it for one endpoint, or pass `null` to disable it there. The builder does not look the username up: resolve the user in your controller and attach it with `withUser()`.
 
 A very simple service is provided: `Webauthn\SimpleFakeCredentialGenerator`. It derives the list from the username and from a secret, so that a given username always gets the same credentials while an outsider cannot compute them.
 

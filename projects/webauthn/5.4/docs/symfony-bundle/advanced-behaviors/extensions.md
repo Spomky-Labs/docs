@@ -44,7 +44,20 @@ final class LocationExtensionOutputChecker
 }
 ```
 
-The easiest way to manage that is by using the creation and request profiles.
+With the [options helpers](../options-helpers.md), pass the extensions to `withExtensions()`. The list replaces the extensions of the options.
+
+```php linenums="1"
+use Webauthn\AuthenticationExtensions\AuthenticationExtension;
+
+return $this->options
+    ->forRequest('example.com')
+    ->withExtensions([AuthenticationExtension::create('uvm', true)])
+    ->build($request);
+```
+
+!!! warning
+
+    **Deprecated in v5.4.0:** the creation and request profiles below are removed in 6.0.0. See [From 5.3 to 5.4](../../migration/from-v5.3-to-v5.4.md).
 
 ```yaml title="config/packages/webauthn.yaml" linenums="1"
 webauthn:

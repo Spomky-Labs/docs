@@ -4,7 +4,7 @@
 
     **New in v5.4.0**
 
-Companion of the [Options Helpers](options-helpers.md) for the **response side**: instead of routing your `/attestation/response` and `/assertion/response` endpoints through the bundle's `AttestationResponseController` / `AssertionResponseController` (driven by `creation_profiles` / `request_profiles` config), you write your own controllers and call a single helper to deserialise the body, validate the ceremony and return a typed result. Your controller stays in charge of what to do with that result (login, redirect, JSON envelope, Signal API payload, etc.).
+Companion of the [Options Helpers](options-helpers.md) for the **response side**: instead of routing your `/attestation/response` and `/assertion/response` endpoints through the bundle's `AttestationResponseController` / `AssertionResponseController` (driven by the `controllers` configuration, deprecated since 5.4.0 and removed in 6.0.0), you write your own controllers and call a single helper to deserialise the body, validate the ceremony and return a typed result. Your controller stays in charge of what to do with that result (login, redirect, JSON envelope, Signal API payload, etc.).
 
 ## The entry point
 
@@ -102,13 +102,14 @@ Most of the ceremony configuration has already happened on the *options* side; t
 | Setter | Default |
 | --- | --- |
 | `withAllowedOrigins(array)` | the global `webauthn.allowed_origins` configuration |
-| `withAllowSubdomains(bool = true)` | the global `webauthn.allow_subdomains` configuration |
+| `withAllowSubdomains(bool = true)` | `false` when `withAllowedOrigins()` is called; ignored otherwise |
 | `withCeremonyOriginPinning(bool = true)` | the global `webauthn.ceremony_origin_pinning` configuration (`false`) |
 | `withTopOriginValidator(?TopOriginValidator)` | the global `webauthn.top_origin_validator` (or none) |
 | `withOptionsStorage(OptionsStorage)` | the global `webauthn.options_storage` |
 | `withCredentialRepository(CredentialRecordRepositoryInterface)` | the global `webauthn.credential_repository` |
+| `withScope(string)` | `helpers`, see [Scopes](#scopes) |
 
-`withAllowedOrigins(...)` / `withAllowSubdomains(bool)` override the accepted origins. When set, the verifier asks the autowired `CeremonyStepManagerFactory` to produce a fresh `CeremonyStepManager` and a fresh validator on top, so the singleton factory's state stays untouched. Use it when one route accepts a different list of origins than the rest of the application (multi-tenant, internal-vs-public, staging vs production, etc.).
+`withAllowedOrigins(...)` / `withAllowSubdomains(bool)` override the accepted origins. `withAllowSubdomains()` only applies together with `withAllowedOrigins()`: called alone, it is ignored and the global settings apply, and the global `webauthn.allow_subdomains` does not apply to a list set with `withAllowedOrigins()`. When set, the verifier asks the autowired `CeremonyStepManagerFactory` to produce a fresh `CeremonyStepManager` and a fresh validator on top, so the singleton factory's state stays untouched. Use it when one route accepts a different list of origins than the rest of the application (multi-tenant, internal-vs-public, staging vs production, etc.).
 
 ```php
 $result = $this->verifier
@@ -150,10 +151,11 @@ $result = $this->verifier
 | Setter | Default |
 | --- | --- |
 | `withSaveCredential(bool = true)` | `true` (auto-persist via `CanSaveCredentialRecord`) |
-| `withMetadata(MetadataStatementRepository, StatusReportRepository, CertificateChainValidator)` | inherits the global `webauthn.metadata` config |
+| `withMetadata(MetadataStatementRepository, StatusReportRepository, CertificateChainValidator, bool $requireStatement = true)` | inherits the global `webauthn.metadata` config |
 | `withoutMetadata()` | inherits the global `webauthn.metadata` config |
+| `withEnterpriseAttestationTrustAnchors(array)` | the global `webauthn.metadata.enterprise_attestation_trust_anchors` |
 
-If your `CredentialRecordRepositoryInterface` does not implement `CanSaveCredentialRecord`, calling `verify()` with the default behaviour throws `Webauthn\Bundle\Exception\MissingFeatureException`. Implement the interface or pass `withSaveCredential(false)` and persist yourself.
+If your `CredentialRecordRepositoryInterface` does not implement `CanSaveCredentialRecord`, calling `verify()` with the default behaviour fails with a `WebauthnAuthenticationFailureException` whose previous exception is a `Webauthn\Bundle\Exception\MissingFeatureException`. Implement the interface or pass `withSaveCredential(false)` and persist yourself.
 
 #### Metadata statement validation
 
@@ -170,6 +172,8 @@ Two setters layer per-verifier overrides on top of that default:
       ->verify($request);
   ```
 
+  The fourth argument, `$requireStatement`, does not inherit `webauthn.metadata.require_statement`: it is `true` unless you pass `false`. See [Authenticators without a metadata statement](advanced-behaviors/attestation-and-metadata-statement.md#authenticators-without-a-metadata-statement).
+
 * **`withoutMetadata()`** opts the current verification out of metadata validation, even when the global toggle is on. Useful when a registration route has to accept authenticators that don't publish a Metadata Statement:
 
   ```php
@@ -180,6 +184,8 @@ Two setters layer per-verifier overrides on top of that default:
   ```
 
 Both setters clone the autowired `CeremonyStepManagerFactory` before reconfiguring it, so the singleton's global state is untouched.
+
+`withEnterpriseAttestationTrustAnchors(array)` pins the trust anchors of the enterprise attestations for this verification only, for instance those of the organization a registration belongs to. See [Enterprise attestation](advanced-behaviors/attestation-and-metadata-statement.md#enterprise-attestation).
 
 ### Assertion only
 
@@ -201,7 +207,7 @@ $result = $this->verifier
 `verify()` throws in two well-defined ways:
 
 * `Symfony\Component\HttpKernel\Exception\BadRequestHttpException` for **malformed inputs**: wrong content type, empty body, deserialisation failure, unknown challenge in `OptionsStorage`, response type mismatch (assertion body posted to the attestation verifier or vice-versa), Relying Party ID mismatch. Symfony's HTTP layer turns these into HTTP 400 automatically; you don't have to catch them.
-* `Webauthn\Bundle\Security\Authentication\Exception\WebauthnAuthenticationFailureException` for **ceremony validation failures**: signature invalid, user handle mismatch, attestation rejected, etc. The exception carries the deserialised `PublicKeyCredential`, the underlying `AuthenticatorResponse`, the `PublicKeyCredentialOptions` it was checked against and the user entity (when known), so your controller can build a contextual response, including the [Signal API](../pure-php/advanced-behaviours/signal-api.md) `signalUnknownCredential` payload to drop a stale passkey from the platform UI.
+* `Webauthn\Bundle\Security\Authentication\Exception\WebauthnAuthenticationFailureException` for **ceremony validation failures**: signature invalid, user handle mismatch, attestation rejected, etc. The errors raised while the credential is saved arrive the same way, as the previous exception: a repository that cannot save, or a credential that already exists. The exception carries the deserialised `PublicKeyCredential`, the underlying `AuthenticatorResponse`, the `PublicKeyCredentialOptions` it was checked against and the user entity (when known), so your controller can build a contextual response, including the [Signal API](../pure-php/advanced-behaviours/signal-api.md) `signalUnknownCredential` payload to drop a stale passkey from the platform UI.
 
 ```php
 try {
@@ -220,6 +226,32 @@ try {
 
 The helper reads ceremony options from the bundle's `OptionsStorage` automatically (the same one [Options Helpers](options-helpers.md) write to). Use the bundle's helpers on both ends and you don't have to manage challenge storage at all.
 
+### Scopes
+
+The options helpers store the options with a scope, `helpers` unless `withScope()` names another one, and the verifier only redeems the options issued under its own scope. Options issued under another scope are refused with a 400 `The options were not issued by this endpoint.` A challenge obtained from one endpoint therefore cannot be redeemed against the requirements of another (user verification, attestation conveyance, allowed credentials):
+
+* the verifiers refuse the options issued by the firewall and by the `webauthn.controllers` endpoints, and those endpoints refuse the options issued by the helpers;
+* options stored without a scope, by code of your own, are still accepted.
+
+Give each pair of endpoints whose requirements differ a scope of its own. Two pairs that share a scope accept each other's challenges.
+
+```php
+// Options endpoint
+return $this->options
+    ->forRequest('example.com')
+    ->withUserVerification(AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_REQUIRED)
+    ->withScope('step_up')
+    ->build($request);
+
+// Result endpoint
+$result = $this->verifier
+    ->forAssertion('example.com')
+    ->withScope('step_up')
+    ->verify($request);
+```
+
+An empty scope throws a `LogicException`. An `OptionsStorage` of your own must keep the scope of each `Item` (`getScope()`) and restore it with `withScope()`: options read back without a scope are accepted by every endpoint.
+
 ## Why a single entry point?
 
 `WebauthnResponseVerifier` is the only service you inject in your controllers. The two verifiers it returns are typed (`WebauthnAttestationVerifier` and `WebauthnAssertionVerifier`), so the IDE autocomplete only proposes the methods that make sense for the ceremony at hand.
@@ -231,7 +263,7 @@ $this->verifier->forAssertion(...)->withSaveCredential(false);      // ERROR: no
 
 ## Migration from `AttestationResponseController` / `AssertionResponseController`
 
-If you are still routing `/attestation/response` and `/assertion/response` through the bundle's controllers via `webauthn.controllers.creation.<name>` / `webauthn.controllers.request.<name>`, the migration path is straightforward:
+If you are still routing `/attestation/response` and `/assertion/response` through the bundle's controllers via `webauthn.controllers.creation.<name>` / `webauthn.controllers.request.<name>`, deprecated since 5.4.0 and removed in 6.0.0, the migration path is straightforward:
 
 1. Write a controller of your own that calls `WebauthnResponseVerifier`.
 2. Re-bind the existing route(s) to your controller via the `#[Route]` attribute.

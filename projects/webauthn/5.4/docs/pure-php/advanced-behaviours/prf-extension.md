@@ -2,7 +2,7 @@
 
 !!! info
 
-    **New in v5.4.0**
+    **Changed in v5.4.0:** `PseudoRandomFunctionInputExtensionBuilder` is available since v5.2.0. Version 5.4.0 makes `build()` reject a builder without any input, adds `requiresMultipleCredentialEvaluation()` and the opt-in `PseudoRandomFunctionOutputChecker`, and fixes the PRF handling of the legacy Stimulus controller.
 
 The [WebAuthn Pseudo-Random Function (PRF) extension](https://www.w3.org/TR/webauthn-3/#prf-extension) lets the relying party derive an authenticator-bound, salt-bound secret on the client. Because the secret is a deterministic function of `(credential, salt)`, it is the building block for **client-side encryption**: the authenticator returns the same bytes for the same salt as long as the credential lives, the relying party never sees them, and yet the user can decrypt their own data after a fresh assertion.
 
@@ -32,8 +32,7 @@ use Webauthn\AuthenticationExtensions\PseudoRandomFunctionInputExtensionBuilder;
 use Webauthn\PublicKeyCredentialCreationOptions;
 
 $prf = PseudoRandomFunctionInputExtensionBuilder::create()
-    ->withInputs(random_bytes(32))                  // raw salt, base64url-encoded for transport
-    ->withInputs(random_bytes(32), random_bytes(32))  // optional second salt → results.second
+    ->withInputs(random_bytes(32), random_bytes(32))  // first salt, optional second salt for results.second
     ->build();
 
 $options = PublicKeyCredentialCreationOptions::create(
@@ -44,7 +43,7 @@ $options = PublicKeyCredentialCreationOptions::create(
 );
 ```
 
-The salts are passed in **raw bytes**. The builder takes care of base64url-encoding them so the JSON sent to the browser matches the W3C wire format.
+The salts are passed in **raw bytes**. The builder takes care of base64url-encoding them so the JSON sent to the browser matches the W3C wire format. The second salt is optional; calling `withInputs()` again replaces the previous `eval` block instead of adding to it.
 
 ### Per-credential salts (`evalByCredential`)
 
@@ -108,7 +107,7 @@ if ($builder->requiresMultipleCredentialEvaluation()) {
 
 ## Reading the PRF output
 
-The browser surfaces the PRF result in the assertion's `clientExtensionResults.prf.results.first` (and optionally `.second`) as `ArrayBuffer`. Verifying the assertion through `AuthenticatorAssertionResponseValidator::check(...)` does not consume the output — you read it from the deserialized `PublicKeyCredential->response->clientExtensionResults` after validation succeeds and pipe it into your application-level KDF.
+The browser surfaces the PRF result in the assertion's `clientExtensionResults.prf.results.first` (and optionally `.second`) as `ArrayBuffer`. Verifying the assertion through `AuthenticatorAssertionResponseValidator::check(...)` does not consume the output: the page reads it from `credential.getClientExtensionResults().prf.results` and pipes it into your application-level KDF, typically with Web Crypto.
 
 ### PRF results never reach the server
 
@@ -150,23 +149,29 @@ No additional configuration is required — return options with a `prf` extensio
 
 ## Symfony bundle
 
-PRF support currently lives only at the library level. The Symfony bundle does not yet expose a `prf:` profile flag — to enable PRF on a bundle-driven flow you have to attach the extension yourself, for instance from a custom `CreationOptionsHandler` / `RequestOptionsHandler`:
+The bundle has no dedicated PRF configuration: the creation and request profiles are deprecated since v5.4.0. Build the extension in your options controller and attach it with `withExtensions()` on the builder returned by the [Options Helpers](../../symfony-bundle/options-helpers.md), on `forCreation()` and `forRequest()` alike:
 
 ```php linenums="1"
-public function onCreationOptions(
-    PublicKeyCredentialCreationOptions $options,
-    PublicKeyCredentialUserEntity $userEntity,
-    ?Request $request = null,
-): Response {
-    $options->extensions[] = PseudoRandomFunctionInputExtensionBuilder::create()
-        ->withInputs($this->saltProvider->saltFor($userEntity))
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+use Webauthn\AuthenticationExtensions\PseudoRandomFunctionInputExtensionBuilder;
+
+#[Route('/webauthn/register/options', methods: ['POST'])]
+public function __invoke(Request $request): JsonResponse
+{
+    $prf = PseudoRandomFunctionInputExtensionBuilder::create()
+        ->withInputs($this->saltProvider->registrationSalt())
         ->build();
 
-    return new JsonResponse($options);
+    return $this->options
+        ->forCreation('example.com', $this->guesser)
+        ->withExtensions([$prf])
+        ->build($request);
 }
 ```
 
-A `prf:` profile block (with a pluggable `PrfSaltProviderInterface` for per-user/per-credential salt rotation) is on the roadmap for a future minor.
+`$this->options` is the autowired `Webauthn\Bundle\Service\WebauthnOptionsResponse`, `$this->guesser` your `UserEntityGuesser` and `$this->saltProvider` a service of your application. `withExtensions()` replaces the whole extension list, so pass every extension the ceremony needs in the same call.
 
 ## Runnable demo
 

@@ -49,24 +49,6 @@ webauthn:
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_PS384
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_PS512
 #            attestation_conveyance: !php/const Webauthn\PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE
-#            client_override_policy: # Granular control over client overrides (new in 5.3.0)
-#                user_verification:
-#                    enabled: true
-#                    allowed_values: ['required', 'preferred', 'discouraged']
-#                authenticator_attachment:
-#                    enabled: true
-#                    allowed_values: ['platform', 'cross-platform']
-#                resident_key:
-#                    enabled: true
-#                    allowed_values: ['required', 'preferred', 'discouraged']
-#                attestation_conveyance:
-#                    enabled: true
-#                    allowed_values: ['indirect', 'direct', 'enterprise'] # 'none' is left out by default since 5.3.13
-#                extensions:
-#                    enabled: true
-#                mediation: # Opt-in: let the client request a Conditional Create flow
-#                    enabled: false
-#                    allowed_values: ['default', 'conditional']
     request_profiles: # Authentication profiles
         default: # Unique name of the profile
             rp_id: '%env(RELYING_PARTY_ID)%' # Please adapt the env file with the correct relying party ID or set null
@@ -76,6 +58,24 @@ webauthn:
 #            hints: [] # WebAuthn hints: security-key, client-device, hybrid (new in 5.3.0)
 #            extensions:
 #                loc: true
+#    client_override_policy: # Granular control over client overrides, applied to every profile (new in 5.3.0)
+#        user_verification:
+#            enabled: false
+#            allowed_values: ['required', 'preferred']
+#        authenticator_attachment:
+#            enabled: true
+#            allowed_values: ['platform', 'cross-platform']
+#        resident_key:
+#            enabled: true
+#            allowed_values: ['required', 'preferred', 'discouraged']
+#        attestation_conveyance:
+#            enabled: true
+#            allowed_values: ['indirect', 'direct', 'enterprise'] # 'none' is left out by default since 5.3.13
+#        extensions:
+#            enabled: true
+#        mediation: # Opt-in: let the client request a Conditional Create flow
+#            enabled: false
+#            allowed_values: ['default', 'conditional']
 #    passkey_endpoints: # .well-known/passkey-endpoints discovery (new in 5.3.0)
 #        enabled: false
 #        enroll: 'https://example.com/passkeys/register'
@@ -295,20 +295,16 @@ See [Conditional Create](../pure-php/advanced-behaviours/conditional-create.md) 
 
     **New in v5.3.0**
 
-Control which WebAuthn options can be overridden by client request parameters. See [Client Override Policy](advanced-behaviors/client-override-policy.md) for detailed configuration.
+Control which WebAuthn options can be overridden by client request parameters. The `client_override_policy` node sits at the root of the configuration and applies to every profile. See [Client Override Policy](advanced-behaviors/client-override-policy.md) for detailed configuration.
 
 ```yaml title="app/config/webauthn.yaml" linenums="1"
 webauthn:
-    creation_profiles:
-        acme:
-            rp:
-                id: 'example.com'
-            client_override_policy:
-                user_verification:
-                    enabled: true
-                    allowed_values: ['required', 'preferred']
-                authenticator_attachment:
-                    enabled: false  # Prevent client override
+    client_override_policy:
+        user_verification:
+            enabled: true
+            allowed_values: ['required', 'preferred']
+        authenticator_attachment:
+            enabled: false  # Prevent client override
 ```
 
 #### Extensions

@@ -30,12 +30,14 @@ $extensions = AuthenticationExtensions::create([
 ]);
 ```
 
-| Factory | Policy |
-| --- | --- |
-| `userVerificationOptional()` | `1` — UV optional |
-| `userVerificationOptionalWithCredentialIDList()` | `2` — UV optional unless the credential is discoverable |
-| `userVerificationRequired()` | `3` — UV always required |
-| `enforce()` | `enforceCredentialProtectionPolicy: true` — ask the user agent to fail rather than silently downgrade |
+| Factory | `credentialProtectionPolicy` sent to the browser | Policy reported by the authenticator |
+| --- | --- | --- |
+| `userVerificationOptional()` | `'userVerificationOptional'` | `1`: UV optional |
+| `userVerificationOptionalWithCredentialIDList()` | `'userVerificationOptionalWithCredentialIDList'` | `2`: UV optional unless the credential is discoverable |
+| `userVerificationRequired()` | `'userVerificationRequired'` | `3`: UV always required |
+| `enforce()` | `enforceCredentialProtectionPolicy: true`, asks the user agent to fail rather than silently downgrade | |
+
+The request side uses the W3C string values, exposed as the `POLICY_USER_VERIFICATION_OPTIONAL`, `POLICY_USER_VERIFICATION_OPTIONAL_WITH_CREDENTIAL_ID_LIST` and `POLICY_USER_VERIFICATION_REQUIRED` constants of `CredentialProtectionInputExtension`. The authenticator answers with the CTAP integer, exposed by the constants of the same names on `CredentialProtectionOutput` (`1`, `2` and `3`).
 
 ### Reading the applied policy
 
@@ -44,11 +46,15 @@ $extensions = AuthenticationExtensions::create([
 ```php linenums="1"
 use Webauthn\AuthenticationExtensions\CredentialProtectionOutput;
 
-$applied = CredentialProtectionOutput::fromExtensions($authenticatorData->extensions);
-if ($applied?->policy !== CredentialProtectionInputExtension::POLICY_UV_REQUIRED) {
+$applied = $authenticatorData->extensions !== null
+    ? CredentialProtectionOutput::fromExtensions($authenticatorData->extensions)
+    : null;
+if ($applied?->policy !== CredentialProtectionOutput::POLICY_USER_VERIFICATION_REQUIRED) {
     // Authenticator silently downgraded; reject or warn the user.
 }
 ```
+
+`$authenticatorData` is the authenticator data of the validated response: `$authenticatorAttestationResponse->attestationObject->authData` after a registration, `$authenticatorAssertionResponse->authenticatorData` after an authentication. Its `extensions` property is `null` when the authenticator returned no extension output, and the `fromExtensions()` methods of the output classes on this page do not accept `null`, hence the guard.
 
 ## credBlob / getCredBlob (CTAP 2.1 §12.2)
 
@@ -65,7 +71,17 @@ $extensions = AuthenticationExtensions::create([
 ]);
 ```
 
-`withBlob()` rejects payloads above 32 bytes at construction time. The success flag the authenticator returns is exposed by `CredentialBlobRegistrationOutput`.
+`withBlob()` rejects payloads above 32 bytes at construction time. The success flag the authenticator returns is exposed by the `stored` property (`bool`) of `CredentialBlobRegistrationOutput`; `false` means the authenticator dropped the blob:
+
+```php linenums="1"
+use Webauthn\AuthenticationExtensions\CredentialBlobRegistrationOutput;
+
+// after validation:
+$result = $authenticatorData->extensions !== null
+    ? CredentialBlobRegistrationOutput::fromExtensions($authenticatorData->extensions)
+    : null;
+$stored = $result?->stored === true;
+```
 
 ### Retrieving the blob at assertion
 
@@ -79,8 +95,10 @@ $extensions = AuthenticationExtensions::create([
 ]);
 
 // after validation:
-$blob = CredentialBlobAssertionOutput::fromExtensions($authenticatorData->extensions);
-$bytes = $blob?->bytes;  // raw bytes, ≤ 32
+$blob = $authenticatorData->extensions !== null
+    ? CredentialBlobAssertionOutput::fromExtensions($authenticatorData->extensions)
+    : null;
+$bytes = $blob?->blob;  // raw bytes, 32 at most
 ```
 
 The Stimulus base controller takes care of encoding/decoding transparently: registration `extensions.credBlob` strings are base64url-decoded to `ArrayBuffer` before `navigator.credentials.create()`, and the assertion `clientExtensionResults.credBlob` `ArrayBuffer` is re-encoded to base64url before the credential event is dispatched. JSON sent to the server round-trips cleanly through `CredentialBlobAssertionOutput`.
@@ -99,8 +117,10 @@ $extensions = AuthenticationExtensions::create([
 ]);
 
 // after validation:
-$minPinLength = MinPinLengthOutput::fromExtensions($authenticatorData->extensions);
-$value = $minPinLength?->minPinLength;  // int
+$minPinLength = $authenticatorData->extensions !== null
+    ? MinPinLengthOutput::fromExtensions($authenticatorData->extensions)
+    : null;
+$value = $minPinLength?->minPinLength;  // int|null
 ```
 
 `MinPinLengthOutput::fromExtensions(...)` rejects non-integer or negative values defensively.
@@ -120,7 +140,10 @@ $extensions = AuthenticationExtensions::create([
     AuthenticationExtension::create('credProps', true),
 ]);
 
-// After validation, read the typed view
+// After validation, read the typed view from the client extension results
+// $data is the JSON payload posted by the browser
+$payload = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+$clientExtensionResults = AuthenticationExtensions::create($payload['clientExtensionResults'] ?? []);
 $credProps = CredentialPropertiesOutput::fromExtensions($clientExtensionResults);
 $isPasskey         = $credProps?->rk;                       // bool|null
 $authenticatorName = $credProps?->authenticatorDisplayName; // string|null

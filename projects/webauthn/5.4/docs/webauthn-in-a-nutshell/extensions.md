@@ -154,11 +154,13 @@ $extensions = AuthenticationExtensions::create([
 The PRF (Pseudo-Random Function) extension allows you to generate cryptographic keys from authenticator secrets. This is particularly useful for encryption scenarios:
 
 ```php linenums="1"
+use ParagonIE\ConstantTime\Base64UrlSafe;
+
 // Request PRF during authentication
 $extensions = AuthenticationExtensions::create([
     AuthenticationExtension::create('prf', [
         'eval' => [
-            'first' => base64_encode(random_bytes(32))
+            'first' => Base64UrlSafe::encodeUnpadded(random_bytes(32))
         ]
     ])
 ]);
@@ -168,6 +170,8 @@ $publicKeyCredentialRequestOptions = PublicKeyCredentialRequestOptions::create(
     extensions: $extensions
 );
 ```
+
+The salts are base64url-encoded, as the WebAuthn JSON format requires. `PseudoRandomFunctionInputExtensionBuilder` does the encoding for you, see the [PRF Extension](../pure-php/advanced-behaviours/prf-extension.md) page.
 
 ## Implementation considerations
 

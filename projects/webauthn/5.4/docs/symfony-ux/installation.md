@@ -187,7 +187,7 @@ The dedicated controllers accept the following options. See the [User Authentica
 | `resultUrl` | string | `/registration/verify` | URL to submit the attestation response |
 | `submitViaForm` | boolean | `false` | Submit via form instead of fetch |
 | `successRedirectUri` | string | – | URL to redirect after successful registration |
-| `autoRegister` | boolean | `false` | Auto-start registration on page load |
+| `autoRegister` | boolean | `false` | Request a Conditional Create (`mediation: 'conditional'`) when the `register` action runs; nothing starts on page load |
 
 ### Authentication options
 
@@ -197,7 +197,7 @@ The dedicated controllers accept the following options. See the [User Authentica
 | `resultUrl` | string | `/authentication/verify` | URL to submit the assertion response |
 | `submitViaForm` | boolean | `false` | Submit via form instead of fetch |
 | `successRedirectUri` | string | – | URL to redirect after successful auth |
-| `conditionalUi` | boolean | `false` | Enable conditional UI (autofill) |
+| `conditionalUi` | boolean | `false` | Enable conditional UI (autofill) on connect, when the browser reports the `conditionalGet` capability |
 
 ## Troubleshooting
 

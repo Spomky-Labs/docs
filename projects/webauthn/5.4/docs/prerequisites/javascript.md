@@ -338,7 +338,14 @@ Modern browsers support autofill for WebAuthn credentials, allowing users to sel
 
 ```javascript linenums="1"
 // Check if conditional UI is available
-const conditionalUIAvailable = await PublicKeyCredential.isConditionalMediationAvailable();
+let conditionalUIAvailable = false;
+if (typeof PublicKeyCredential.getClientCapabilities === 'function') {
+    const capabilities = await PublicKeyCredential.getClientCapabilities();
+    conditionalUIAvailable = capabilities.conditionalGet === true;
+} else if (typeof PublicKeyCredential.isConditionalMediationAvailable === 'function') {
+    // Fallback for the user agents that do not ship getClientCapabilities() yet
+    conditionalUIAvailable = await PublicKeyCredential.isConditionalMediationAvailable();
+}
 
 if (conditionalUIAvailable) {
     // Add 'conditional' mediation to allow autofill
@@ -349,7 +356,9 @@ if (conditionalUIAvailable) {
 }
 ```
 
-For Symfony UX users, enable this with the `useBrowserAutofill` option in the Stimulus controller configuration.
+WebAuthn Level 3 supersedes `PublicKeyCredential.isConditionalMediationAvailable()` with `PublicKeyCredential.getClientCapabilities()`, which reports every client capability in a single call (`conditionalGet`, `conditionalCreate`, `hybridTransport`, `relatedOrigins` and more). Keep the former only as a fallback.
+
+For Symfony UX users, enable this with the `conditionalUi` value of the dedicated authentication controller (`useBrowserAutofill` with the legacy combined controller). Since v5.4.0 the dedicated controller performs the `getClientCapabilities()` check itself.
 
 ## Development setup
 
