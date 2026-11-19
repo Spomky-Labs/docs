@@ -11,6 +11,8 @@ webauthn:
     counter_checker: App\Service\CustomCounterChecker
 ```
 
+A [verification helper](../verification-helpers.md#assertion-only) can use another checker for one endpoint with `withCounterChecker()`.
+
 The following example is fictitious and shows how to lock a user, log the error and throw an exception.
 
 ```php linenums="1"

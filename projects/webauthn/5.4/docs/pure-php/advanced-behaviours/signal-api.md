@@ -266,10 +266,10 @@ namespace App\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
+use Webauthn\Bundle\Repository\CredentialRecordRepositoryInterface;
 use Webauthn\Bundle\Security\Handler\FailureHandler;
 use Webauthn\Bundle\Service\WebauthnSignalFactory;
 use Webauthn\Bundle\Service\WebauthnSignalResponse;
-use Webauthn\Exception\AuthenticatorResponseVerificationException;
 use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialOptions;
 use Webauthn\PublicKeyCredentialUserEntity;
@@ -281,6 +281,7 @@ final readonly class WebauthnSignalingFailureHandler implements FailureHandler
     public function __construct(
         private WebauthnSignalFactory $signals,
         private WebauthnSignalResponse $response,
+        private CredentialRecordRepositoryInterface $credentialRecords,
     ) {
     }
 
@@ -295,7 +296,7 @@ final readonly class WebauthnSignalingFailureHandler implements FailureHandler
 
         if (
             $publicKeyCredential !== null
-            && $exception instanceof AuthenticatorResponseVerificationException
+            && $this->credentialRecords->findOneByCredentialId($publicKeyCredential->rawId) === null
         ) {
             $signals[] = $this->signals->forUnknownCredential(
                 self::RP_ID,
@@ -310,6 +311,10 @@ final readonly class WebauthnSignalingFailureHandler implements FailureHandler
     }
 }
 ```
+
+!!! warning
+
+    Check the repository before emitting the signal. The response controllers raise the same `AuthenticatorResponseVerificationException` for an unknown credential ID and for any other verification failure (signature, counter, user verification, origin, and so on). Signalling `unknownCredential` for a credential your repository still holds may lead the authenticator to hide or delete a valid passkey.
 
 !!! info
 
@@ -352,6 +357,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Webauthn\Bundle\Repository\CredentialRecordRepositoryInterface;
 use Webauthn\Bundle\Security\Authentication\Exception\WebauthnAuthenticationFailureException;
 use Webauthn\Bundle\Security\Authentication\Token\WebauthnToken;
 use Webauthn\Bundle\Security\Authentication\WebauthnAuthenticator as BaseWebauthnAuthenticator;
@@ -368,6 +374,7 @@ final class WebauthnAuthenticator extends BaseWebauthnAuthenticator
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly WebauthnSignalFactory $signals,
         private readonly WebauthnSignalResponse $response,
+        private readonly CredentialRecordRepositoryInterface $credentialRecords,
     ) {
     }
 
@@ -400,7 +407,11 @@ final class WebauthnAuthenticator extends BaseWebauthnAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $signals = [];
-        if ($exception instanceof WebauthnAuthenticationFailureException) {
+        if (
+            $exception instanceof WebauthnAuthenticationFailureException
+            && $exception->publicKeyCredential !== null
+            && $this->credentialRecords->findOneByCredentialId($exception->publicKeyCredential->rawId) === null
+        ) {
             $signal = $this->signals->forUnknownCredentialFromException(self::RP_ID, $exception);
             if ($signal !== null) {
                 $signals[] = $signal;
@@ -444,11 +455,11 @@ Failures raised inside `WebauthnBadgeListener` after it has recognised the reque
 | `publicKeyCredentialOptions` | The stored `PublicKeyCredentialOptions` of the ceremony. |
 | `userEntity` | The resolved `PublicKeyCredentialUserEntity` if the badge got that far. |
 
-`WebauthnSignalFactory::forUnknownCredentialFromException()` extracts the descriptor from the carried credential and produces the signal in one call. Pre-deserialization failures (malformed body, missing stored options) keep the historical silent-fail so other authenticators on the same firewall stay free to handle the request.
+`WebauthnSignalFactory::forUnknownCredentialFromException()` extracts the descriptor from the carried credential and produces the signal in one call. It does not check why the ceremony failed: every failure raised after deserialization is wrapped in this exception, an invalid signature as much as an unknown credential ID. Call it only once your credential record repository confirmed that the credential is unknown, as in the example above. Pre-deserialization failures (malformed body, missing stored options) keep the historical silent-fail so other authenticators on the same firewall stay free to handle the request.
 
 ## Stimulus integration
 
-The `@web-auth/webauthn-stimulus` controllers (`AuthenticationController`, `RegistrationController`, `WebauthnController`) pick up the `signals: [...]` envelope automatically after a successful `verify` call and dispatch each entry to the matching `PublicKeyCredential.signalXxx()` JS API. Each call is feature-detected, silently no-ops on browsers that do not expose the method, and swallows the spec-defined `TypeError` / `SecurityError` so the rest of your application flow proceeds unchanged.
+The `@web-auth/webauthn-stimulus` controllers built on `BaseController` (`AuthenticationController`, `RegistrationController` and the controllers extending them) pick up the `signals: [...]` envelope automatically when the verification request sent by the controller returns a successful (2xx) response. The legacy combined `WebauthnController` does not, and neither does a flow using `submitViaForm`, where the browser submits the form instead of the controller calling the result URL. Each entry is dispatched to the matching `PublicKeyCredential.signalXxx()` JS API. Each call is feature-detected, silently no-ops on browsers that do not expose the method, and swallows the spec-defined `TypeError` / `SecurityError` so the rest of your application flow proceeds unchanged.
 
 If you want to fire signals outside of a controller flow (e.g. from a custom JS handler after a profile update), the package also exports four helpers from its entry point:
 

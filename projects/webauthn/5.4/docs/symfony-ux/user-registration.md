@@ -161,25 +161,8 @@ The registration controller accepts the following options:
 |--------|------|----------|-------------|
 | `creationOptionsUrl` | string | Yes | URL to fetch credential creation options |
 | `creationResultField` | string | Yes | CSS selector for the hidden attestation field |
-| `autoRegister` | boolean | No | Automatically trigger registration on page load (default: false) |
 
-### Auto-register example
-
-Automatically start the registration process when the page loads:
-
-```twig linenums="1"
-{{ stimulus_controller('@web-auth/webauthn-stimulus',
-    {
-        autoRegister: true,
-        creationOptionsUrl: path('webauthn.controller.creation.request.new_user'),
-        creationResultField: 'input[name="attestation"]'
-    }
-) }}
-```
-
-!!! warning
-
-    Use `autoRegister` carefully as it immediately prompts the user for biometric authentication or security key interaction.
+The combined controller has no `autoRegister` option: Conditional Create is only available on the [dedicated registration controller](#conditional-create).
 
 ## Dedicated registration controller
 
@@ -230,7 +213,21 @@ The dedicated `registration-controller` provides a focused controller for creden
 | `resultUrl` | string | `/registration/verify` | URL to submit the attestation response |
 | `submitViaForm` | boolean | `false` | Submit via form instead of fetch |
 | `successRedirectUri` | string | - | URL to redirect after successful registration |
-| `autoRegister` | boolean | `false` | Auto-start registration on page load |
+| `autoRegister` | boolean | `false` | Request a Conditional Create (`mediation: 'conditional'`) when the `register` action runs |
+
+### Conditional Create
+
+`autoRegister: true` does not start anything when the page loads: the controller only dispatches its `webauthn:registration:connect` event there, and the ceremony still starts when the `register` action runs. The option turns that ceremony into a Conditional Create (`mediation: 'conditional'`), so the browser may create the passkey without prompting a user who has just signed in with a saved password.
+
+```twig linenums="1"
+{{ stimulus_controller('@web-auth/webauthn-stimulus/registration', {
+    optionsUrl: path('webauthn.controller.creation.request.new_user'),
+    resultUrl: path('app_register'),
+    autoRegister: true
+}) }}
+```
+
+The creation options must be built for conditional mediation on the server side too, otherwise the user presence check can reject the response. See [Conditional Create](../pure-php/advanced-behaviours/conditional-create.md).
 
 ### Registration controller targets
 

@@ -131,15 +131,17 @@ const credential = await navigator.credentials.create({
 });
 ```
 
-With the Stimulus controller, use the `autoRegister` option on the registration controller:
+With the Stimulus controllers, use the `autoRegister` option of the dedicated registration controller. The legacy `@web-auth/webauthn-stimulus` controller has no such option.
 
 ```twig
-{{ stimulus_controller('@web-auth/webauthn-stimulus', {
-    creationOptionsUrl: path('webauthn.controller.creation.creation.passkey_upgrade'),
-    creationResultField: 'input[name="attestation"]',
+{{ stimulus_controller('@web-auth/webauthn-stimulus/registration', {
+    optionsUrl: path('webauthn.controller.creation.request.passkey_upgrade'),
+    resultUrl: path('webauthn.controller.creation.response.passkey_upgrade'),
     autoRegister: true
 }) }}
 ```
+
+The ceremony starts when the `register` action runs, not when the page loads. See [User registration](../../symfony-ux/user-registration.md#conditional-create).
 
 !!! warning
 

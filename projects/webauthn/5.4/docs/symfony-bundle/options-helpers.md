@@ -4,7 +4,7 @@
 
     **New in v5.4.0**
 
-The bundle ships an autowired helper that lets you write your own attestation/assertion *options* controllers without touching a single line of bundle configuration. This is the recommended path going forward: the controllers shipped with the bundle (`AttestationRequestController` / `AssertionRequestController`, driven by `creation_profiles` / `request_profiles`) stay available for backwards compatibility but the helper is more flexible and clearer.
+The bundle ships an autowired helper that lets you write your own attestation/assertion *options* controllers without touching a single line of bundle configuration. This is the recommended path going forward: the controllers shipped with the bundle (`AttestationRequestController` / `AssertionRequestController`, driven by `creation_profiles` / `request_profiles`) are deprecated since 5.4.0 and removed in 6.0.0. They keep working in 5.4, but the helper is more flexible and clearer.
 
 ## The entry point
 
@@ -114,11 +114,12 @@ Every optional field has a `with…()` setter on the returned builder. Each call
 | `withTimeout(?int)` | `null` (UA decides) |
 | `withAttestation(?string)` | `null` (= `none`) |
 | `withAttestationFormats(array)` | empty (any format accepted) |
-| `withExtensions(array)` | none — pass a `list<AuthenticationExtension>`; the builder wraps it as `AuthenticationExtensions` |
+| `withExtensions(array)` | none; pass a `list<AuthenticationExtension>`, the builder wraps it as `AuthenticationExtensions` |
 | `withHints(array)` | none |
 | `withClientOverrides(ClientOverridePolicy)` | none (no client field has effect) |
 | `withOptionsStorage(OptionsStorage)` | the global `webauthn.options_storage` |
 | `withCredentialRepository(CredentialRecordRepositoryInterface)` | the global `webauthn.credential_repository` |
+| `withScope(string)` | `helpers`, see [Storage](#storage) |
 
 `withOptionsStorage(...)` and `withCredentialRepository(...)` override the challenge-storage backend and the credential lookup repository for this options build only. Multi-tenant setups can pre-build a per-tenant builder once and reuse it across requests:
 
@@ -135,6 +136,7 @@ return $this->options
 | Setter | Default |
 | --- | --- |
 | `withAuthenticatorSelectionCriteria(AuthenticatorSelectionCriteria)` | none |
+| `withRpName(string)` | the RP ID passed to `forCreation()` |
 | `withPubKeyCredParams(array)` | the W3C-recommended baseline list |
 | `withMediation(?string)` | `null` (= `default`); use `'conditional'` for [Conditional Create](../pure-php/advanced-behaviours/conditional-create.md) |
 | `withHideExistingCredentials(bool = true)` | `false` (excluded credentials are derived from the repository) |
@@ -152,17 +154,28 @@ return $this->options
 
 #### Username-enumeration protection
 
-When the JSON body carries a `username` (typical login form post: `{"username":"alice"}`) but `alice` does not resolve to a known user, the request builder consults the autowired `FakeCredentialGenerator` and emits **fake** `allowCredentials` instead of an empty list. From the client's standpoint, the response shape is identical whether or not the username matches a real account, so an attacker cannot probe for valid usernames.
+When no credential can be listed in `allowCredentials` (no user attached with `withUser()`, or a user without any credential) and the JSON body carries a non-empty `username` (typical login form post: `{"username":"alice"}`), the request builder asks the `FakeCredentialGenerator` for **fake** `allowCredentials` instead of returning an empty list. From the client's standpoint, the response has the same shape whether or not the username matches an account that has credentials, so an attacker cannot probe for valid usernames.
 
-Default behaviour (no setup needed):
+The builder does not look the username up itself. Resolve the user in your controller and attach it when it exists, otherwise a known user receives fake credentials and cannot log in:
 
 ```php
-return $this->options
-    ->forRequest('example.com')
-    ->build($request);
+#[Route('/webauthn/login/options', methods: ['POST'])]
+public function __invoke(Request $request): JsonResponse
+{
+    $builder = $this->options->forRequest('example.com');
+    $username = $request->getPayload()->getString('username');
+    $user = $username === '' ? null : $this->userEntityRepository->findOneByUsername($username);
+    if ($user !== null) {
+        $builder = $builder->withUser($user);
+    }
+
+    return $builder->build($request);
+}
 ```
 
-Opt out (response will be a true userless / empty `allowCredentials` ceremony when the username is unknown):
+Attach the user entity, not a `UserEntityGuesser` that throws for an unknown username: the exception would leave `build()` and reveal that the account does not exist.
+
+The generator is the `webauthn.fake_credential_generator` service (`SimpleFakeCredentialGenerator` by default). No fake credential is produced when the list is set with `withAllowCredentials()` or when `withDeriveAllowCredentialsFromUser(false)` is called. To opt out entirely:
 
 ```php
 return $this->options
@@ -171,7 +184,11 @@ return $this->options
     ->build($request);
 ```
 
-Or swap with a custom implementation of `Webauthn\FakeCredentialGenerator` (e.g. a hash-keyed deterministic generator backed by your `kernel.secret`) by passing it to `withFakeCredentialGenerator($custom)`.
+Or swap with a custom implementation of `Webauthn\FakeCredentialGenerator` (e.g. a hash-keyed deterministic generator backed by your `kernel.secret`) by passing it to `withFakeCredentialGenerator($custom)`. See [Fake Credentials](advanced-behaviors/fake-credentials.md).
+
+!!! warning
+
+    To read the `username`, the request builder parses the body as soon as a fake credential generator is set, which is the default, and the creation builder does the same when a client override policy is attached. The request must then be sent with `Content-Type: application/json`, even when its body is empty: otherwise the builder answers with a 400 `Only JSON content type allowed`.
 
 ## Client overrides
 
@@ -196,8 +213,8 @@ return $this->options
     ->build($request);
 ```
 
-* `ClientOverrideRule::any()` — accepts any value the client submits
-* `ClientOverrideRule::restrictTo($allowedValues)` — restricts the client value to a list
+* `ClientOverrideRule::any()`: accepts any value the client submits
+* `ClientOverrideRule::restrictTo($allowedValues)`: restricts the client value to a list
 * Pass `null` (the default) for fields the client must NOT be able to override
 
 ### Nested-array form
@@ -222,13 +239,19 @@ The constructor also accepts a mix of typed `ClientOverrideRule` entries and leg
 
 ### Behaviour
 
-If the client posts `{"userVerification": "required"}`, the merged options carry `required`. If it posts `"discouraged"`, the policy rejects it (not in the allow-list) and the default (`preferred`) wins. Anything outside the policy keys is ignored regardless of what the body contains.
+If the client posts `{"userVerification": "required"}`, the merged options carry `required`. If it posts `"discouraged"`, the policy rejects it (not in the allow-list) and the value set on the builder wins. Anything outside the policy keys is ignored regardless of what the body contains.
+
+* A policy built in PHP has no defaults: a field without a rule cannot be overridden. In the nested-array form, `['enabled' => true]` without `allowed_values` accepts any value.
+* The request builder honours `user_verification` and `extensions` only. `authenticator_attachment`, `resident_key`, `attestation_conveyance` and `mediation` apply to the creation builder.
+* The extensions sent by the client **replace** those set with `withExtensions()`, they are not merged. `allowed_values` does not apply to `extensions`: the rule only says whether the client can override them.
 
 See [Client Override Policy](advanced-behaviors/client-override-policy.md) for the full list of overridable fields.
 
 ## Storage
 
 The helper persists the produced options in the bundle's `OptionsStorage` automatically before returning the response. Forgetting to store options is a frequent source of *"challenge mismatch"* errors when the response controller validates the assertion later: the helper removes that risk.
+
+The stored options carry a scope, `helpers` by default, and only a [verifier](verification-helpers.md#scopes) bound to the same scope redeems them. When two pairs of endpoints have different requirements, for instance a login and a step-up that requires user verification, give each pair a scope of its own with `withScope()`, on the options builder and on the verifier alike.
 
 If you want to bypass the helper's storage and call `OptionsStorage` yourself (e.g. to attach extra metadata), you can build the options classes directly using the lib API and skip the helper entirely.
 
@@ -245,7 +268,7 @@ $this->options->forCreation(...)->withUiMode(...);       // ❌ does not exist o
 
 ## Migration from `creation_profiles` / `request_profiles`
 
-If you are still using the bundle's profile-driven controllers, the migration path is straightforward: write a controller of your own that calls the helper, then drop the matching `webauthn.controllers.creation.<name>` / `webauthn.controllers.request.<name>` config block. The route name(s) you previously had can be re-bound to your controller via the `#[Route]` attribute.
+The profile-driven controllers are deprecated since 5.4.0 and removed in 6.0.0. The migration path is straightforward: write a controller of your own that calls the helper, then drop the matching `webauthn.controllers.creation.<name>` / `webauthn.controllers.request.<name>` config block. The route name(s) you previously had can be re-bound to your controller via the `#[Route]` attribute.
 
 ## See also
 

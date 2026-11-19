@@ -41,7 +41,7 @@ Four user-written controllers cover the request and response sides of registrati
 |---|---|---|
 | Routes | `controllers.creation[].options_path`, `result_path` | `#[Route]` attributes on user controllers |
 | Profile (challenge length, RP, UV, attestation, etc.) | `creation_profiles` / `request_profiles` | `with*()` setters on the builder returned by `forCreation()` / `forRequest()` |
-| Allowed origins | `allowed_origins` (root + per-controller) | `withAllowedOrigins(...)` on the verifier (or omit for the W3C same-origin fallback on single-domain apps) |
+| Allowed origins | `allowed_origins` (root + per-controller) | `withAllowedOrigins(...)` on the verifier, or nothing on single-domain apps, see [From 5.3 to 5.4](from-v5.3-to-v5.4.md#webauthnallowed_origins-webauthnallow_subdomains) |
 | Client overrides | `client_override_policy` (array-in-array YAML) | `ClientOverridePolicy` built inline + `withClientOverrides()` |
 | Anti-enumeration | implicit, via `fake_credential_generator` service ID | active by default on `forRequest()`; `withFakeCredentialGenerator(null)` opts out |
 | User entity guesser | `controllers.creation[].user_entity_guesser` | second positional argument of `forCreation($rpId, $guesser)` |
@@ -114,6 +114,10 @@ The same applies to the entities extending `PublicKeyCredentialUserEntity` or `P
 !!! danger
 
     Move to an entity of your application on 5.4, where the switch requires no schema change, before upgrading. See [From 5.3 to 5.4](from-v5.3-to-v5.4.md#doctrine-mapping-of-the-bundle).
+
+### Malformed serial number extensions are refused
+
+A packed attestation whose certificate carries the serial number extension (`1.3.6.1.4.1.45724.1.1.2`) marked critical or with a value that is not an OCTET STRING is refused. 5.4 accepts it, ignores the extension and triggers a deprecation. See [From 5.3 to 5.4](from-v5.3-to-v5.4.md#malformed-serial-number-extension-of-the-packed-attestations).
 
 ### PublicKeyCredentialUserEntity.name stays
 

@@ -6,7 +6,7 @@ description: Upgrade guide from 5.3 to 5.4
 
 !!! success
 
-    No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0. The only exception concerns the applications overriding the type of the counter column of the Doctrine mapping, see [the counter column](#database-schema-the-counter-column).
+    No backward compatibility break. The YAML sections deprecated below keep working until 6.0.0. The exceptions concern the applications overriding the type of the counter column of the Doctrine mapping, see [the counter column](#database-schema-the-counter-column), those declaring origins in a `webauthn.controllers` block, see [per-controller origins](#per-controller-origins-are-enforced), and those building a PRF extension without input, see [the PRF extension](#an-empty-prf-extension-is-refused).
 
 Version 5.4 is the preparation step for 6.0: the profile-driven YAML configuration of the Symfony bundle is superseded by autowired helpers called from controllers you write yourself. The whole configuration surface that goes away in 6.0 is deprecated here, so you can migrate progressively while staying on the 5.x line.
 
@@ -120,7 +120,7 @@ public function __invoke(Request $request): JsonResponse
 
 #### `webauthn.controllers`
 
-Replace each `controllers.creation[name]` and `controllers.request[name]` block by a pair of user controllers, one for the options endpoint and one for the response endpoint. The routes move to `#[Route]` attributes; the per-controller `host`, `allowed_origins`, `allow_subdomains`, `hide_existing_credentials`, `user_entity_guesser` and the other options all have a direct `with*()` equivalent on the helpers.
+Replace each `controllers.creation[name]` and `controllers.request[name]` block by a pair of user controllers, one for the options endpoint and one for the response endpoint. The paths, the methods and the `host` move to `#[Route]` attributes. `user_entity_guesser` becomes the second argument of `forCreation()`, `allowed_origins` and `allow_subdomains` become `withAllowedOrigins()` and `withAllowSubdomains()` on the verifier, `hide_existing_credentials` becomes `withHideExistingCredentials()`, and the success, failure and options handlers move into the body of your controllers.
 
 The full refactored example is on the [Verification Helpers](../symfony-bundle/verification-helpers.md) page.
 
@@ -169,7 +169,7 @@ See [Client Override Policy](../symfony-bundle/advanced-behaviors/client-overrid
 
 Two migration paths, depending on your topology.
 
-**Single-origin app (most common)**: drop the YAML node entirely. The verifier falls back to the W3C-recommended same-origin check against the request host. Nothing else to do.
+**Single-origin app (most common)**: drop the YAML node entirely. The verifier then accepts an HTTPS origin whose host is the Relying Party ID or one of its subdomains. Nothing else to do.
 
 **Multi-origin app**: inject a Symfony parameter into the helper.
 
@@ -214,6 +214,10 @@ public function __invoke(Request $request): Response
 
 The list lives in a single Symfony parameter, the security-critical decision is visible right where it applies, and the per-route overrides become trivial.
 
+!!! warning
+
+    The `/.well-known/webauthn` endpoint of [Related Origin Requests](../symfony-bundle/advanced-behaviors/cross-origin-authentication.md) is only served when `webauthn.allowed_origins` is set, and the helpers have no equivalent for it in 5.4. If your application publishes that endpoint, keep the node for now.
+
 ### Doctrine mapping of the bundle
 
 !!! warning
@@ -254,6 +258,20 @@ Use `isBackupEligible()` and `isBackedUp()` to read the backup flags.
 
     In 6.0.0 the serialized payload of `WebauthnToken` loses two entries, so a session created by a 5.x application cannot be unserialized by a 6.0 one. Plan to invalidate the existing sessions when you upgrade.
 
+### Malformed serial number extension of the packed attestations
+
+!!! warning
+
+    **Deprecated in v5.4.0**
+
+The specification requires the `id-fido-gen-ce-sernum` extension (`1.3.6.1.4.1.45724.1.1.2`) of a packed attestation certificate not to be marked critical, and its value to be an OCTET STRING. A packed attestation whose certificate carries a malformed extension is still accepted: the extension is ignored and a deprecation is triggered.
+
+```
+Since web-auth/webauthn-lib 5.4.0: Verifying a packed attestation whose certificate carries the serial number extension (1.3.6.1.4.1.45724.1.1.2) marked critical or with a value that is not an OCTET STRING is deprecated and "Webauthn\AttestationStatement\PackedAttestationStatementSupport" will refuse it in 6.0.0. Until then, the extension is ignored.
+```
+
+Nothing to change in your code: such attestations are refused in 6.0.0. See [Enterprise attestation](../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#serial-number-of-the-authenticator).
+
 ### PseudoRandomFunctionInputExtensionBuilder::requiresHmacSecretMc
 
 !!! warning
@@ -262,13 +280,39 @@ Use `isBackupEligible()` and `isBackedUp()` to read the backup flags.
 
 The method named the CTAP `hmac-secret-mc` extension in an API that is abstract over the authenticator implementation. Use `requiresMultipleCredentialEvaluation()`, which describes the input shape the method actually detects. The old name delegates to the new one until 6.0.0. See the [PRF Extension](../pure-php/advanced-behaviours/prf-extension.md) page.
 
+## Per-controller origins are enforced
+
+!!! warning
+
+    **Changed in v5.4.0**
+
+The `allowed_origins` and `allow_subdomains` options of the `webauthn.controllers.creation.<name>` and `webauthn.controllers.request.<name>` blocks, and their deprecated `secured_rp_ids` alias, were ignored by the previous 5.x releases: only the root `webauthn.allowed_origins` applied. They are applied from 5.4.0. If one of your controllers declares its own list, check that it contains every origin the controller receives responses from, otherwise these responses are now refused.
+
+## An empty PRF extension is refused
+
+!!! warning
+
+    **Changed in v5.4.0**
+
+`PseudoRandomFunctionInputExtensionBuilder::build()` throws an `AuthenticationExtensionException` when no input was given: `Cannot build a PRF extension without any input. Call withInputs() or withCredentialInputs() first.` It used to return a `prf` extension without input, which the clients cannot evaluate. Call `withInputs()` or `withCredentialInputs()` before `build()`, or leave the extension out.
+
 ## Other changes
 
 Opt-in features, nothing to do on your side unless you want them:
 
+* **Scopes of the helper options**: the options stored by the helpers are bound to a scope (`helpers` by default), and only a verifier of the same scope redeems them. Give each pair of endpoints with different requirements its own scope with `withScope()`. See [Verification Helpers](../symfony-bundle/verification-helpers.md#scopes).
+* **Authenticators without a metadata statement**: `enableMetadataStatementSupport()` takes a fourth argument, `$requireStatement`, and the bundle a `webauthn.metadata.require_statement` node. With `false`, a full attestation whose AAGUID has no Metadata Statement is accepted unverified, and the `AttestationCheckedAgainstMetadata` event says so. See [Attestation and Metadata Statement](../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#authenticators-without-a-metadata-statement).
+* **Admitting a compromised authenticator**: a listener of `CompromisedAuthenticatorDetected` can admit a model flagged by its status reports, instead of filtering the `StatusReportRepository`. See [Attestation and Metadata Statement](../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#admitting-a-compromised-authenticator).
+* **Enterprise attestation**: the trust anchors of the organization can be pinned (`setEnterpriseAttestationTrustAnchors()`, `webauthn.metadata.enterprise_attestation_trust_anchors`, `withEnterpriseAttestationTrustAnchors()`), the packed format accepts the `Enterprise Attestation` unit on a certificate carrying the serial number extension, and `CertificateTrustPath::authenticatorSerialNumber()` reads that serial number. See [Enterprise attestation](../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#enterprise-attestation).
 * **Ceremony origin pinning**: the options request records its own origin next to the challenge, and the verifier can require the response to be produced on that very origin, on top of the allow list. Enable it with `withCeremonyOriginPinning()` or the `webauthn.ceremony_origin_pinning` node. It fails closed on a ceremony stored without an origin, which is why it defaults to `false`. See [Verification Helpers](../symfony-bundle/verification-helpers.md).
-* **Related Origin Requests**: the `/.well-known/webauthn` endpoint warns when the published origins resolve to more than five distinct eTLD+1 labels, because the clients silently ignore the extra ones. Configure it under `webauthn.related_origins`.
+* **Related Origin Requests**: when a public suffix resolver is configured under `webauthn.related_origins`, the bundle logs a warning at cache warmup if the origins published on `/.well-known/webauthn` resolve to more than five distinct eTLD+1 labels, because the clients silently ignore the extra ones. See [Cross origin authentication](../symfony-bundle/advanced-behaviors/cross-origin-authentication.md#related-origin-requests).
 * **Signal API helpers**: a factory and a JSON envelope for the WebAuthn Level 3 signal methods. See [Signal API](../pure-php/advanced-behaviours/signal-api.md).
 * **CTAP 2.1 authenticator extensions**: `credProtect`, `credBlob`, `getCredBlob` and `minPinLength`. See [Authenticator Extensions](../pure-php/advanced-behaviours/authenticator-extensions.md).
 * **Fully-specified COSE algorithm identifiers** from RFC 9864 are accepted.
-* **Immediate mediation** is supported on `navigator.credentials.get()`, and the Stimulus controllers use the native `parseCreationOptionsFromJSON`, `parseRequestOptionsFromJSON` and `toJSON` helpers along with `PublicKeyCredential.getClientCapabilities()`.
+* **Immediate UI mode**: `uiMode: immediate` (`PublicKeyCredentialRequestOptions::UI_MODE_IMMEDIATE`, `withUiMode()` on the request helper) is supported on `navigator.credentials.get()`, and the Stimulus controllers use the native `parseCreationOptionsFromJSON`, `parseRequestOptionsFromJSON` and `toJSON` helpers along with `PublicKeyCredential.getClientCapabilities()`.
+* **Attestation on the request options**: `PublicKeyCredentialRequestOptions` accepts `attestation` and `attestationFormats`, and `attestationFormats` is also available on the creation options. See [Attestation and Metadata Statement](../pure-php/advanced-behaviours/attestation-and-metadata-statement.md#attestation-on-requestoptions-v540).
+* **Secure Payment Confirmation**: see [Secure Payment Confirmation](../pure-php/advanced-behaviours/secure-payment-confirmation.md).
+* **PRF extension**: the builder refuses an empty input, and `requiresMultipleCredentialEvaluation()` tells whether `evalByCredential` carries inputs for several credentials, which needs an authenticator able to answer several evaluations in one assertion. See [PRF Extension](../pure-php/advanced-behaviours/prf-extension.md).
+* **`credProps.authenticatorDisplayName`** is parsed. See [Authenticator Extensions](../pure-php/advanced-behaviours/authenticator-extensions.md).
+* **`UvInitializedChangedEvent`** is dispatched when the `uvInitialized` indicator of a credential record changes during an assertion. See [Backup Events](../pure-php/advanced-behaviours/backup-events.md#uvinitializedchangedevent).
+* **Relying Party name**: the creation helper defaults `rp.name` to the Relying Party ID, and `withRpName()` sets another one.

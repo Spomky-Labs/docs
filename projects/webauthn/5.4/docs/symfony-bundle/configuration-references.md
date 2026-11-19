@@ -8,19 +8,26 @@ You may also need to adjust other parameters.
 
 If you don't use Flex, hereafter an example of configuration file:
 
+!!! warning
+
+    **Deprecated in v5.4.0:** `creation_profiles`, `request_profiles`, `controllers`, `client_override_policy`, `allowed_origins` and `allow_subdomains` are superseded by the [options helpers](options-helpers.md) and the [verification helpers](verification-helpers.md), and removed in 6.0.0. They keep working in 5.4. See [From 5.3 to 5.4](../migration/from-v5.3-to-v5.4.md).
+
 ```yaml title="config/packages/webauthn.yaml" linenums="1"
 webauthn:
 #    logger: null # PSR-3 compatible logging service
     credential_repository: 'Webauthn\Bundle\Repository\DummyPublicKeyCredentialSourceRepository' # CREATE YOUR REPOSITORY AND CHANGE THIS!
     user_repository: 'Webauthn\Bundle\Repository\DummyPublicKeyCredentialUserEntityRepository' # CREATE YOUR REPOSITORY AND CHANGE THIS!
-#    allowed_origins: # List of allowed origins for WebAuthn operations (new in 5.2.0)
+#    allowed_origins: # List of allowed origins for WebAuthn operations (new in 5.2.0, deprecated in 5.4.0)
 #        - 'https://example.com'
 #        - 'https://app.example.com'
 #        - 'android:apk-key-hash://your-app-hash' # For Android FIDO2
 #        - 'ios:bundle-id://your.bundle.id' # For iOS
-#    allow_subdomains: false # Allow subdomains when validating origins (new in 5.2.0)
+#    allow_subdomains: false # Allow subdomains when validating origins (new in 5.2.0, deprecated in 5.4.0)
 #    ceremony_origin_pinning: false # Also require the response to come from the origin the ceremony started on (new in 5.4.0)
-    creation_profiles: # Authenticator registration profiles
+#    related_origins: # Settings of the /.well-known/webauthn endpoint (new in 5.4.0)
+#        public_suffix_resolver: null # Service implementing Webauthn\Util\PublicSuffixResolver, e.g. Webauthn\Util\PdpPublicSuffixResolver
+#        label_limit_check: true # Warn when the published origins resolve to more than 5 distinct eTLD+1 labels
+    creation_profiles: # Authenticator registration profiles (deprecated in 5.4.0)
         default: # Unique name of the profile
             rp: # Relying Party information
                 id: '%env(RELYING_PARTY_ID)%' # Please adapt the env file with the correct relying party ID or set null
@@ -38,7 +45,7 @@ webauthn:
 #            extensions:
 #                loc: true
 #            public_key_credential_parameters: # You should not change this list
-#                - !php/const Cose\Algorithms::COSE_ALGORITHM_EdDSA #Order is important. Preferred algorithms go first
+#                - !php/const Cose\Algorithms::COSE_ALGORITHM_EDDSA #Order is important. Preferred algorithms go first
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_ES256
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_ES256K
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_ES384
@@ -50,25 +57,7 @@ webauthn:
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_PS384
 #                - !php/const Cose\Algorithms::COSE_ALGORITHM_PS512
 #            attestation_conveyance: !php/const Webauthn\PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE
-#            client_override_policy: # Granular control over client overrides (new in 5.3.0)
-#                user_verification:
-#                    enabled: true
-#                    allowed_values: ['required', 'preferred', 'discouraged']
-#                authenticator_attachment:
-#                    enabled: true
-#                    allowed_values: ['platform', 'cross-platform']
-#                resident_key:
-#                    enabled: true
-#                    allowed_values: ['required', 'preferred', 'discouraged']
-#                attestation_conveyance:
-#                    enabled: true
-#                    allowed_values: ['indirect', 'direct', 'enterprise'] # 'none' is left out by default since 5.3.13
-#                extensions:
-#                    enabled: true
-#                mediation: # Opt-in: let the client request a Conditional Create flow
-#                    enabled: false
-#                    allowed_values: ['default', 'conditional']
-    request_profiles: # Authentication profiles
+    request_profiles: # Authentication profiles (deprecated in 5.4.0)
         default: # Unique name of the profile
             rp_id: '%env(RELYING_PARTY_ID)%' # Please adapt the env file with the correct relying party ID or set null
 #            challenge_length: 32
@@ -77,6 +66,24 @@ webauthn:
 #            hints: [] # WebAuthn hints: security-key, client-device, hybrid (new in 5.3.0)
 #            extensions:
 #                loc: true
+#    client_override_policy: # Granular control over client overrides, applied to every profile (new in 5.3.0, deprecated in 5.4.0)
+#        user_verification:
+#            enabled: false
+#            allowed_values: ['required', 'preferred']
+#        authenticator_attachment:
+#            enabled: true
+#            allowed_values: ['platform', 'cross-platform']
+#        resident_key:
+#            enabled: true
+#            allowed_values: ['required', 'preferred', 'discouraged']
+#        attestation_conveyance:
+#            enabled: true
+#            allowed_values: ['indirect', 'direct', 'enterprise'] # 'none' is left out by default since 5.3.13
+#        extensions:
+#            enabled: true
+#        mediation: # Opt-in: let the client request a Conditional Create flow
+#            enabled: false
+#            allowed_values: ['default', 'conditional']
 #    passkey_endpoints: # .well-known/passkey-endpoints discovery (new in 5.3.0)
 #        enabled: false
 #        enroll: 'https://example.com/passkeys/register'
@@ -87,10 +94,16 @@ webauthn:
 #        mds_repository: 'App\Repository\MetadataStatementRepository'
 #        status_report_repository: 'App\Repository\StatusReportRepository'
 #        certificate_chain_checker: 'App\Security\CertificateChainChecker'
+#        require_statement: true # Refuse a full attestation whose AAGUID has no Metadata Statement (new in 5.4.0)
 #        tpm_acknowledge_insecure_algorithm: false # Acknowledge RS1 (SHA-1) for the TPM attestation statements (new in 5.3.12)
+#        enterprise_attestation_trust_anchors: [] # PEM or Base64-encoded DER roots of the enterprise attestations (new in 5.4.0)
 ```
 
 ### Creation profiles
+
+!!! warning
+
+    **Deprecated in v5.4.0:** use the [options helpers](options-helpers.md) instead. The section is removed in 6.0.0.
 
 !!! success
 
@@ -296,20 +309,16 @@ See [Conditional Create](../pure-php/advanced-behaviours/conditional-create.md) 
 
     **New in v5.3.0**
 
-Control which WebAuthn options can be overridden by client request parameters. See [Client Override Policy](advanced-behaviors/client-override-policy.md) for detailed configuration.
+Control which WebAuthn options can be overridden by client request parameters. The `client_override_policy` node sits at the root of the configuration and applies to every profile. See [Client Override Policy](advanced-behaviors/client-override-policy.md) for detailed configuration.
 
 ```yaml title="app/config/webauthn.yaml" linenums="1"
 webauthn:
-    creation_profiles:
-        acme:
-            rp:
-                id: 'example.com'
-            client_override_policy:
-                user_verification:
-                    enabled: true
-                    allowed_values: ['required', 'preferred']
-                authenticator_attachment:
-                    enabled: false  # Prevent client override
+    client_override_policy:
+        user_verification:
+            enabled: true
+            allowed_values: ['required', 'preferred']
+        authenticator_attachment:
+            enabled: false  # Prevent client override
 ```
 
 #### Extensions
@@ -332,6 +341,10 @@ webauthn:
 ```
 
 ### Request profiles
+
+!!! warning
+
+    **Deprecated in v5.4.0:** use the [options helpers](options-helpers.md) instead. The section is removed in 6.0.0.
 
 !!! success
 
