@@ -114,20 +114,31 @@ The user agent creates the browser-bound key when the credential is registered w
 | Both | The signature must verify over the raw `clientDataJSON` with the public key, otherwise the ceremony fails |
 | Only one of them, or a malformed value | The ceremony fails. At authentication, the public key is part of the client data signed by the authenticator, so a missing signature means that the client dropped it, typically by not sending `clientExtensionResults` |
 
-After a successful ceremony, a public key found in the client data has proven possession of its private key. To bind payments to a device, store it at registration and compare it on the next authentications:
+After a successful ceremony, a public key found in the client data has proven possession of its private key. To bind payments to a device, store it at registration and compare it on the next authentications.
+
+Denormalize the client data of the response into `CollectedClientPaymentData` with the serializer of the library (see [Input loading](../input-loading.md); with the Symfony bundle, inject `Symfony\Component\Serializer\Normalizer\DenormalizerInterface`). Its `payment` member is a `CollectedClientAdditionalPaymentRegistrationData` at registration and a `CollectedClientAdditionalPaymentData` at authentication. Both give the key as a `BrowserBoundPublicKey`, or `null` when the user agent returned none:
 
 ```php linenums="1"
 <?php
 
 declare(strict_types=1);
 
-$payment = $publicKeyCredential->response->clientDataJSON->has('payment')
-    ? $publicKeyCredential->response->clientDataJSON->get('payment')
-    : [];
-$browserBoundPublicKey = $payment['browserBoundPublicKey'] ?? null;
+use Webauthn\SecurePaymentConfirmation\CollectedClientPaymentData;
+
+$clientData = $publicKeyCredential->response->clientDataJSON;
+$browserBoundPublicKey = null;
+if ($clientData->has('payment')) {
+    $paymentData = $serializer->denormalize($clientData->data, CollectedClientPaymentData::class);
+    $browserBoundPublicKey = $paymentData->payment->browserBoundPublicKey;
+}
+
+if ($browserBoundPublicKey !== null) {
+    $coseKey = $browserBoundPublicKey->publicKey;
+    $algorithm = $browserBoundPublicKey->algorithm();
+}
 ```
 
-The value is the base64url encoding of a COSE_Key, the same at registration and at authentication. At authentication, `CollectedClientAdditionalPaymentData::$browserBoundPublicKey`, denormalized from the same `payment` member, gives it as a `BrowserBoundPublicKey` that holds the decoded COSE_Key.
+`publicKey` holds the decoded COSE_Key bytes. They are the same at registration and at authentication, so comparing them is enough to recognize the key. `algorithm()` returns the `alg` member of the COSE_Key, for instance `-7` for ES256, and `coseKey()` the decoded `Cose\Key\Key`. Both refuse with an `InvalidDataException` a key that is not a COSE_Key with an integer `alg` member. That cannot happen after a successful ceremony: `CheckBrowserBoundSignature` decodes the key the same way to verify the signature.
 
 The specification leaves this comparison to the relying party: the library verifies each signature, it does not keep the key.
 
@@ -139,12 +150,13 @@ All value objects live under the `Webauthn\SecurePaymentConfirmation` namespace 
 | --- | --- |
 | `PaymentCurrencyAmount` | ISO 4217 currency + decimal value (`'EUR'`, `'99.99'`). |
 | `PaymentCredentialInstrument` | `displayName`, `icon` (a URL), `iconMustBeShown` (`true` by default) and optional `details`. |
-| `CollectedClientAdditionalPaymentData` | Mirrors what the browser signs in `clientDataJSON.payment`. |
-| `CollectedClientPaymentData` | Top-level wrapper used by `PaymentClientDataCollector`. |
+| `CollectedClientAdditionalPaymentData` | Mirrors what the browser signs in `clientDataJSON.payment` at authentication, checked by `PaymentClientDataCollector`. |
+| `CollectedClientAdditionalPaymentRegistrationData` | `clientDataJSON.payment` at registration: the browser-bound public key only. |
+| `CollectedClientPaymentData` | The client data of an SPC ceremony. Its `payment` member is the registration dictionary when the client data type is `webauthn.create`, and the authentication one otherwise. |
 | `PaymentEntityLogo` | Optional `paymentEntitiesLogos[]` entry. |
-| `BrowserBoundPublicKey` | The browser-bound public key: the decoded COSE_Key, whose `alg` member gives the algorithm. The serializer reads and writes it as the base64url string of the client data. |
+| `BrowserBoundPublicKey` | The browser-bound public key: the decoded COSE_Key bytes, with `algorithm()` for its `alg` member and `coseKey()` for the decoded key. The serializer reads and writes it as the base64url string of the client data. |
 | `BrowserBoundSignature` | The browser-bound signature bytes. |
-| `BrowserBoundSignatureVerifier` | CBOR-decodes the COSE key, looks up the matching `Cose\Algorithm\Signature\Signature` and verifies the signature against raw `clientDataJSON`. ECDSA signatures are accepted in DER form, as the platform key stores produce them, or in the raw COSE form. |
+| `BrowserBoundSignatureVerifier` | Decodes the COSE key with `BrowserBoundPublicKey::coseKey()`, looks up the `Cose\Algorithm\Signature\Signature` matching `algorithm()` and verifies the signature against raw `clientDataJSON`. ECDSA signatures are accepted in DER form, as the platform key stores produce them, or in the raw COSE form. |
 
 ## Stimulus controller
 
