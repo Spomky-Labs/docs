@@ -88,16 +88,24 @@ $publicKeyCredentialCreationOptions = PublicKeyCredentialCreationOptions::create
 );
 ```
 
-After registration, check the extension outputs:
+After registration, read the extension outputs. The outputs of the extensions processed by the authenticator are in the authenticator data, which the authenticator signs. The outputs of the extensions processed by the browser, such as `credProps`, are the client extension results: they are not part of the authenticator data and nothing signs them.
+
+!!! warning
+
+    The library does not deserialize the client extension results before v5.4.0: neither `PublicKeyCredential` nor its response carries them. Read `clientExtensionResults.credProps.rk` from the JSON object posted by the browser, the one you give to the serializer. The client must send `clientExtensionResults` with the credential, as `@simplewebauthn/browser` and the Stimulus controllers do. This value is informative: the client may omit it or send any value, so do not base a security decision on it.
 
 ```php linenums="1"
-// After successful registration
-$extensionOutputs = $publicKeyCredential->response->getAuthenticatorData()->extensions;
+<?php
 
-// Check if credential is discoverable (resident key)
-if (isset($extensionOutputs['credProps']['rk'])) {
-    $isDiscoverable = $extensionOutputs['credProps']['rk'];
-    echo $isDiscoverable ? 'Resident key created' : 'Non-resident key';
+declare(strict_types=1);
+
+$authenticatorOutputs = $publicKeyCredential->response->attestationObject->authData->extensions;
+
+// $data is the JSON object posted by the browser, the one given to the serializer
+$payload = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+$rk = $payload['clientExtensionResults']['credProps']['rk'] ?? null;
+if (is_bool($rk)) {
+    echo $rk ? 'Resident key created' : 'Non-resident key';
 }
 ```
 
@@ -127,8 +135,8 @@ $extensions = AuthenticationExtensions::create([
     AuthenticationExtension::create('credProps', true)
 ]);
 
-// After registration, check:
-$rk = $extensionOutputs['credProps']['rk'] ?? false;
+// After registration, see above:
+$rk = ($payload['clientExtensionResults']['credProps']['rk'] ?? false) === true;
 ```
 
 ### 3. Large blob storage (largeBlob extension)
