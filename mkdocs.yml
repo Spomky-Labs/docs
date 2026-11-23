@@ -169,3 +169,11 @@ extra:
 
 nav:
   - index.md
+  - Security:
+      - security/index.md
+      - security/webauthn.md
+      - security/jwt.md
+      - security/otphp.md
+      - security/pki.md
+      - security/cbor.md
+      - security/cose.md

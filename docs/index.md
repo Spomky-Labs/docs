@@ -87,3 +87,9 @@ documentation is here for the day you read a stack trace or write a layer of you
 <span class="sl-card__meta">web-auth/cose-lib</span>
 </a>
 </div>
+
+## Security
+
+A vulnerability is reported privately, never in a public issue. The [security page](security/index.md)
+says how, and lists the published advisories of each library with the versions that fix them.
+{ .sl-lead }
