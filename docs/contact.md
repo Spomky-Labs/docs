@@ -16,8 +16,8 @@ find: a question asked in the open has often already been answered there. The li
 [Spomky-Labs](https://github.com/Spomky-Labs) organization, and those of
 [web-auth](https://github.com/web-auth) and [web-token](https://github.com/web-token) on theirs.
 
-A security problem is never reported in a public issue. Each repository describes how to report one in
-its security policy, `SECURITY.md`, under the Security tab.
+A security problem is never reported in a public issue. The [security page](security/index.md) says how to
+report one, and lists the published advisories of each library.
 
 ## For anything else
 
