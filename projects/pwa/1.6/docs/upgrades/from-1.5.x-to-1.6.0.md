@@ -184,6 +184,21 @@ self.addEventListener('backgroundfetchsuccess', (event) => {
     build time with an explicit message, rather than producing a service worker that throws a
     `ReferenceError` in the browser.
 
+## New: a command to create the configuration file
+
+Creating a PWA used to start with a `config/packages/pwa.yaml` copied from another project. `pwa:create:config`
+writes it, step by step, or from options alone:
+
+```bash title="terminal"
+php bin/console pwa:create:config
+php bin/console pwa:create:config --no-interaction --name="HackerNews PWA" --icon=images/logo.svg
+```
+
+It never overwrites an existing file without `--force`, and `--dry-run` prints the configuration instead. An
+application that already has its configuration has nothing to do.
+
+See [Creating the configuration file](../installation.md#creating-the-configuration-file).
+
 ## New: purging your own caches
 
 `clear_cache` only ever deleted the caches the bundle registers itself through
@@ -280,8 +295,8 @@ pwa:
 
 The generated files do not change. `favicons.use_start_image` now defaults to `null`, still considered
 `true` when omitted: an application that sets it has made its choice too, and only gets the deprecation of
-that key, described above. `pwa:create:config` writes `startup_images.enabled: true` whenever it enables
-the favicons.
+that key, described above. [`pwa:create:config`](../installation.md#creating-the-configuration-file) writes
+`startup_images.enabled: true` whenever it enables the favicons.
 
 See [Startup Images](../favicons/startup-images.md#inherited-from-the-favicons).
 
