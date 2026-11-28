@@ -432,6 +432,26 @@ the `translation_domain` variable, to write `{{ app_name|trans({}, translation_d
 
 See [The translation domain](../experimental-features/translations.md#the-translation-domain).
 
+## New: the configured strings are extracted
+
+`debug:translation` and `translation:extract` never read the bundle configuration. Earlier versions reported
+the translations of its keys as unused, `translation:extract` did not add them to the catalogues, and
+`translation:extract --clean` removed them from the catalogues it wrote.
+
+The bundle now hands its configured strings over to both commands, in the translation domain: the texts of the
+manifest, of its shortcuts and widgets, the screenshot labels and the background fetch messages, plain texts
+included.
+
+```bash title="terminal"
+php bin/console debug:translation fr --domain=pwa --only-unused
+php bin/console translation:extract fr --dump-messages --domain=pwa
+```
+
+The labels of the `#[Screenshot]` attributes and the strings a `PreManifestCompileEvent` listener adds are not
+part of the configuration, and are still left out.
+
+See [Extracting the strings](../experimental-features/translations.md#extracting-the-strings).
+
 ## Deprecated: choosing the Workbox version
 
 The bundle carried two copies of the Workbox libraries, 7.0.0 and 7.3.0. Both are replaced by a single
