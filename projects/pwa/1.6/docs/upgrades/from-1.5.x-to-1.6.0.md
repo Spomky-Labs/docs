@@ -17,6 +17,10 @@ This page describes the changes you need to make when upgrading from version 1.5
     with MonologBundle, where 1.5.x did not log at all. See
     [Changed: the bundle logs to the default logger](#changed-the-bundle-logs-to-the-default-logger).
 
+    Two constructors changed, which only matters to code that builds those services by hand, such as
+    tests or custom service definitions. See
+    [Changed: the constructors of two services](#changed-the-constructors-of-two-services).
+
 ## The bundle is narrowing its scope
 
 The bundle is going back to what it does well: the **web manifest**, the **service worker**, and
@@ -173,7 +177,9 @@ Since spomky-labs/pwa-bundle 1.6.0: The service worker helpers "registerCacheFir
 "pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
 ```
 
-Setting it to `false` is what silences it, and it is the exact change 2.0.0 will make for you.
+Setting it to `false` is what silences it. 2.0.0 removes the helpers but keeps accepting
+`keep_deprecated_helpers: false`: the line is ignored there and reported as deprecated, so a configuration
+written for 1.6 keeps working and you can remove the line at your own pace. Only `true` is rejected in 2.0.0.
 
 !!! warning
 
@@ -718,6 +724,44 @@ in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 **What to do:** if your application filters or baselines deprecations on "spomky-labs/phpwa", make the filter
 match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.
 
+## Changed: the constructors of two services
+
+Two final classes that are not marked internal take different arguments in 1.6.0. An application that
+lets the container autowire them, which is every application using the bundle as configured, sees no
+difference. Code that instantiates them itself, in tests or in its own service definitions, fails with a
+`TypeError` or an `ArgumentCountError`.
+
+**`SpomkyLabs\PwaBundle\Service\FaviconsCompiler`.** The asset mapper and the icon renderer moved into a
+`SourceImageResolver`, which the startup images use as well:
+
+```php
+// 1.5.x
+new FaviconsCompiler($imageProcessor, $faviconsBuilder, $assetMapper, $iconRenderer, $basePathResolver, $debug);
+
+// 1.6.0
+use SpomkyLabs\PwaBundle\Service\SourceImageResolver;
+
+new FaviconsCompiler(
+    $imageProcessor,
+    $faviconsBuilder,
+    new SourceImageResolver($assetMapper, $iconRenderer),
+    $basePathResolver,
+    $debug
+);
+```
+
+`FaviconsCompiler::getFiles()` no longer yields the iOS startup images either: they have a compiler of
+their own, `SpomkyLabs\PwaBundle\Service\StartupImagesCompiler`. Code that listed the files of the
+favicons to find the `apple-touch-startup-image` files or tags must read that compiler too.
+`{{ pwa() }}` and `pwa:compile` are not affected.
+
+**`SpomkyLabs\PwaBundle\Normalizer\ManifestNormalizer`.** It had no constructor in 1.5.x. In 1.6.0 it
+takes the `SpomkyLabs\PwaBundle\Service\LocalizedMembersBuilder` that writes the `*_localized` members,
+so `new ManifestNormalizer()` fails. Fetch the normalizer from the container, or build it with a
+`LocalizedMembersBuilder`.
+
+**What to do:** nothing if the container builds these services. Otherwise pass the new arguments.
+
 ## Migration checklist
 
 - [ ] Copy the Stimulus controllers you use into your own application, register them there
@@ -736,6 +780,7 @@ match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.
 - [ ] Decide which log handlers get the `pwa` channel, and exclude it from the `fingers_crossed` ones in production
 - [ ] If you wrote `workbox: false` and relied on the Workbox caches, remove it or write `workbox: {}`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
+- [ ] If your code instantiates `FaviconsCompiler` or `ManifestNormalizer` itself, pass their new arguments, and read the startup images from `StartupImagesCompiler`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
 - [ ] Update the deprecation filters and baselines that match "spomky-labs/phpwa": the deprecations now name "spomky-labs/pwa-bundle"
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations
