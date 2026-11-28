@@ -529,6 +529,7 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
 - [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings, and delete the stale `workbox-v7.*` folders from `public/`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
+- [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations
 
 ## Still deprecated (from earlier versions)
