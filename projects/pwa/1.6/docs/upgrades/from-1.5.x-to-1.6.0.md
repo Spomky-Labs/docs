@@ -207,6 +207,29 @@ Callbacks may be async, and one throwing is logged without stopping the others.
 
 See [Cache Cleaning](../the-service-worker/workbox/cache-cleaning.md).
 
+## New: keeping the page when a new service worker takes control
+
+With Workbox enabled, the script injected by `pwa()` reloads the page as soon as a new service worker takes
+control of it. With `skip_waiting: true`, a deploy reloads every open tab and can throw a half-filled form
+away, and the application had no say in it. As in 1.5.16, a first visit does not reload the page.
+
+Before reloading, the script now dispatches a cancelable `sw:controller-changed` event on `window`, the same
+way it dispatches `sw:update-available`, with the `workbox.Workbox` instance in `event.detail.wb`. The page is
+reloaded only if no listener called `preventDefault()`, synchronously:
+
+```javascript title="assets/app.js" linenums="1"
+window.addEventListener('sw:controller-changed', (event) => {
+    if (formHasUnsavedChanges()) {
+        event.preventDefault();
+        showReloadToast(() => window.location.reload());
+    }
+});
+```
+
+An application that does not listen to the event gets the reload, as before.
+
+See [Updates](../the-service-worker/configuration.md#updates).
+
 ## Deprecated: `favicons.use_start_image`
 
 The iOS startup images used to be a favicon setting, which they only ever were because they shared a
