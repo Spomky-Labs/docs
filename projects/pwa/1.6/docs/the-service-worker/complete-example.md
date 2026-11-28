@@ -10,6 +10,16 @@ pwa:
         scope: /
         skip_waiting: true
 
+        # Offline fallbacks, with or without Workbox
+        offline_fallback:
+            version: '2025-01-15' # change it when a fallback changes
+            page: '/offline'
+            pages:
+                - page: '/fr/offline'
+                  match: '^https?://[^/]+/fr(/|$)'
+            image: '/images/offline.svg'
+            font: '/fonts/fallback.woff2'
+
         workbox:
             config:
                 workbox_public_url: '/workbox'
@@ -63,16 +73,6 @@ pwa:
                   max_age: 3600 # 1 hour
                   cacheable_response_statuses: [0, 200]
 
-            # Offline fallback
-            offline_fallback:
-                version: '2025-01-15' # change it when a fallback changes
-                page: '/offline'
-                pages:
-                    - page: '/fr/offline'
-                      match: '^https?://[^/]+/fr(/|$)'
-                image: '/images/offline.svg'
-                font: '/fonts/fallback.woff2'
-
             # Background sync
             background_sync:
                 - queue_name: 'contact-form'
@@ -105,7 +105,7 @@ Static resources are cached with long expiration times for instant loading:
 
 ### Offline support
 
-- Offline fallback page shown when no cached page is available, the French one for the URLs under `/fr`
+- Offline fallback page shown when no cached page is available, the French one for the URLs under `/fr`, see [Offline fallbacks](offline-fallback.md)
 - The fallbacks cached again whenever `version` changes
 - Fallback image and font for graceful degradation
 - Background sync queues form submissions for retry when back online

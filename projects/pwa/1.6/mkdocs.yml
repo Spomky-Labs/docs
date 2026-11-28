@@ -74,7 +74,8 @@ plugins:
       type: date
       fallback_to_build_date: true
   - redirects:
-      redirect_maps: {}
+      redirect_maps:
+        the-service-worker/workbox/offline-fallback.md: the-service-worker/offline-fallback.md
 
 markdown_extensions:
   - abbr
@@ -203,6 +204,7 @@ nav:
       - the-service-worker/configuration.md
       - the-service-worker/content-security-policy.md
       - the-service-worker/custom-service-worker-rule.md
+      - the-service-worker/offline-fallback.md
       - "Workbox":
           - the-service-worker/workbox/README.md
           - the-service-worker/workbox/site-manifest-cache.md
@@ -210,7 +212,6 @@ nav:
           - the-service-worker/workbox/resource-caching.md
           - the-service-worker/workbox/image-caching.md
           - the-service-worker/workbox/font-caching.md
-          - the-service-worker/workbox/offline-fallback.md
           - the-service-worker/workbox/background-sync.md
           - the-service-worker/workbox/cdn-and-versions.md
           - the-service-worker/workbox/cache-cleaning.md

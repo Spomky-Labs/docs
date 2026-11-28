@@ -21,6 +21,8 @@ pwa:
 
 Nothing else is needed: run `php bin/console pwa:compile`, keep `{{ pwa() }}` in your `<head>`, and every `<link rel="apple-touch-startup-image">` tag is written for you.
 
+The tags come right after the favicon ones, and `pwa(injectFavicons: false)` leaves both out. They are written whenever the startup images are enabled, even with the favicons disabled.
+
 ### Inherited from the favicons
 
 The section is optional. When you say nothing, the startup images keep borrowing everything from the favicons, the way they did before 1.6.0.
@@ -74,7 +76,12 @@ pwa:
 
 !!! warning
 
-    `pwa.favicons.use_start_image` is deprecated since 1.6.0 and will be removed in 2.0.0. It now only seeds `pwa.startup_images.enabled`; set that one instead. Its default is `null`, considered `true`: an application that sets it has made its choice, and is only told about this key.
+    `pwa.favicons.use_start_image` is deprecated since 1.6.0 and will be removed in 2.0.0. It now only seeds `pwa.startup_images.enabled`; set that one instead. Its default is `null`, considered `true`: an application that sets it has made its choice, and is only told about this key:
+
+    ```
+    Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+    in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
+    ```
 
 A color scheme nobody described an image for is simply not declined, and when no `default` source can be resolved at all, no startup image is generated.
 
@@ -124,7 +131,7 @@ pwa:
 
 !!! info
 
-    The share of the screen the logo takes is derived from the screen diagonal: the bigger the screen, the smaller the share. A logo scaled to a third of an iPad screen reads as a poster, where the very same share of an iPhone SE screen reads as an icon. The `image_scale` option is therefore not applied to startup images.
+    The share of the screen the logo takes is derived from the screen diagonal: the bigger the screen, the smaller the share. A logo scaled to a third of an iPad screen reads as a poster, where the very same share of an iPhone SE screen reads as an icon.
 
 ### A Twig template
 
@@ -152,6 +159,8 @@ The template is rendered by your own Twig environment: its globals, extensions a
 !!! warning
 
     Describing the images with a template is a **compile-time** requirement: `symfony/twig-bundle` and a headless browser must be available when `pwa:compile` runs. Asking for a template without the means to render it is reported, not worked around — quietly shipping the plain image would ship something you chose not to ask for.
+
+`{{ pwa() }}` names the images on every page, and naming one only takes Twig: the template is rendered to compute the hash of each URL, but nothing is painted. A production server without a browser renders its pages and writes the tags. A missing browser is reported when an image is painted: by `pwa:compile`, which then fails, and, in the `dev` and `test` environments, when the browser asks for an image the bundle serves on the fly.
 
 #### Requirements
 
@@ -190,9 +199,11 @@ The browser is started once and reused for the whole compilation: there are more
 | `icon_svg` | The source markup when it is an SVG, `null` otherwise |
 | `context` | Whatever you declared under `context` |
 
-!!! info
+!!! warning
 
-    The manifest values are the raw configured ones. When they are translation keys, run them through the `trans` filter with the domain handed to the template: `{{ app_name|trans({}, translation_domain) }}`.
+    The manifest values are the raw configured ones, translation keys included. **Do not translate inside a startup image template.** The hash in each image URL is computed from the rendered template, and `{{ pwa() }}` computes it again on every page, with the translator in the locale of the request. `pwa:compile` renders the template in the default locale. With a `trans` filter, a page served in another locale gets other hashes: its tags point at images that were never compiled, and iOS shows none.
+
+    Write the texts in the template or under `context` as they should appear. If they must come from a catalogue, give `trans` a fixed locale, which keeps the hashes stable: `{{ app_name|trans({}, translation_domain, 'en') }}`.
 
 The document is painted from a temporary file with no application URL to resolve an asset against, which is why the source image is handed over inlined rather than as a path. For the same reason, any font, image or stylesheet the template pulls in must be inlined too.
 
@@ -204,7 +215,7 @@ The document is painted from a temporary file with no application URL to resolve
 {% extends '@SpomkyLabsPwa/StartupImage/default.html.twig' %}
 
 {% block subtitle %}
-    <p class="subtitle">{{ context.subtitle|trans({}, translation_domain) }}</p>
+    <p class="subtitle">{{ context.subtitle }}</p>
 {% endblock %}
 ```
 
@@ -233,7 +244,7 @@ pwa:
                 baseline: 'Your nightly companion'   # overrides the shared one
 ```
 
-`border_radius` and `image_scale` are ignored when a template is used: the template is free to size and shape the image as it sees fit.
+`border_radius` is ignored when a template is used: the template is free to size and shape the image as it sees fit.
 
 ### Painting the document yourself
 
@@ -276,7 +287,6 @@ pwa:
             src: ~              # Asset Mapper path, absolute path or UX Icon name
             background_color: ~
             border_radius: ~    # 1 to 50, ignored when a template is used
-            image_scale: ~      # 1 to 100, not applied to startup images
             svg_attr: []        # attributes added to the SVG root
             context: []         # merged over the shared ones
         dark:
@@ -296,7 +306,8 @@ pwa:
 ### Nothing shows, or a white screen shows
 
 * The application must be **installed** on the home screen; Safari itself never shows a startup image.
-* Check that the `<link rel="apple-touch-startup-image">` tags are in the `<head>`, i.e. that `{{ pwa() }}` is rendered there.
+* Check that the `<link rel="apple-touch-startup-image">` tags are in the `<head>`, i.e. that `{{ pwa() }}` is rendered there, without `injectFavicons: false`.
+* Check that each `href` points at a compiled file. With a template, a tag pointing nowhere usually means the template depends on the request, e.g. a `trans` filter without a fixed locale: see [The variables handed to the template](#the-variables-handed-to-the-template).
 * Check that the device geometry is one of the 21 the bundle knows about. A screen with no matching media query gets no image.
 * Recompile with `php bin/console pwa:compile` after any change: the URLs carry a content hash.
 

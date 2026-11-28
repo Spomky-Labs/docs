@@ -76,13 +76,17 @@ instance because it embeds routes, translations or configuration values.
 
 ## Available helpers
 
-`WorkboxHelpers` declares a handful of functions your rule can rely on.
+`WorkboxHelpers` declares a handful of functions your rule can rely on, when Workbox is enabled. With
+Workbox disabled, it declares nothing, and a rule calling them breaks the service worker: check
+`$workbox->enabled` first, as the example above does.
 
 ### `registerInstallTask(callback, priority = 100)`
 
 Registers a task to run on the `install` event. Tasks run in ascending priority order, unlike
 native `install` listeners which run concurrently. This is why the helper exists: cache clearing
-runs at 0, `skipWaiting()` at 5, the offline fallback at 10 and the precaching at 100.
+runs at 0, `skipWaiting()` at 5, the offline fallback at 10 and the precaching at 100. Without
+Workbox, the [offline fallbacks](offline-fallback.md#without-workbox) and `skip_waiting` use plain
+`install` listeners instead.
 
 ```js
 registerInstallTask(() => doSomething(), 50);

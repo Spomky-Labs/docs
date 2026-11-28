@@ -4,12 +4,13 @@ This page describes the changes you need to make when upgrading from version 1.5
 
 !!! success
 
-    **The deprecated pieces keep working in 1.6.0.** The release exists to give you a full minor
-    version to migrate before 2.0.0 takes them away.
+    **Nothing is removed in 1.6.0.** The deprecated pieces keep working, and the release exists to give
+    you a full minor version to migrate before 2.0.0 takes them away. The few behaviours that change are
+    described below, with what to do.
 
-    One thing is already gone: since 1.6.0, the bundle ships Workbox 7.4.1 only, and no longer the 7.0.0
-    and 7.3.0 copies. A version other than 7.4.1, pinned while the Workbox files are served from your own
-    server (`use_cdn: false`, the default), is not served from the bundle. See
+    The bundle ships Workbox 7.4.1 only, and no longer the 7.0.0 and 7.3.0 copies. A version pinned while
+    the Workbox files are served from your own server (`use_cdn: false`, the default) keeps compiling: the
+    bundled 7.4.1 files are served, and a warning is logged. See
     [Deprecated: choosing the Workbox version](#deprecated-choosing-the-workbox-version).
 
 ## The bundle is narrowing its scope
@@ -90,8 +91,22 @@ The following helpers are deprecated:
 | `simplePushNotificationSupport()` | Same |
 | `notifyPeriodicSyncClients()` | Create your own `BroadcastChannel` and post to it |
 
-Each of them warns in the console **when it is actually called**, so an application that already
-stopped using them gets a silent service worker.
+Each of them warns in the console **when it is actually called**, once per helper, so an application
+that already stopped using them gets a silent service worker. The warning names the replacement:
+
+```
+[pwa-bundle] registerPushTask() is deprecated since 1.6.0 and will be removed in 2.0.0. Use
+self.addEventListener("push", (event) => event.waitUntil(...)).
+```
+
+The warning of `openBackgroundFetchDatabase()` points at the database, not at a listener. `self.idb` is not
+a way out, since the library goes away with the helpers:
+
+```
+[pwa-bundle] openBackgroundFetchDatabase() is deprecated since 1.6.0 and will be removed in 2.0.0. Open
+your own database with indexedDB.open(), or import idb yourself: self.idb is only imported while
+"pwa.serviceworker.workbox.keep_deprecated_helpers" is true.
+```
 
 ### What stays
 
@@ -147,8 +162,9 @@ container build time:
 
 ```
 Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
-"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask"
-and "openBackgroundFetchDatabase" are deprecated and will be removed in 2.0.0. Replace them with plain
+"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask",
+"openBackgroundFetchDatabase", "structuredPushNotificationSupport", "simplePushNotificationSupport" and
+"notifyPeriodicSyncClients" are deprecated and will be removed in 2.0.0. Replace them with plain
 "self.addEventListener()" calls in your own service worker source, then set
 "pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
 ```
@@ -261,6 +277,61 @@ An application that does not listen to the event gets the reload, as before.
 
 See [Updates](../the-service-worker/configuration.md#updates).
 
+## Deprecated: `workbox.offline_fallback`
+
+The offline fallbacks were a Workbox option, and wrote nothing with Workbox disabled. They now work with or
+without Workbox, and have moved out of the Workbox section, with the same options. This is deprecated:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        workbox:
+            offline_fallback:      # deprecated since 1.6.0
+                page: 'app_offline'
+```
+
+Write this instead:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        offline_fallback:
+            page: 'app_offline'
+```
+
+The former place keeps working until 2.0.0: it is read as the new one, and triggers this deprecation:
+
+```
+Since spomky-labs/pwa-bundle 1.6.0: The "pwa.serviceworker.workbox.offline_fallback" option is deprecated
+and will be removed in 2.0.0. Move it to "pwa.serviceworker.offline_fallback": it takes the same options,
+and the offline fallbacks work there with or without Workbox.
+```
+
+Writing both, in one file or across several, fails:
+
+```
+Invalid configuration for path "pwa.serviceworker": The offline fallbacks are configured twice: under
+"pwa.serviceworker.offline_fallback" and under the deprecated "pwa.serviceworker.workbox.offline_fallback".
+Keep "pwa.serviceworker.offline_fallback" only.
+```
+
+**What to do:** move the block one level up, out of `workbox`. With Workbox enabled, the compiled service
+worker does not change.
+
+On the PHP side, `SpomkyLabs\PwaBundle\Dto\ServiceWorker::$offlineFallback` holds the fallbacks.
+`Dto\Workbox::$offlineFallback` is deprecated and will be removed in 2.0.0. Until then, the service worker
+builder sets it to the same object, so code that reads or changes it keeps working.
+
+!!! warning
+
+    **An application that kept `workbox.offline_fallback` with Workbox disabled now gets the fallbacks.**
+    They wrote nothing until 1.6.0. They are now served by plain `install` and `fetch` listeners, placed
+    before your own source, and the `fetch` listener answers every navigation when a page is set, and every
+    image or font request when those fallbacks are set: the `fetch` listeners of your own source are no
+    longer called for these requests. Remove the block if you do not want the fallbacks.
+
+See [Without Workbox](../the-service-worker/offline-fallback.md#without-workbox).
+
 ## New: one offline page per URL
 
 `offline_fallback.page` resolves to a single URL, so with localized routes every visitor got the offline page
@@ -269,19 +340,18 @@ of one locale. `pages` lists offline pages chosen by the URL of the failed navig
 ```yaml title="config/packages/pwa.yaml" linenums="1"
 pwa:
     serviceworker:
-        workbox:
-            offline_fallback:
-                page: { path: 'app_offline', params: { _locale: 'en' } }
-                pages:
-                    - { page: { path: 'app_offline', params: { _locale: 'fr' } }, match: '^https?://[^/]+/fr(/|$)' }
-                    - { page: { path: 'app_offline', params: { _locale: 'de' } }, match: '^https?://[^/]+/de(/|$)' }
+        offline_fallback:
+            page: { path: 'app_offline', params: { _locale: 'en' } }
+            pages:
+                - { page: { path: 'app_offline', params: { _locale: 'fr' } }, match: '^https?://[^/]+/fr(/|$)' }
+                - { page: { path: 'app_offline', params: { _locale: 'de' } }, match: '^https?://[^/]+/de(/|$)' }
 ```
 
 `match` is a JavaScript regular expression, without delimiters, tested against the full URL of the failed
 navigation. The first page whose pattern matches is served, `page` when none does, and every page is cached
 when the service worker installs. `page` keeps working as before, as the default page.
 
-See [One offline page per URL](../the-service-worker/workbox/offline-fallback.md#one-offline-page-per-url).
+See [One offline page per URL](../the-service-worker/offline-fallback.md#one-offline-page-per-url).
 
 ## New: a version to refresh the offline fallbacks
 
@@ -294,15 +364,14 @@ fallbacks are cached again, into the same cache:
 ```yaml title="config/packages/pwa.yaml" linenums="1"
 pwa:
     serviceworker:
-        workbox:
-            offline_fallback:
-                page: 'app_offline'
-                version: '2025-01-15'
+        offline_fallback:
+            page: 'app_offline'
+            version: '2025-01-15'
 ```
 
 Without `version` and `pages`, the compiled service worker is the same as before.
 
-See [Refreshing the fallbacks](../the-service-worker/workbox/offline-fallback.md#refreshing-the-fallbacks).
+See [Refreshing the fallbacks](../the-service-worker/offline-fallback.md#refreshing-the-fallbacks).
 
 ## Deprecated: `favicons.use_start_image`
 
@@ -317,6 +386,13 @@ pwa:
 
     startup_images:
         enabled: false           # this instead
+```
+
+Setting `use_start_image` triggers this deprecation:
+
+```
+Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 ```
 
 Nothing else has to move. `use_start_image` still seeds `startup_images.enabled`, and the images keep
@@ -400,7 +476,8 @@ pwa:
 
 The template is rendered by your own Twig environment and painted by a headless Chrome driven by
 Panther — a **compile-time** dependency, and only when a template is configured. Without one, nothing
-new is required.
+new is required. `{{ pwa() }}` writes the `<link rel="apple-touch-startup-image">` tags of these images
+too, which only takes Twig: a server without a browser renders its pages, and only painting an image fails.
 
 See [Startup Images](../favicons/startup-images.md).
 
@@ -431,7 +508,10 @@ pwa:
 
 It is read everywhere the bundle translates a value: the members of the manifest and their `*_localized`
 counterparts, the background fetch messages and the profiler panel. Startup image templates receive it as
-the `translation_domain` variable, to write `{{ app_name|trans({}, translation_domain) }}`.
+the `translation_domain` variable. Avoid translating there, or give `trans` a fixed locale,
+`{{ app_name|trans({}, translation_domain, 'en') }}`: the URLs of the images depend on what the template
+renders, and `{{ pwa() }}` computes them again on every page, in the locale of the request. See
+[The variables handed to the template](../favicons/startup-images.md#the-variables-handed-to-the-template).
 
 `pwa` stays the default, so an application keeping its `pwa.*.yaml` files has nothing to change.
 
@@ -475,11 +555,26 @@ Everything the bundle generates — the imports, the caching strategies, the plu
 written against the API of the version it ships. Pinning another one produced a service worker written
 for one version and running against another, failing in the browser rather than at compile time.
 
-**What to do:** remove both options and let the bundled files be served from your own public folder.
-Then clear the stale copies, which `pwa:compile` writes past but never removes:
+A pinned version still compiles until 2.0.0:
+
+* With `use_cdn: false`, the default, the files are served from your own server, and only the bundled
+  ones can be: a pinned version, `config.version` or the flat `version`, is ignored, and the 7.4.1 files
+  are served. When it compiles them, the bundle logs this warning, here for `version: '7.3.0'`:
+
+    ```
+    The Workbox version "7.3.0" is ignored: only the bundled version "7.4.1" can be served from the
+    application. Remove the "version" option from the Workbox configuration.
+    ```
+
+    It reaches your logs when `pwa.logger` is set.
+
+* With `use_cdn: true`, the CDN still serves the pinned version.
+
+**What to do:** remove both options and let the bundled files be served from your own public folder,
+then compile again. The files keep their names and their place under `workbox_public_url`, so
+`pwa:compile` writes the 7.4.1 ones over those of the former version:
 
 ```bash title="terminal"
-rm -rf public/workbox-v7.0.0 public/workbox-v7.3.0
 php bin/console pwa:compile
 ```
 
@@ -494,6 +589,27 @@ php bin/console pwa:compile
 Workbox logs, remain yours to decide.
 
 See [Workbox Files](../the-service-worker/workbox/cdn-and-versions.md).
+
+## Changed: `workbox: false` disables Workbox
+
+`pwa.serviceworker.workbox: false` now disables Workbox. In 1.5.x the value was ignored: Workbox stayed
+enabled with all its default caches (asset, image, font, Google Fonts and the `pages` navigation cache), and
+PHP only reported an "Automatic conversion of false to array" deprecation.
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        enabled: true
+        src: 'sw.js'
+        workbox: false   # 1.6.0: no Workbox, like {enabled: false}
+```
+
+**What to do:** if your service worker relied on these caches, remove `workbox: false`, or write
+`workbox: {}`, to keep them.
+
+`workbox: ~` and `workbox: true` keep every default, including the `pages` navigation cache, like
+`workbox: {}`. Leaving the `workbox` key out altogether registers no `pages` cache, as in 1.5.x. See
+[Enabling Workbox](../the-service-worker/workbox/README.md#enabling-workbox).
 
 ## Changed: the two image processors agree on their output
 
@@ -550,9 +666,11 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] If you used `self.idb` in your own source, switch to `indexedDB.open()`
 - [ ] Replace `background_fetch` with your own `backgroundfetchsuccess` handler
 - [ ] Declare the caches you open yourself with `registerClearCacheListener()`
+- [ ] Move `workbox.offline_fallback` to `serviceworker.offline_fallback`; with Workbox disabled, check that you want the fallbacks it now enables
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
-- [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings, and delete the stale `workbox-v7.*` folders from `public/`
+- [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings: a pinned version is not served from your own server
+- [ ] If you wrote `workbox: false` and relied on the Workbox caches, remove it or write `workbox: {}`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations

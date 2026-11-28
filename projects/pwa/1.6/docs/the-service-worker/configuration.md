@@ -75,6 +75,23 @@ pwa:
         skip_waiting: false
 ```
 
+#### Offline fallbacks
+
+The `offline_fallback` section sets the page, image and font served when the network cannot be reached. It works with or without Workbox. See [Offline fallbacks](offline-fallback.md).
+
+```yaml title="/config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        enabled: true
+        src: "sw.js"
+        offline_fallback:
+            page: 'app_offline'
+```
+
+!!! warning
+
+    Until 1.6.0, the section was `pwa.serviceworker.workbox.offline_fallback`. That place is deprecated and will be removed in 2.0.0.
+
 ### Updates
 
 With Workbox enabled, the registration script injected by `{{ pwa() }}` tells the page what happens to its

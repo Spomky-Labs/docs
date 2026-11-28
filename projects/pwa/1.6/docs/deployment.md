@@ -41,4 +41,4 @@ parameters:
 
 !!! warning
 
-    The values you write yourself are never rewritten. The service worker [`scope`](the-service-worker/configuration.md), the `href` of a [resource hint](performance/resource-hints.md) and the [offline fallback](the-service-worker/workbox/offline-fallback.md) page are used as-is, so include the base path in them when your application needs one.
+    The values you write yourself are never rewritten. The service worker [`scope`](the-service-worker/configuration.md), the `href` of a [resource hint](performance/resource-hints.md) and the [offline fallback](the-service-worker/offline-fallback.md) page are used as-is, so include the base path in them when your application needs one.
