@@ -3820,6 +3820,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changed-the-constructors-of-two-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: the constructors of two services
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#migration-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4217,6 +4228,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changed-the-constructors-of-two-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: the constructors of two services
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#migration-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4277,6 +4299,9 @@ bundled 7.4.1 files are served, and a warning is logged. See
 <p>Without <code>pwa.logger</code>, the bundle now logs to the default logger of your application, on a <code>pwa</code> channel
 with MonologBundle, where 1.5.x did not log at all. See
 <a href="#changed-the-bundle-logs-to-the-default-logger">Changed: the bundle logs to the default logger</a>.</p>
+<p>Two constructors changed, which only matters to code that builds those services by hand, such as
+tests or custom service definitions. See
+<a href="#changed-the-constructors-of-two-services">Changed: the constructors of two services</a>.</p>
 </div>
 <h2 id="the-bundle-is-narrowing-its-scope">The bundle is narrowing its scope<a class="headerlink" href="#the-bundle-is-narrowing-its-scope" title="Link to this section">&para;</a></h2>
 <p>The bundle is going back to what it does well: the <strong>web manifest</strong>, the <strong>service worker</strong>, and
@@ -4435,7 +4460,9 @@ container build time:</p>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>"self.addEventListener()" calls in your own service worker source, then set
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>"pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
 </span></code></pre></div>
-<p>Setting it to <code>false</code> is what silences it, and it is the exact change 2.0.0 will make for you.</p>
+<p>Setting it to <code>false</code> is what silences it. 2.0.0 removes the helpers but keeps accepting
+<code>keep_deprecated_helpers: false</code>: the line is ignored there and reported as deprecated, so a configuration
+written for 1.6 keeps working and you can remove the line at your own pace. Only <code>true</code> is rejected in 2.0.0.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Setting <code>keep_deprecated_helpers</code> to <code>false</code> stops the <code>idb</code> library from being imported into the
@@ -4828,6 +4855,36 @@ the <code>name</code> of its <code>composer.json</code>:</p>
 </span></code></pre></div>
 <p><strong>What to do:</strong> if your application filters or baselines deprecations on "spomky-labs/phpwa", make the filter
 match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.</p>
+<h2 id="changed-the-constructors-of-two-services">Changed: the constructors of two services<a class="headerlink" href="#changed-the-constructors-of-two-services" title="Link to this section">&para;</a></h2>
+<p>Two final classes that are not marked internal take different arguments in 1.6.0. An application that
+lets the container autowire them, which is every application using the bundle as configured, sees no
+difference. Code that instantiates them itself, in tests or in its own service definitions, fails with a
+<code>TypeError</code> or an <code>ArgumentCountError</code>.</p>
+<p><strong><code>SpomkyLabs\PwaBundle\Service\FaviconsCompiler</code>.</strong> The asset mapper and the icon renderer moved into a
+<code>SourceImageResolver</code>, which the startup images use as well:</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1">// 1.5.x</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="k">new</span> <span class="nx">FaviconsCompiler</span><span class="p">(</span><span class="nv">$imageProcessor</span><span class="p">,</span> <span class="nv">$faviconsBuilder</span><span class="p">,</span> <span class="nv">$assetMapper</span><span class="p">,</span> <span class="nv">$iconRenderer</span><span class="p">,</span> <span class="nv">$basePathResolver</span><span class="p">,</span> <span class="nv">$debug</span><span class="p">);</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="c1">// 1.6.0</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="k">use</span> <span class="nx">SpomkyLabs\PwaBundle\Service\SourceImageResolver</span><span class="p">;</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="k">new</span> <span class="nx">FaviconsCompiler</span><span class="p">(</span>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>    <span class="nv">$imageProcessor</span><span class="p">,</span>
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a>    <span class="nv">$faviconsBuilder</span><span class="p">,</span>
+</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a>    <span class="k">new</span> <span class="nx">SourceImageResolver</span><span class="p">(</span><span class="nv">$assetMapper</span><span class="p">,</span> <span class="nv">$iconRenderer</span><span class="p">),</span>
+</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a>    <span class="nv">$basePathResolver</span><span class="p">,</span>
+</span><span id="__span-34-12"><a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a>    <span class="nv">$debug</span>
+</span><span id="__span-34-13"><a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a><span class="p">);</span>
+</span></code></pre></div>
+<p><code>FaviconsCompiler::getFiles()</code> no longer yields the iOS startup images either: they have a compiler of
+their own, <code>SpomkyLabs\PwaBundle\Service\StartupImagesCompiler</code>. Code that listed the files of the
+favicons to find the <code>apple-touch-startup-image</code> files or tags must read that compiler too.
+<code>{{ pwa() }}</code> and <code>pwa:compile</code> are not affected.</p>
+<p><strong><code>SpomkyLabs\PwaBundle\Normalizer\ManifestNormalizer</code>.</strong> It had no constructor in 1.5.x. In 1.6.0 it
+takes the <code>SpomkyLabs\PwaBundle\Service\LocalizedMembersBuilder</code> that writes the <code>*_localized</code> members,
+so <code>new ManifestNormalizer()</code> fails. Fetch the normalizer from the container, or build it with a
+<code>LocalizedMembersBuilder</code>.</p>
+<p><strong>What to do:</strong> nothing if the container builds these services. Otherwise pass the new arguments.</p>
 <h2 id="migration-checklist">Migration checklist<a class="headerlink" href="#migration-checklist" title="Link to this section">&para;</a></h2>
 <ul>
 <li>[ ] Copy the Stimulus controllers you use into your own application, register them there</li>
@@ -4846,6 +4903,7 @@ match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.</p>
 <li>[ ] Decide which log handlers get the <code>pwa</code> channel, and exclude it from the <code>fingers_crossed</code> ones in production</li>
 <li>[ ] If you wrote <code>workbox: false</code> and relied on the Workbox caches, remove it or write <code>workbox: {}</code></li>
 <li>[ ] Replace any remaining <code>Dto\PageCache</code> reference with <code>Dto\ResourceCache</code></li>
+<li>[ ] If your code instantiates <code>FaviconsCompiler</code> or <code>ManifestNormalizer</code> itself, pass their new arguments, and read the startup images from <code>StartupImagesCompiler</code></li>
 <li>[ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written</li>
 <li>[ ] Update the deprecation filters and baselines that match "spomky-labs/phpwa": the deprecations now name "spomky-labs/pwa-bundle"</li>
 <li>[ ] Run <code>php bin/console pwa:compile</code> and test with <code>APP_ENV=dev</code> to surface the deprecations</li>
@@ -4933,7 +4991,7 @@ match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 17:15:32 UTC">November 28, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 17:53:42 UTC">November 28, 2026</span>
   </span>
 
     
