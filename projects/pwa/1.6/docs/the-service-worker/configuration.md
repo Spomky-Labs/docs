@@ -144,6 +144,16 @@ php bin/console pwa:compile
 
 ### Background Fetch
 
+!!! danger
+
+    **Deprecated since 1.6.0, removed in 2.0.0.** The option decides for you what a click opens, how the
+    downloads are stored and what the notification says. Handle the `backgroundfetchsuccess` event and its
+    siblings in your own service worker source instead.
+
+    It relies on `registerBackgroundFetchTask()`, one of the deprecated service worker helpers: enabling it
+    while `keep_deprecated_helpers` is `false` fails at container build time. See the
+    [upgrade guide](../upgrades/from-1.5.x-to-1.6.0.md#deprecated-background-fetch).
+
 The Background Fetch API allows your PWA to handle long-running downloads in the background. Configure it in the workbox section:
 
 ```yaml title="config/packages/pwa.yaml" linenums="1"

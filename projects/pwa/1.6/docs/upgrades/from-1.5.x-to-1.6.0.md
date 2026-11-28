@@ -26,11 +26,13 @@ The full rationale is in
 All 27 controllers shipped by the bundle are deprecated and will be removed in 2.0.0, along with
 the `@spomky-labs/pwa-bundle` npm package.
 
-Each one prints a warning in the browser console the first time it is mounted:
+Each one prints a warning in the browser console the first time it is mounted, once per controller
+identifier:
 
 ```
 [pwa-bundle] The "pwa--web-push" Stimulus controller is deprecated since 1.6.0 and will be
 removed in 2.0.0. Copy the controller into your own application and register it there.
+See https://github.com/Spomky-Labs/pwa-bundle/issues/372#issuecomment-5295710299
 ```
 
 **What to do:** copy the controllers you actually use into your own application and register them
@@ -135,9 +137,18 @@ pwa:
             keep_deprecated_helpers: false
 ```
 
-As long as this option is left to `true`, the bundle triggers a deprecation notice at container
-build time. Setting it to `false` is what silences it, and it is the exact change 2.0.0 will make
-for you.
+As long as this option is left to `true`, its default, the bundle triggers a deprecation notice at
+container build time:
+
+```
+Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
+"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask"
+and "openBackgroundFetchDatabase" are deprecated and will be removed in 2.0.0. Replace them with plain
+"self.addEventListener()" calls in your own service worker source, then set
+"pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
+```
+
+Setting it to `false` is what silences it, and it is the exact change 2.0.0 will make for you.
 
 !!! warning
 
