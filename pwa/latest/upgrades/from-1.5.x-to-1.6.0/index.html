@@ -1282,6 +1282,8 @@
       
         
       
+        
+      
     
     
     
@@ -1412,13 +1414,39 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../the-service-worker/offline-fallback/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Offline fallbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
         
           
-        
-      
         
       
         
@@ -1451,7 +1479,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_5" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1473,14 +1501,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_10_4" id="__nav_10_4_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_10_5" id="__nav_10_5_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_10_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1619,34 +1647,6 @@
     
   
     Font caching
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-service-worker/workbox/offline-fallback/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Offline fallbacks
   
 
     
@@ -3622,6 +3622,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#deprecated-workboxoffline_fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated: workbox.offline_fallback
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#new-one-offline-page-per-url" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3725,6 +3736,17 @@
     <span class="md-ellipsis">
       
         Deprecated: choosing the Workbox version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changed-workbox-false-disables-workbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: workbox: false disables Workbox
       
     </span>
   </a>
@@ -3975,6 +3997,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#deprecated-workboxoffline_fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated: workbox.offline_fallback
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#new-one-offline-page-per-url" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4085,6 +4118,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changed-workbox-false-disables-workbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: workbox: false disables Workbox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#changed-the-two-image-processors-agree-on-their-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4179,11 +4223,12 @@
 <p>This page describes the changes you need to make when upgrading from version 1.5.x to 1.6.0.</p>
 <div class="admonition success">
 <p class="admonition-title">Success</p>
-<p><strong>The deprecated pieces keep working in 1.6.0.</strong> The release exists to give you a full minor
-version to migrate before 2.0.0 takes them away.</p>
-<p>One thing is already gone: since 1.6.0, the bundle ships Workbox 7.4.1 only, and no longer the 7.0.0
-and 7.3.0 copies. A version other than 7.4.1, pinned while the Workbox files are served from your own
-server (<code>use_cdn: false</code>, the default), is not served from the bundle. See
+<p><strong>Nothing is removed in 1.6.0.</strong> The deprecated pieces keep working, and the release exists to give
+you a full minor version to migrate before 2.0.0 takes them away. The few behaviours that change are
+described below, with what to do.</p>
+<p>The bundle ships Workbox 7.4.1 only, and no longer the 7.0.0 and 7.3.0 copies. A version pinned while
+the Workbox files are served from your own server (<code>use_cdn: false</code>, the default) keeps compiling: the
+bundled 7.4.1 files are served, and a warning is logged. See
 <a href="#deprecated-choosing-the-workbox-version">Deprecated: choosing the Workbox version</a>.</p>
 </div>
 <h2 id="the-bundle-is-narrowing-its-scope">The bundle is narrowing its scope<a class="headerlink" href="#the-bundle-is-narrowing-its-scope" title="Link to this section">&para;</a></h2>
@@ -4282,8 +4327,17 @@ indirection.</p>
 </tr>
 </tbody>
 </table>
-<p>Each of them warns in the console <strong>when it is actually called</strong>, so an application that already
-stopped using them gets a silent service worker.</p>
+<p>Each of them warns in the console <strong>when it is actually called</strong>, once per helper, so an application
+that already stopped using them gets a silent service worker. The warning names the replacement:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[pwa-bundle] registerPushTask() is deprecated since 1.6.0 and will be removed in 2.0.0. Use
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>self.addEventListener("push", (event) =&gt; event.waitUntil(...)).
+</span></code></pre></div>
+<p>The warning of <code>openBackgroundFetchDatabase()</code> points at the database, not at a listener. <code>self.idb</code> is not
+a way out, since the library goes away with the helpers:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>[pwa-bundle] openBackgroundFetchDatabase() is deprecated since 1.6.0 and will be removed in 2.0.0. Open
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>your own database with indexedDB.open(), or import idb yourself: self.idb is only imported while
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>"pwa.serviceworker.workbox.keep_deprecated_helpers" is true.
+</span></code></pre></div>
 <h3 id="what-stays">What stays<a class="headerlink" href="#what-stays" title="Link to this section">&para;</a></h3>
 <p>These are not going anywhere, because your own source file cannot replace them: they either
 arbitrate an order between the rules the bundle generates, or carry a state shared with them.</p>
@@ -4295,43 +4349,44 @@ arbitrate an order between the rules the bundle generates, or carry a state shar
 </ul>
 <h3 id="migrating">Migrating<a class="headerlink" href="#migrating" title="Link to this section">&para;</a></h3>
 <p>Replace the calls in your own service worker source:</p>
-<div class="language-javascript highlight"><span class="filename">assets/sw.js</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="c1">// registerPushTask(structuredPushNotificationSupport);</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'push'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">text</span><span class="p">());</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">registration</span><span class="p">.</span><span class="nx">showNotification</span><span class="p">(</span><span class="nx">title</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">));</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="p">});</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="c1">// registerNotificationAction('*', handler);</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'notificationclick'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">notification</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">handler</span><span class="p">(</span><span class="nx">event</span><span class="p">));</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="p">});</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a><span class="c1">// registerPeriodicSyncTask('my-tag', callback);</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'periodicsync'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><a href="#__codelineno-3-15"><span class="linenos" data-linenos="15 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">tag</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'my-tag'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><a href="#__codelineno-3-16"><span class="linenos" data-linenos="16 "></span></a><span class="w">        </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">callback</span><span class="p">(</span><span class="nx">event</span><span class="p">));</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a><a href="#__codelineno-3-17"><span class="linenos" data-linenos="17 "></span></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><a href="#__codelineno-3-18"><span class="linenos" data-linenos="18 "></span></a><span class="p">});</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><a href="#__codelineno-3-19"><span class="linenos" data-linenos="19 "></span></a>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><a href="#__codelineno-3-20"><span class="linenos" data-linenos="20 "></span></a><span class="c1">// registerMessageTask(callback);</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><a href="#__codelineno-3-21"><span class="linenos" data-linenos="21 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><a href="#__codelineno-3-22"><span class="linenos" data-linenos="22 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">callback</span><span class="p">(</span><span class="nx">event</span><span class="p">));</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23"></a><a href="#__codelineno-3-23"><span class="linenos" data-linenos="23 "></span></a><span class="p">});</span>
+<div class="language-javascript highlight"><span class="filename">assets/sw.js</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="c1">// registerPushTask(structuredPushNotificationSupport);</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'push'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">text</span><span class="p">());</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">registration</span><span class="p">.</span><span class="nx">showNotification</span><span class="p">(</span><span class="nx">title</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">));</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="p">});</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="c1">// registerNotificationAction('*', handler);</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8"></a><a href="#__codelineno-5-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'notificationclick'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">notification</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">handler</span><span class="p">(</span><span class="nx">event</span><span class="p">));</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><a href="#__codelineno-5-11"><span class="linenos" data-linenos="11 "></span></a><span class="p">});</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><a href="#__codelineno-5-13"><span class="linenos" data-linenos="13 "></span></a><span class="c1">// registerPeriodicSyncTask('my-tag', callback);</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><a href="#__codelineno-5-14"><span class="linenos" data-linenos="14 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'periodicsync'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><a href="#__codelineno-5-15"><span class="linenos" data-linenos="15 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">tag</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'my-tag'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><a href="#__codelineno-5-16"><span class="linenos" data-linenos="16 "></span></a><span class="w">        </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">callback</span><span class="p">(</span><span class="nx">event</span><span class="p">));</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17"></a><a href="#__codelineno-5-17"><span class="linenos" data-linenos="17 "></span></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18"></a><a href="#__codelineno-5-18"><span class="linenos" data-linenos="18 "></span></a><span class="p">});</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19"></a><a href="#__codelineno-5-19"><span class="linenos" data-linenos="19 "></span></a>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20"></a><a href="#__codelineno-5-20"><span class="linenos" data-linenos="20 "></span></a><span class="c1">// registerMessageTask(callback);</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21"></a><a href="#__codelineno-5-21"><span class="linenos" data-linenos="21 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22"></a><a href="#__codelineno-5-22"><span class="linenos" data-linenos="22 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">(</span><span class="nx">callback</span><span class="p">(</span><span class="nx">event</span><span class="p">));</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23"></a><a href="#__codelineno-5-23"><span class="linenos" data-linenos="23 "></span></a><span class="p">});</span>
 </span></code></pre></div>
 <p>Then turn the helpers off:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">keep_deprecated_helpers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">keep_deprecated_helpers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </span></code></pre></div>
 <p>As long as this option is left to <code>true</code>, its default, the bundle triggers a deprecation notice at
 container build time:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask"
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>and "openBackgroundFetchDatabase" are deprecated and will be removed in 2.0.0. Replace them with plain
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>"self.addEventListener()" calls in your own service worker source, then set
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>"pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask",
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>"openBackgroundFetchDatabase", "structuredPushNotificationSupport", "simplePushNotificationSupport" and
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>"notifyPeriodicSyncClients" are deprecated and will be removed in 2.0.0. Replace them with plain
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>"self.addEventListener()" calls in your own service worker source, then set
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>"pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
 </span></code></pre></div>
 <p>Setting it to <code>false</code> is what silences it, and it is the exact change 2.0.0 will make for you.</p>
 <div class="admonition warning">
@@ -4346,24 +4401,24 @@ library yourself.</p>
 <p>It decides for you that a click opens a given URL, that downloads are chunked into a fixed
 IndexedDB schema and that the notification title is rewritten with <code>{title} ✅</code>. That is a lot of
 opinion for a feature every application ends up wanting differently.</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">background_fetch</span><span class="p">:</span><span class="w">      </span><span class="c1"># deprecated since 1.6.0</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">background_fetch</span><span class="p">:</span><span class="w">      </span><span class="c1"># deprecated since 1.6.0</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></code></pre></div>
 <p>Handle the events in your own source file instead. <code>self.idb</code> remains available as long as
 <code>keep_deprecated_helpers</code> is <code>true</code>, and the storage is a dozen lines with plain <code>indexedDB</code>:</p>
-<div class="language-javascript highlight"><span class="filename">assets/sw.js</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'backgroundfetchsuccess'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">((</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">records</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">registration</span><span class="p">.</span><span class="nx">matchAll</span><span class="p">();</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">record</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">records</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">record</span><span class="p">.</span><span class="nx">responseReady</span><span class="p">;</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">            </span><span class="c1">// store it the way your application needs</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">updateUI</span><span class="p">({</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'Download complete'</span><span class="w"> </span><span class="p">});</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">    </span><span class="p">})());</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10"></a><a href="#__codelineno-7-10"><span class="linenos" data-linenos="10 "></span></a><span class="p">});</span>
+<div class="language-javascript highlight"><span class="filename">assets/sw.js</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nx">self</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'backgroundfetchsuccess'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">waitUntil</span><span class="p">((</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">records</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">registration</span><span class="p">.</span><span class="nx">matchAll</span><span class="p">();</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">record</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">records</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">record</span><span class="p">.</span><span class="nx">responseReady</span><span class="p">;</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">            </span><span class="c1">// store it the way your application needs</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">updateUI</span><span class="p">({</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'Download complete'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">    </span><span class="p">})());</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10"></a><a href="#__codelineno-9-10"><span class="linenos" data-linenos="10 "></span></a><span class="p">});</span>
 </span></code></pre></div>
 <div class="admonition danger">
 <p class="admonition-title">Danger</p>
@@ -4374,8 +4429,8 @@ build time with an explicit message, rather than producing a service worker that
 <h2 id="new-a-command-to-create-the-configuration-file">New: a command to create the configuration file<a class="headerlink" href="#new-a-command-to-create-the-configuration-file" title="Link to this section">&para;</a></h2>
 <p>Creating a PWA used to start with a <code>config/packages/pwa.yaml</code> copied from another project. <code>pwa:create:config</code>
 writes it, step by step, or from options alone:</p>
-<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config<span class="w"> </span>--no-interaction<span class="w"> </span>--name<span class="o">=</span><span class="s2">"HackerNews PWA"</span><span class="w"> </span>--icon<span class="o">=</span>images/logo.svg
+<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config<span class="w"> </span>--no-interaction<span class="w"> </span>--name<span class="o">=</span><span class="s2">"HackerNews PWA"</span><span class="w"> </span>--icon<span class="o">=</span>images/logo.svg
 </span></code></pre></div>
 <p>It never overwrites an existing file without <code>--force</code>, and <code>--dry-run</code> prints the configuration instead. An
 application that already has its configuration has nothing to do.</p>
@@ -4386,9 +4441,9 @@ application that already has its configuration has nothing to do.</p>
 every install, silently.</p>
 <p>The new <code>registerClearCacheListener()</code> closes the gap. The callback receives every cache name
 currently stored and returns the ones to delete:</p>
-<div class="language-javascript highlight"><span class="filename">assets/sw.js</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nx">registerClearCacheListener</span><span class="p">((</span><span class="nx">names</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nx">names</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">name</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">'my-app-'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">'my-app-v3'</span><span class="p">)</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a><span class="p">);</span>
+<div class="language-javascript highlight"><span class="filename">assets/sw.js</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nx">registerClearCacheListener</span><span class="p">((</span><span class="nx">names</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nx">names</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">name</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">'my-app-'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">'my-app-v3'</span><span class="p">)</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a><span class="p">);</span>
 </span></code></pre></div>
 <p>A callback rather than a list of names in the configuration, because the interesting cases are
 dynamic: versioned caches where the current one must survive, prefixes, anything computed at
@@ -4402,55 +4457,96 @@ away, and the application had no say in it. As in 1.5.16, a first visit does not
 <p>Before reloading, the script now dispatches a cancelable <code>sw:controller-changed</code> event on <code>window</code>, the same
 way it dispatches <code>sw:update-available</code>, with the <code>workbox.Workbox</code> instance in <code>event.detail.wb</code>. The page is
 reloaded only if no listener called <code>preventDefault()</code>, synchronously:</p>
-<div class="language-javascript highlight"><span class="filename">assets/app.js</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'sw:controller-changed'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">formHasUnsavedChanges</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nx">showReloadToast</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">reload</span><span class="p">());</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos="6 "></span></a><span class="p">});</span>
+<div class="language-javascript highlight"><span class="filename">assets/app.js</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'sw:controller-changed'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">formHasUnsavedChanges</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nx">showReloadToast</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">reload</span><span class="p">());</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos="6 "></span></a><span class="p">});</span>
 </span></code></pre></div>
 <p>An application that does not listen to the event gets the reload, as before.</p>
 <p>See <a href="../../the-service-worker/configuration/#updates">Updates</a>.</p>
+<h2 id="deprecated-workboxoffline_fallback">Deprecated: <code>workbox.offline_fallback</code><a class="headerlink" href="#deprecated-workboxoffline_fallback" title="Link to this section">&para;</a></h2>
+<p>The offline fallbacks were a Workbox option, and wrote nothing with Workbox disabled. They now work with or
+without Workbox, and have moved out of the Workbox section, with the same options. This is deprecated:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4"></a><a href="#__codelineno-13-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">offline_fallback</span><span class="p">:</span><span class="w">      </span><span class="c1"># deprecated since 1.6.0</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5"></a><a href="#__codelineno-13-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">page</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span>
+</span></code></pre></div>
+<p>Write this instead:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">offline_fallback</span><span class="p">:</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">page</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span>
+</span></code></pre></div>
+<p>The former place keeps working until 2.0.0: it is read as the new one, and triggers this deprecation:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Since spomky-labs/pwa-bundle 1.6.0: The "pwa.serviceworker.workbox.offline_fallback" option is deprecated
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>and will be removed in 2.0.0. Move it to "pwa.serviceworker.offline_fallback": it takes the same options,
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>and the offline fallbacks work there with or without Workbox.
+</span></code></pre></div>
+<p>Writing both, in one file or across several, fails:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Invalid configuration for path "pwa.serviceworker": The offline fallbacks are configured twice: under
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>"pwa.serviceworker.offline_fallback" and under the deprecated "pwa.serviceworker.workbox.offline_fallback".
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>Keep "pwa.serviceworker.offline_fallback" only.
+</span></code></pre></div>
+<p><strong>What to do:</strong> move the block one level up, out of <code>workbox</code>. With Workbox enabled, the compiled service
+worker does not change.</p>
+<p>On the PHP side, <code>SpomkyLabs\PwaBundle\Dto\ServiceWorker::$offlineFallback</code> holds the fallbacks.
+<code>Dto\Workbox::$offlineFallback</code> is deprecated and will be removed in 2.0.0. Until then, the service worker
+builder sets it to the same object, so code that reads or changes it keeps working.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>An application that kept <code>workbox.offline_fallback</code> with Workbox disabled now gets the fallbacks.</strong>
+They wrote nothing until 1.6.0. They are now served by plain <code>install</code> and <code>fetch</code> listeners, placed
+before your own source, and the <code>fetch</code> listener answers every navigation when a page is set, and every
+image or font request when those fallbacks are set: the <code>fetch</code> listeners of your own source are no
+longer called for these requests. Remove the block if you do not want the fallbacks.</p>
+</div>
+<p>See <a href="../../the-service-worker/offline-fallback/#without-workbox">Without Workbox</a>.</p>
 <h2 id="new-one-offline-page-per-url">New: one offline page per URL<a class="headerlink" href="#new-one-offline-page-per-url" title="Link to this section">&para;</a></h2>
 <p><code>offline_fallback.page</code> resolves to a single URL, so with localized routes every visitor got the offline page
 of one locale. <code>pages</code> lists offline pages chosen by the URL of the failed navigation:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">offline_fallback</span><span class="p">:</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">page</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span><span class="p p-Indicator">,</span><span class="nt"> params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> _locale</span><span class="p">:</span><span class="w"> </span><span class="s">'en'</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">}</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6"></a><a href="#__codelineno-11-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="nt">pages</span><span class="p">:</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7"></a><a href="#__codelineno-11-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">                    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> page</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span><span class="p p-Indicator">,</span><span class="nt"> params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> _locale</span><span class="p">:</span><span class="w"> </span><span class="s">'fr'</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">},</span><span class="nt"> match</span><span class="p">:</span><span class="w"> </span><span class="s">'^https?://[^/]+/fr(/|$)'</span><span class="w"> </span><span class="p p-Indicator">}</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8"></a><a href="#__codelineno-11-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">                    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> page</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span><span class="p p-Indicator">,</span><span class="nt"> params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> _locale</span><span class="p">:</span><span class="w"> </span><span class="s">'de'</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">},</span><span class="nt"> match</span><span class="p">:</span><span class="w"> </span><span class="s">'^https?://[^/]+/de(/|$)'</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">offline_fallback</span><span class="p">:</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><a href="#__codelineno-17-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">page</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span><span class="p p-Indicator">,</span><span class="nt"> params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> _locale</span><span class="p">:</span><span class="w"> </span><span class="s">'en'</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><a href="#__codelineno-17-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">pages</span><span class="p">:</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a><a href="#__codelineno-17-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> page</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span><span class="p p-Indicator">,</span><span class="nt"> params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> _locale</span><span class="p">:</span><span class="w"> </span><span class="s">'fr'</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">},</span><span class="nt"> match</span><span class="p">:</span><span class="w"> </span><span class="s">'^https?://[^/]+/fr(/|$)'</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7"></a><a href="#__codelineno-17-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> page</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span><span class="p p-Indicator">,</span><span class="nt"> params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> _locale</span><span class="p">:</span><span class="w"> </span><span class="s">'de'</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">},</span><span class="nt"> match</span><span class="p">:</span><span class="w"> </span><span class="s">'^https?://[^/]+/de(/|$)'</span><span class="w"> </span><span class="p p-Indicator">}</span>
 </span></code></pre></div>
 <p><code>match</code> is a JavaScript regular expression, without delimiters, tested against the full URL of the failed
 navigation. The first page whose pattern matches is served, <code>page</code> when none does, and every page is cached
 when the service worker installs. <code>page</code> keeps working as before, as the default page.</p>
-<p>See <a href="../../the-service-worker/workbox/offline-fallback/#one-offline-page-per-url">One offline page per URL</a>.</p>
+<p>See <a href="../../the-service-worker/offline-fallback/#one-offline-page-per-url">One offline page per URL</a>.</p>
 <h2 id="new-a-version-to-refresh-the-offline-fallbacks">New: a version to refresh the offline fallbacks<a class="headerlink" href="#new-a-version-to-refresh-the-offline-fallbacks" title="Link to this section">&para;</a></h2>
 <p>The offline fallbacks are cached when the service worker installs, and a browser installs it again only when
 its script changes. A reworded offline page left the script as it was, and visitors kept the old copy.</p>
 <p><code>offline_fallback.version</code> is written into the service worker. Change it whenever a fallback changes, and the
 fallbacks are cached again, into the same cache:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">offline_fallback</span><span class="p">:</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">page</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'2025-01-15'</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3"></a><a href="#__codelineno-18-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">offline_fallback</span><span class="p">:</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4"></a><a href="#__codelineno-18-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">page</span><span class="p">:</span><span class="w"> </span><span class="s">'app_offline'</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5"></a><a href="#__codelineno-18-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'2025-01-15'</span>
 </span></code></pre></div>
 <p>Without <code>version</code> and <code>pages</code>, the compiled service worker is the same as before.</p>
-<p>See <a href="../../the-service-worker/workbox/offline-fallback/#refreshing-the-fallbacks">Refreshing the fallbacks</a>.</p>
+<p>See <a href="../../the-service-worker/offline-fallback/#refreshing-the-fallbacks">Refreshing the fallbacks</a>.</p>
 <h2 id="deprecated-faviconsuse_start_image">Deprecated: <code>favicons.use_start_image</code><a class="headerlink" href="#deprecated-faviconsuse_start_image" title="Link to this section">&para;</a></h2>
 <p>The iOS startup images used to be a favicon setting, which they only ever were because they shared a
 source image. They now have a section of their own:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4"></a><a href="#__codelineno-13-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">use_start_image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">   </span><span class="c1"># deprecated since 1.6.0</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5"></a><a href="#__codelineno-13-5"><span class="linenos" data-linenos="5 "></span></a>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6"></a><a href="#__codelineno-13-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7"></a><a href="#__codelineno-13-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">           </span><span class="c1"># this instead</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3"></a><a href="#__codelineno-19-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4"></a><a href="#__codelineno-19-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">use_start_image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">   </span><span class="c1"># deprecated since 1.6.0</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5"></a><a href="#__codelineno-19-5"><span class="linenos" data-linenos="5 "></span></a>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6"></a><a href="#__codelineno-19-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">           </span><span class="c1"># this instead</span>
+</span></code></pre></div>
+<p>Setting <code>use_start_image</code> triggers this deprecation:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 </span></code></pre></div>
 <p>Nothing else has to move. <code>use_start_image</code> still seeds <code>startup_images.enabled</code>, and the images keep
 borrowing their source, background color, border radius and SVG attributes from the favicon of the same
@@ -4462,19 +4558,19 @@ favicons, and 2.0.0 only generates them on request.</p>
 <p>The default does not change in 1.6, as changing it would silently remove the splash screens of every
 application relying on it. An application that enables the favicons and sets neither
 <code>startup_images.enabled</code> nor <code>favicons.use_start_image</code> is told instead:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Since spomky-labs/pwa-bundle 1.6.0: The iOS startup images are generated by default when "pwa.favicons"
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>is enabled. This default becomes false in 2.0.0. Set "pwa.startup_images.enabled" explicitly: true to
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>keep generating them, false to stop.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Since spomky-labs/pwa-bundle 1.6.0: The iOS startup images are generated by default when "pwa.favicons"
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>is enabled. This default becomes false in 2.0.0. Set "pwa.startup_images.enabled" explicitly: true to
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>keep generating them, false to stop.
 </span></code></pre></div>
 <p><strong>What to do:</strong> make the choice.</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3"></a><a href="#__codelineno-15-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4"></a><a href="#__codelineno-15-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5"></a><a href="#__codelineno-15-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'icons/logo.svg'</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6"></a><a href="#__codelineno-15-6"><span class="linenos" data-linenos="6 "></span></a>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7"></a><a href="#__codelineno-15-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8"></a><a href="#__codelineno-15-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">   </span><span class="c1"># to keep the splash screens, false to stop generating them</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1"></a><a href="#__codelineno-22-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2"></a><a href="#__codelineno-22-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3"></a><a href="#__codelineno-22-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4"></a><a href="#__codelineno-22-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5"></a><a href="#__codelineno-22-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'icons/logo.svg'</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6"></a><a href="#__codelineno-22-6"><span class="linenos" data-linenos="6 "></span></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7"></a><a href="#__codelineno-22-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8"></a><a href="#__codelineno-22-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">   </span><span class="c1"># to keep the splash screens, false to stop generating them</span>
 </span></code></pre></div>
 <p>The generated files do not change. <code>favicons.use_start_image</code> now defaults to <code>null</code>, still considered
 <code>true</code> when omitted: an application that sets it has made its choice too, and only gets the deprecation of
@@ -4486,14 +4582,14 @@ that key, described above. <a href="../../installation/#creating-the-configurati
 transparent areas of the apple-touch-icon with black, so a transparent round logo, right for the browser
 tabs, showed on a black square on the home screen, and a background color turned the tab icon into a square.</p>
 <p><code>favicons.apple_touch_icon</code> lets the home screen icon differ from the others:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'images/logo.png'</span><span class="w">   </span><span class="c1"># used as is for the tab icons</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6"></a><a href="#__codelineno-16-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">        </span><span class="nt">apple_touch_icon</span><span class="p">:</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">            </span><span class="nt">background_color</span><span class="p">:</span><span class="w"> </span><span class="s">'#00bc7d'</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">            </span><span class="nt">image_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1"></a><a href="#__codelineno-23-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2"></a><a href="#__codelineno-23-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3"></a><a href="#__codelineno-23-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4"></a><a href="#__codelineno-23-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5"></a><a href="#__codelineno-23-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'images/logo.png'</span><span class="w">   </span><span class="c1"># used as is for the tab icons</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6"></a><a href="#__codelineno-23-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">        </span><span class="nt">apple_touch_icon</span><span class="p">:</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7"></a><a href="#__codelineno-23-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">            </span><span class="nt">background_color</span><span class="p">:</span><span class="w"> </span><span class="s">'#00bc7d'</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8"></a><a href="#__codelineno-23-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">            </span><span class="nt">image_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
 </span></code></pre></div>
 <p>It takes <code>src</code>, <code>background_color</code>, <code>border_radius</code> and <code>image_scale</code>, each falling back to the theme the icon
 is generated for, and one block applies to both color schemes. Only the <code>apple-touch-icon</code> files follow it:
@@ -4503,34 +4599,38 @@ not change.</p>
 <h2 id="new-startup-images-described-by-a-twig-template">New: startup images described by a Twig template<a class="headerlink" href="#new-startup-images-described-by-a-twig-template" title="Link to this section">&para;</a></h2>
 <p>A startup image could only ever be the favicon source, scaled down and centered over a background
 color. It can now be any document you care to write:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="s">'pwa/startup_image.html.twig'</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><a href="#__codelineno-17-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">context</span><span class="p">:</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><a href="#__codelineno-17-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">subtitle</span><span class="p">:</span><span class="w"> </span><span class="s">'Identify</span><span class="nv"> </span><span class="s">every</span><span class="nv"> </span><span class="s">plant,</span><span class="nv"> </span><span class="s">even</span><span class="nv"> </span><span class="s">offline.'</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1"></a><a href="#__codelineno-24-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2"></a><a href="#__codelineno-24-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3"></a><a href="#__codelineno-24-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="s">'pwa/startup_image.html.twig'</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4"></a><a href="#__codelineno-24-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">context</span><span class="p">:</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5"></a><a href="#__codelineno-24-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">            </span><span class="nt">subtitle</span><span class="p">:</span><span class="w"> </span><span class="s">'Identify</span><span class="nv"> </span><span class="s">every</span><span class="nv"> </span><span class="s">plant,</span><span class="nv"> </span><span class="s">even</span><span class="nv"> </span><span class="s">offline.'</span>
 </span></code></pre></div>
 <p>The template is rendered by your own Twig environment and painted by a headless Chrome driven by
 Panther — a <strong>compile-time</strong> dependency, and only when a template is configured. Without one, nothing
-new is required.</p>
+new is required. <code>{{ pwa() }}</code> writes the <code>&lt;link rel="apple-touch-startup-image"&gt;</code> tags of these images
+too, which only takes Twig: a server without a browser renders its pages, and only painting an image fails.</p>
 <p>See <a href="../../favicons/startup-images/">Startup Images</a>.</p>
 <h2 id="new-localized-manifest-members">New: localized manifest members<a class="headerlink" href="#new-localized-manifest-members" title="Link to this section">&para;</a></h2>
 <p>The manifest can now carry every translation in a single file, through the <code>*_localized</code> members of the
 specification, instead of one compiled file per locale:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">manifest</span><span class="p">:</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3"></a><a href="#__codelineno-18-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">localization_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">'inline'</span><span class="w">   </span><span class="c1"># or 'both', or 'files'</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1"></a><a href="#__codelineno-25-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2"></a><a href="#__codelineno-25-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">manifest</span><span class="p">:</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3"></a><a href="#__codelineno-25-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">localization_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">'inline'</span><span class="w">   </span><span class="c1"># or 'both', or 'files'</span>
 </span></code></pre></div>
 <p><code>files</code> is the default and the historical behaviour, so nothing changes unless you ask for it.</p>
 <p>See <a href="../../experimental-features/translations/">Translations</a>.</p>
 <h2 id="new-a-translation-domain-of-your-own">New: a translation domain of your own<a class="headerlink" href="#new-a-translation-domain-of-your-own" title="Link to this section">&para;</a></h2>
 <p>The translation keys of the configuration had to live in the <code>pwa</code> domain. Any domain can now be used, for
 instance the one your application already translates:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">translation_domain</span><span class="p">:</span><span class="w"> </span><span class="s">'messages'</span><span class="w">   </span><span class="c1"># "pwa" when omitted</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1"></a><a href="#__codelineno-26-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2"></a><a href="#__codelineno-26-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">translation_domain</span><span class="p">:</span><span class="w"> </span><span class="s">'messages'</span><span class="w">   </span><span class="c1"># "pwa" when omitted</span>
 </span></code></pre></div>
 <p>It is read everywhere the bundle translates a value: the members of the manifest and their <code>*_localized</code>
 counterparts, the background fetch messages and the profiler panel. Startup image templates receive it as
-the <code>translation_domain</code> variable, to write <code>{{ app_name|trans({}, translation_domain) }}</code>.</p>
+the <code>translation_domain</code> variable. Avoid translating there, or give <code>trans</code> a fixed locale,
+<code>{{ app_name|trans({}, translation_domain, 'en') }}</code>: the URLs of the images depend on what the template
+renders, and <code>{{ pwa() }}</code> computes them again on every page, in the locale of the request. See
+<a href="../../favicons/startup-images/#the-variables-handed-to-the-template">The variables handed to the template</a>.</p>
 <p><code>pwa</code> stays the default, so an application keeping its <code>pwa.*.yaml</code> files has nothing to change.</p>
 <p>See <a href="../../experimental-features/translations/#the-translation-domain">The translation domain</a>.</p>
 <h2 id="new-the-configured-strings-are-extracted">New: the configured strings are extracted<a class="headerlink" href="#new-the-configured-strings-are-extracted" title="Link to this section">&para;</a></h2>
@@ -4540,8 +4640,8 @@ the translations of its keys as unused, <code>translation:extract</code> did not
 <p>The bundle now hands its configured strings over to both commands, in the translation domain: the texts of the
 manifest, of its shortcuts and widgets, the screenshot labels and the background fetch messages, plain texts
 included.</p>
-<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>debug:translation<span class="w"> </span>fr<span class="w"> </span>--domain<span class="o">=</span>pwa<span class="w"> </span>--only-unused
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>php<span class="w"> </span>bin/console<span class="w"> </span>translation:extract<span class="w"> </span>fr<span class="w"> </span>--dump-messages<span class="w"> </span>--domain<span class="o">=</span>pwa
+<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>debug:translation<span class="w"> </span>fr<span class="w"> </span>--domain<span class="o">=</span>pwa<span class="w"> </span>--only-unused
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>php<span class="w"> </span>bin/console<span class="w"> </span>translation:extract<span class="w"> </span>fr<span class="w"> </span>--dump-messages<span class="w"> </span>--domain<span class="o">=</span>pwa
 </span></code></pre></div>
 <p>The labels of the <code>#[Screenshot]</code> attributes and the strings a <code>PreManifestCompileEvent</code> listener adds are not
 part of the configuration, and are still left out.</p>
@@ -4549,20 +4649,35 @@ part of the configuration, and are still left out.</p>
 <h2 id="deprecated-choosing-the-workbox-version">Deprecated: choosing the Workbox version<a class="headerlink" href="#deprecated-choosing-the-workbox-version" title="Link to this section">&para;</a></h2>
 <p>The bundle carried two copies of the Workbox libraries, 7.0.0 and 7.3.0. Both are replaced by a single
 7.4.1 copy, and choosing anything else is deprecated:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3"></a><a href="#__codelineno-21-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4"></a><a href="#__codelineno-21-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">config</span><span class="p">:</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5"></a><a href="#__codelineno-21-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">use_cdn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">       </span><span class="c1"># deprecated since 1.6.0</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6"></a><a href="#__codelineno-21-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'7.3.0'</span><span class="w">    </span><span class="c1"># deprecated since 1.6.0</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1"></a><a href="#__codelineno-28-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2"></a><a href="#__codelineno-28-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3"></a><a href="#__codelineno-28-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4"></a><a href="#__codelineno-28-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">config</span><span class="p">:</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5"></a><a href="#__codelineno-28-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">use_cdn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">       </span><span class="c1"># deprecated since 1.6.0</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6"></a><a href="#__codelineno-28-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'7.3.0'</span><span class="w">    </span><span class="c1"># deprecated since 1.6.0</span>
 </span></code></pre></div>
 <p>Everything the bundle generates — the imports, the caching strategies, the plugins, the helpers — is
 written against the API of the version it ships. Pinning another one produced a service worker written
 for one version and running against another, failing in the browser rather than at compile time.</p>
-<p><strong>What to do:</strong> remove both options and let the bundled files be served from your own public folder.
-Then clear the stale copies, which <code>pwa:compile</code> writes past but never removes:</p>
-<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>public/workbox-v7.0.0<span class="w"> </span>public/workbox-v7.3.0
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:compile
+<p>A pinned version still compiles until 2.0.0:</p>
+<ul>
+<li>
+<p>With <code>use_cdn: false</code>, the default, the files are served from your own server, and only the bundled
+  ones can be: a pinned version, <code>config.version</code> or the flat <code>version</code>, is ignored, and the 7.4.1 files
+  are served. When it compiles them, the bundle logs this warning, here for <code>version: '7.3.0'</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>The Workbox version "7.3.0" is ignored: only the bundled version "7.4.1" can be served from the
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>application. Remove the "version" option from the Workbox configuration.
+</span></code></pre></div>
+<p>It reaches your logs when <code>pwa.logger</code> is set.</p>
+</li>
+<li>
+<p>With <code>use_cdn: true</code>, the CDN still serves the pinned version.</p>
+</li>
+</ul>
+<p><strong>What to do:</strong> remove both options and let the bundled files be served from your own public folder,
+then compile again. The files keep their names and their place under <code>workbox_public_url</code>, so
+<code>pwa:compile</code> writes the 7.4.1 ones over those of the former version:</p>
+<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:compile
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -4574,6 +4689,21 @@ option silences both.</p>
 <p><code>workbox_public_url</code> and <code>debug</code> are <strong>not</strong> deprecated: where your server exposes the files, and whether
 Workbox logs, remain yours to decide.</p>
 <p>See <a href="../../the-service-worker/workbox/cdn-and-versions/">Workbox Files</a>.</p>
+<h2 id="changed-workbox-false-disables-workbox">Changed: <code>workbox: false</code> disables Workbox<a class="headerlink" href="#changed-workbox-false-disables-workbox" title="Link to this section">&para;</a></h2>
+<p><code>pwa.serviceworker.workbox: false</code> now disables Workbox. In 1.5.x the value was ignored: Workbox stayed
+enabled with all its default caches (asset, image, font, Google Fonts and the <code>pages</code> navigation cache), and
+PHP only reported an "Automatic conversion of false to array" deprecation.</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1"></a><a href="#__codelineno-31-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2"></a><a href="#__codelineno-31-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3"></a><a href="#__codelineno-31-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4"></a><a href="#__codelineno-31-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'sw.js'</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5"></a><a href="#__codelineno-31-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">   </span><span class="c1"># 1.6.0: no Workbox, like {enabled: false}</span>
+</span></code></pre></div>
+<p><strong>What to do:</strong> if your service worker relied on these caches, remove <code>workbox: false</code>, or write
+<code>workbox: {}</code>, to keep them.</p>
+<p><code>workbox: ~</code> and <code>workbox: true</code> keep every default, including the <code>pages</code> navigation cache, like
+<code>workbox: {}</code>. Leaving the <code>workbox</code> key out altogether registers no <code>pages</code> cache, as in 1.5.x. See
+<a href="../../the-service-worker/workbox/#enabling-workbox">Enabling Workbox</a>.</p>
 <h2 id="changed-the-two-image-processors-agree-on-their-output">Changed: the two image processors agree on their output<a class="headerlink" href="#changed-the-two-image-processors-agree-on-their-output" title="Link to this section">&para;</a></h2>
 <p>GD and Imagick used to leave the encoding quality to their extension, so the very same configuration
 produced noticeably different files: GD fell back on its default of 75, Imagick picked 92, or the quality
@@ -4616,9 +4746,11 @@ empty: read <code>$manifest['shortcuts'] ?? []</code>.</p>
 <li>[ ] If you used <code>self.idb</code> in your own source, switch to <code>indexedDB.open()</code></li>
 <li>[ ] Replace <code>background_fetch</code> with your own <code>backgroundfetchsuccess</code> handler</li>
 <li>[ ] Declare the caches you open yourself with <code>registerClearCacheListener()</code></li>
+<li>[ ] Move <code>workbox.offline_fallback</code> to <code>serviceworker.offline_fallback</code>; with Workbox disabled, check that you want the fallbacks it now enables</li>
 <li>[ ] Move <code>favicons.use_start_image</code> to <code>startup_images.enabled</code></li>
 <li>[ ] With the favicons enabled, set <code>startup_images.enabled</code> explicitly, <code>true</code> or <code>false</code></li>
-<li>[ ] Remove <code>use_cdn</code> and <code>version</code> from the Workbox configuration, both spellings, and delete the stale <code>workbox-v7.*</code> folders from <code>public/</code></li>
+<li>[ ] Remove <code>use_cdn</code> and <code>version</code> from the Workbox configuration, both spellings: a pinned version is not served from your own server</li>
+<li>[ ] If you wrote <code>workbox: false</code> and relied on the Workbox caches, remove it or write <code>workbox: {}</code></li>
 <li>[ ] Replace any remaining <code>Dto\PageCache</code> reference with <code>Dto\ResourceCache</code></li>
 <li>[ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written</li>
 <li>[ ] Run <code>php bin/console pwa:compile</code> and test with <code>APP_ENV=dev</code> to surface the deprecations</li>
@@ -4706,7 +4838,7 @@ empty: read <code>$manifest['shortcuts'] ?? []</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 15:20:09 UTC">November 28, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 16:26:28 UTC">November 28, 2026</span>
   </span>
 
     
