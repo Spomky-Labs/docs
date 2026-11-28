@@ -160,7 +160,7 @@ The `pwa()` Twig function accepts several optional parameters to control what is
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `injectThemeColor` | bool | `true` | Inject theme color meta tags |
-| `injectFavicons` | bool | `true` | Inject favicon link tags |
+| `injectFavicons` | bool | `true` | Inject favicon link tags, and the [startup image](favicons/startup-images.md) ones |
 | `injectSW` | bool | `true` | Inject service worker registration script |
 | `swAttributes` | object | `{}` | Custom attributes for the service worker script tag |
 | `locale` | string | `null` | Locale for manifest (auto-detected from request if null) |

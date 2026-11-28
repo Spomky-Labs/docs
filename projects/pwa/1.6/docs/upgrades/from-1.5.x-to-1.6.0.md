@@ -400,7 +400,8 @@ pwa:
 
 The template is rendered by your own Twig environment and painted by a headless Chrome driven by
 Panther — a **compile-time** dependency, and only when a template is configured. Without one, nothing
-new is required.
+new is required. `{{ pwa() }}` writes the `<link rel="apple-touch-startup-image">` tags of these images
+too, which only takes Twig: a server without a browser renders its pages, and only painting an image fails.
 
 See [Startup Images](../favicons/startup-images.md).
 
@@ -431,7 +432,10 @@ pwa:
 
 It is read everywhere the bundle translates a value: the members of the manifest and their `*_localized`
 counterparts, the background fetch messages and the profiler panel. Startup image templates receive it as
-the `translation_domain` variable, to write `{{ app_name|trans({}, translation_domain) }}`.
+the `translation_domain` variable. Give `trans` a fixed locale there,
+`{{ app_name|trans({}, translation_domain, 'en') }}`: the URLs of the images depend on what the template
+renders, and are computed again on every page, in the locale of the request. See
+[The variables handed to the template](../favicons/startup-images.md#the-variables-handed-to-the-template).
 
 `pwa` stays the default, so an application keeping its `pwa.*.yaml` files has nothing to change.
 
