@@ -4,8 +4,13 @@ This page describes the changes you need to make when upgrading from version 1.5
 
 !!! success
 
-    **Nothing is removed in 1.6.0.** Everything below keeps working exactly as before. The release
-    exists to give you a full minor version to migrate before 2.0.0 takes the deprecated pieces away.
+    **The deprecated pieces keep working in 1.6.0.** The release exists to give you a full minor
+    version to migrate before 2.0.0 takes them away.
+
+    One thing is already gone: since 1.6.0, the bundle ships Workbox 7.4.1 only, and no longer the 7.0.0
+    and 7.3.0 copies. A version other than 7.4.1, pinned while the Workbox files are served from your own
+    server (`use_cdn: false`, the default), is not served from the bundle. See
+    [Deprecated: choosing the Workbox version](#deprecated-choosing-the-workbox-version).
 
 ## The bundle is narrowing its scope
 
@@ -431,6 +436,26 @@ the `translation_domain` variable, to write `{{ app_name|trans({}, translation_d
 `pwa` stays the default, so an application keeping its `pwa.*.yaml` files has nothing to change.
 
 See [The translation domain](../experimental-features/translations.md#the-translation-domain).
+
+## New: the configured strings are extracted
+
+`debug:translation` and `translation:extract` never read the bundle configuration. Earlier versions reported
+the translations of its keys as unused, `translation:extract` did not add them to the catalogues, and
+`translation:extract --clean` removed them from the catalogues it wrote.
+
+The bundle now hands its configured strings over to both commands, in the translation domain: the texts of the
+manifest, of its shortcuts and widgets, the screenshot labels and the background fetch messages, plain texts
+included.
+
+```bash title="terminal"
+php bin/console debug:translation fr --domain=pwa --only-unused
+php bin/console translation:extract fr --dump-messages --domain=pwa
+```
+
+The labels of the `#[Screenshot]` attributes and the strings a `PreManifestCompileEvent` listener adds are not
+part of the configuration, and are still left out.
+
+See [Extracting the strings](../experimental-features/translations.md#extracting-the-strings).
 
 ## Deprecated: choosing the Workbox version
 

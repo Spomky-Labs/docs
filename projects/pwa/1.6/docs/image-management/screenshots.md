@@ -87,6 +87,14 @@ When a screenshot file exists, it's automatically added to the manifest with:
 
 **No manual configuration needed!**
 
+!!! info
+
+    The labels are translated, but `debug:translation` and `translation:extract` do not see them: unlike the
+    screenshots of the configuration, they are added to the manifest while it is compiled, so they are not
+    [extracted](../experimental-features/translations.md#extracting-the-strings). Add them to the catalogue of
+    the translation domain by hand. `debug:translation` then lists them as unused, and
+    `translation:extract --clean` removes them from the catalogues it writes.
+
 ### Multi-locale support
 
 For internationalized applications, use the `locales` parameter to generate screenshots for multiple locales with a single attribute:

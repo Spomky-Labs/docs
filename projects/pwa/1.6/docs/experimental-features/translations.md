@@ -71,6 +71,49 @@ The `title`, `text` and `url` parameters of the [share target](../the-manifest/s
 
 A shortcut, a screenshot or any other member added by a [`PreManifestCompileEvent`](../events.md) listener gets the domain as well: it is applied to the whole manifest when it is compiled, right after the event.
 
+## Extracting the strings
+
+`debug:translation` and `translation:extract` read the PHP code and the Twig templates, not the bundle configuration. Up to 1.5, they reported the translations of the configured keys as unused, and never added these keys to the catalogues. Since 1.6.0, the bundle hands its configured strings over to both commands, in the [translation domain](#the-translation-domain), `pwa` by default:
+
+* the `name`, `short_name`, `description` and `categories` of the manifest, which the `*_localized` members are built from as well;
+* the `name`, `short_name` and `description` of the shortcuts and of the widgets;
+* the `label` of the screenshots, those of the widgets included;
+* the `success_message` and `failure_message` of [background fetch](../the-service-worker/configuration.md#background-fetch), or `{title} ✅` and `{title} ❌` when they are not set, as long as the rule runs: the service worker, Workbox and background fetch all enabled.
+
+A plain text is listed just like a key. The bundle passes `A sausage application` to the translator as it passes `app.description`, so both are extracted, and `debug:translation` reports either of them as missing in a locale that does not translate it.
+
+Left out:
+
+* the strings of the manifest, when it is disabled;
+* the background fetch messages, when the rule does not run;
+* the members that are not set or are empty;
+* the labels of the [`#[Screenshot]`](../image-management/screenshots.md#using-php-attributes) attributes and anything a [`PreManifestCompileEvent`](../events.md) listener adds: they are not part of the configuration. They are translated all the same, so add them to the catalogue yourself;
+* the `title`, `text` and `url` parameters of the share target, which are not translated (see [above](#the-translation-domain)).
+
+The commands need `symfony/translation` and the translator enabled (`framework.translator`): without the component, the bundle registers nothing, and without the translator, Symfony does not register the commands. With another translation domain, replace `pwa` with it in the commands below.
+
+```bash title="terminal"
+# what is missing, or unused, in French
+php bin/console debug:translation fr --domain=pwa
+php bin/console debug:translation fr --domain=pwa --only-missing
+
+# what would be written, then write it
+php bin/console translation:extract fr --dump-messages --domain=pwa
+php bin/console translation:extract fr --force --domain=pwa
+php bin/console translation:extract fr --force --domain=pwa --no-fill
+php bin/console translation:extract en --force --domain=pwa --prefix=
+```
+
+`--prefix` replaces the `__` the new messages are filled with. An empty one fills each of them with itself, which suits the locale the plain texts are written in.
+
+!!! warning
+
+    Without `--no-fill`, `translation:extract --force` writes each missing message as its translation, prefixed:
+    `__app.name`, `__A sausage application`. These placeholders are translations like any other, so they show
+    in the compiled manifest, and in the service worker for the background fetch messages, until you replace
+    them. `--no-fill` writes an empty value instead, which the translator returns as an empty string: translate
+    the new messages before the next `pwa:compile` either way.
+
 ## Localization strategies
 
 The locales the bundle translates the manifest into are the ones you enabled in the framework configuration.
