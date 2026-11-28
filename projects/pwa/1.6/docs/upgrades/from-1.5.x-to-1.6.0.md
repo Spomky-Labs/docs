@@ -4,8 +4,13 @@ This page describes the changes you need to make when upgrading from version 1.5
 
 !!! success
 
-    **Nothing is removed in 1.6.0.** Everything below keeps working exactly as before. The release
-    exists to give you a full minor version to migrate before 2.0.0 takes the deprecated pieces away.
+    **The deprecated pieces keep working in 1.6.0.** The release exists to give you a full minor
+    version to migrate before 2.0.0 takes them away.
+
+    One thing is already gone: since 1.6.0, the bundle ships Workbox 7.4.1 only, and no longer the 7.0.0
+    and 7.3.0 copies. A version other than 7.4.1, pinned while the Workbox files are served from your own
+    server (`use_cdn: false`, the default), is not served from the bundle. See
+    [Deprecated: choosing the Workbox version](#deprecated-choosing-the-workbox-version).
 
 ## The bundle is narrowing its scope
 
