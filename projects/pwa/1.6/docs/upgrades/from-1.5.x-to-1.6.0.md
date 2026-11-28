@@ -6,7 +6,7 @@ This page describes the changes you need to make when upgrading from version 1.5
 
     **Nothing is removed in 1.6.0.** The deprecated pieces keep working, and the release exists to give
     you a full minor version to migrate before 2.0.0 takes them away. The few behaviours that change are
-    listed below, each in a "Changed" section.
+    described below, with what to do.
 
     The bundle ships Workbox 7.4.1 only, and no longer the 7.0.0 and 7.3.0 copies. A version pinned while
     the Workbox files are served from your own server (`use_cdn: false`, the default) keeps compiling: the
@@ -508,9 +508,9 @@ pwa:
 
 It is read everywhere the bundle translates a value: the members of the manifest and their `*_localized`
 counterparts, the background fetch messages and the profiler panel. Startup image templates receive it as
-the `translation_domain` variable. Give `trans` a fixed locale there,
+the `translation_domain` variable. Avoid translating there, or give `trans` a fixed locale,
 `{{ app_name|trans({}, translation_domain, 'en') }}`: the URLs of the images depend on what the template
-renders, and are computed again on every page, in the locale of the request. See
+renders, and `{{ pwa() }}` computes them again on every page, in the locale of the request. See
 [The variables handed to the template](../favicons/startup-images.md#the-variables-handed-to-the-template).
 
 `pwa` stays the default, so an application keeping its `pwa.*.yaml` files has nothing to change.
