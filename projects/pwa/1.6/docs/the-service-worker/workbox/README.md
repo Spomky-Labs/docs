@@ -29,6 +29,28 @@ Hereafter the main benefits of Precache:
 * **Background Sync**: Integrate background sync to replay failed requests once connectivity is restored.
 * **Offline Fallback**: allow your service worker to serve a web page, image, or font if there's a routing error for any of the three, for instance if a user is offline and there isn't a cache hit. The [offline fallbacks](../offline-fallback.md) work without Workbox too.
 
+### Enabling Workbox
+
+Workbox is enabled by default, and the shorthands of the `workbox` key say the same:
+
+```yaml title="/config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        enabled: true
+        src: "sw.js"
+        workbox: ~   # or true, or {}
+```
+
+The key still decides one default, the `pages` cache. Whenever you write the `workbox` section without `resource_caches`, `~`, `true` and `{}` included, the bundle adds a [resource cache](resource-caching.md) named `pages` for the navigations, with the `StaleWhileRevalidate` strategy and the broadcast of updates. Leaving the `workbox` key out altogether registers no `pages` cache, as in 1.5.x. The asset, image, font and Google Fonts caches are there either way.
+
+| `workbox:` | Workbox | `pages` cache |
+| --- | --- | --- |
+| left out | enabled | no |
+| `~`, `true` or `{}` | enabled | yes |
+| a section without `resource_caches` | enabled | yes |
+| a section with `resource_caches` | enabled | only if listed there |
+| `false` or `{enabled: false}` | disabled | no |
+
 ### Disabling Workbox
 
 Workbox is enabled by default. You can disable it completely if you do not need it.
@@ -41,6 +63,12 @@ pwa:
         workbox:
             enabled: false
 ```
+
+`workbox: false` is the short form, and does the same.
+
+!!! warning
+
+    In 1.5.x, `workbox: false` was ignored: Workbox stayed enabled with all its default caches. See the [upgrade guide](../../upgrades/from-1.5.x-to-1.6.0.md#changed-workbox-false-disables-workbox).
 
 Without Workbox, the service worker is your own source, and what the bundle can write with plain listeners:
 

@@ -568,6 +568,27 @@ Workbox logs, remain yours to decide.
 
 See [Workbox Files](../the-service-worker/workbox/cdn-and-versions.md).
 
+## Changed: `workbox: false` disables Workbox
+
+`pwa.serviceworker.workbox: false` now disables Workbox. In 1.5.x the value was ignored: Workbox stayed
+enabled with all its default caches (asset, image, font, Google Fonts and the `pages` navigation cache), and
+PHP only reported an "Automatic conversion of false to array" deprecation.
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        enabled: true
+        src: 'sw.js'
+        workbox: false   # 1.6.0: no Workbox, like {enabled: false}
+```
+
+**What to do:** if your service worker relied on these caches, remove `workbox: false`, or write
+`workbox: {}`, to keep them.
+
+`workbox: ~` and `workbox: true` keep every default, including the `pages` navigation cache, like
+`workbox: {}`. Leaving the `workbox` key out altogether registers no `pages` cache, as in 1.5.x. See
+[Enabling Workbox](../the-service-worker/workbox/README.md#enabling-workbox).
+
 ## Changed: the two image processors agree on their output
 
 GD and Imagick used to leave the encoding quality to their extension, so the very same configuration
@@ -627,6 +648,7 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
 - [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings: a pinned version is not served from your own server
+- [ ] If you wrote `workbox: false` and relied on the Workbox caches, remove it or write `workbox: {}`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations
