@@ -124,7 +124,7 @@ if (! $authenticatorData->isUserVerified()) {
 You can also read the raw flags if you need fine-grained checks (for example combining `UV` with `BS`/`BE` for backup-eligibility policies):
 
 ```php linenums="1"
-$flags = $authenticatorData->getFlags();
+$flags = $authenticatorData->flags;
 $uvFlag = (ord($flags) & 0x04) !== 0;  // UV flag is bit 2
 ```
 
