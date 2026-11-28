@@ -325,6 +325,23 @@ The name is now a class alias. It still resolves, still passes any `instanceof R
 triggers a deprecation of its own instead of a spurious one. Nothing to change beyond migrating to
 `ResourceCache`, as 1.2.0 already asked.
 
+## Changed: the compiled manifest only carries what you configured
+
+A minimal configuration used to compile into a manifest full of members saying nothing:
+`"display_override": []`, `"screenshots": []`, `"shortcuts": []` and the other empty collections, plus
+`"prefer_related_applications": false`, which is what the specification assumes when the member is absent.
+
+The top-level members that are an empty collection, `null`, or equal to their default in the specification
+are now left out of the compiled file. Browsers read an absent member exactly as they read those values, so
+nothing changes for them.
+
+An empty object is still written: `edge_side_panel: ~` gives `"edge_side_panel": {}`, which is how a manifest
+opts in to the Edge side panel.
+
+**What to do:** nothing in the configuration. If your own code reads the compiled manifest, in a
+`PostManifestCompileEvent` listener or in JavaScript, stop expecting a collection to be there when it is
+empty: read `$manifest['shortcuts'] ?? []`.
+
 ## Migration checklist
 
 - [ ] Copy the Stimulus controllers you use into your own application, register them there

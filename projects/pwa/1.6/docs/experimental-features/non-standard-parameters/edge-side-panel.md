@@ -11,6 +11,9 @@ pwa:
         edge_side_panel: ~
 ```
 
+`~` is compiled into an empty object, `"edge_side_panel": {}`, which is how a manifest opts in. It is kept in the
+compiled file even though it is empty.
+
 You can tell EDGE your PWA should only be loaded in the sidebar and the minimum sidebar size.
 
 ```yaml title="/config/packages/pwa.yaml" linenums="1"
