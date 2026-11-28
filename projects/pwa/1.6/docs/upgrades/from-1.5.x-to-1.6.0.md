@@ -262,6 +262,61 @@ An application that does not listen to the event gets the reload, as before.
 
 See [Updates](../the-service-worker/configuration.md#updates).
 
+## Deprecated: `workbox.offline_fallback`
+
+The offline fallbacks were a Workbox option, and wrote nothing with Workbox disabled. They now work with or
+without Workbox, and have moved out of the Workbox section, with the same options. This is deprecated:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        workbox:
+            offline_fallback:      # deprecated since 1.6.0
+                page: 'app_offline'
+```
+
+Write this instead:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        offline_fallback:
+            page: 'app_offline'
+```
+
+The former place keeps working until 2.0.0: it is read as the new one, and triggers this deprecation:
+
+```
+Since spomky-labs/pwa-bundle 1.6.0: The "pwa.serviceworker.workbox.offline_fallback" option is deprecated
+and will be removed in 2.0.0. Move it to "pwa.serviceworker.offline_fallback": it takes the same options,
+and the offline fallbacks work there with or without Workbox.
+```
+
+Writing both, in one file or across several, fails:
+
+```
+Invalid configuration for path "pwa.serviceworker": The offline fallbacks are configured twice: under
+"pwa.serviceworker.offline_fallback" and under the deprecated "pwa.serviceworker.workbox.offline_fallback".
+Keep "pwa.serviceworker.offline_fallback" only.
+```
+
+**What to do:** move the block one level up, out of `workbox`. With Workbox enabled, the compiled service
+worker does not change.
+
+On the PHP side, `SpomkyLabs\PwaBundle\Dto\ServiceWorker::$offlineFallback` holds the fallbacks.
+`Dto\Workbox::$offlineFallback` is deprecated and will be removed in 2.0.0. Until then, the service worker
+builder sets it to the same object, so code that reads or changes it keeps working.
+
+!!! warning
+
+    **An application that kept `workbox.offline_fallback` with Workbox disabled now gets the fallbacks.**
+    They wrote nothing until 1.6.0. They are now served by plain `install` and `fetch` listeners, placed
+    before your own source, and the `fetch` listener answers every navigation when a page is set, and every
+    image or font request when those fallbacks are set: the `fetch` listeners of your own source are no
+    longer called for these requests. Remove the block if you do not want the fallbacks.
+
+See [Without Workbox](../the-service-worker/offline-fallback.md#without-workbox).
+
 ## New: one offline page per URL
 
 `offline_fallback.page` resolves to a single URL, so with localized routes every visitor got the offline page
@@ -270,19 +325,18 @@ of one locale. `pages` lists offline pages chosen by the URL of the failed navig
 ```yaml title="config/packages/pwa.yaml" linenums="1"
 pwa:
     serviceworker:
-        workbox:
-            offline_fallback:
-                page: { path: 'app_offline', params: { _locale: 'en' } }
-                pages:
-                    - { page: { path: 'app_offline', params: { _locale: 'fr' } }, match: '^https?://[^/]+/fr(/|$)' }
-                    - { page: { path: 'app_offline', params: { _locale: 'de' } }, match: '^https?://[^/]+/de(/|$)' }
+        offline_fallback:
+            page: { path: 'app_offline', params: { _locale: 'en' } }
+            pages:
+                - { page: { path: 'app_offline', params: { _locale: 'fr' } }, match: '^https?://[^/]+/fr(/|$)' }
+                - { page: { path: 'app_offline', params: { _locale: 'de' } }, match: '^https?://[^/]+/de(/|$)' }
 ```
 
 `match` is a JavaScript regular expression, without delimiters, tested against the full URL of the failed
 navigation. The first page whose pattern matches is served, `page` when none does, and every page is cached
 when the service worker installs. `page` keeps working as before, as the default page.
 
-See [One offline page per URL](../the-service-worker/workbox/offline-fallback.md#one-offline-page-per-url).
+See [One offline page per URL](../the-service-worker/offline-fallback.md#one-offline-page-per-url).
 
 ## New: a version to refresh the offline fallbacks
 
@@ -295,15 +349,14 @@ fallbacks are cached again, into the same cache:
 ```yaml title="config/packages/pwa.yaml" linenums="1"
 pwa:
     serviceworker:
-        workbox:
-            offline_fallback:
-                page: 'app_offline'
-                version: '2025-01-15'
+        offline_fallback:
+            page: 'app_offline'
+            version: '2025-01-15'
 ```
 
 Without `version` and `pages`, the compiled service worker is the same as before.
 
-See [Refreshing the fallbacks](../the-service-worker/workbox/offline-fallback.md#refreshing-the-fallbacks).
+See [Refreshing the fallbacks](../the-service-worker/offline-fallback.md#refreshing-the-fallbacks).
 
 ## Deprecated: `favicons.use_start_image`
 
@@ -570,6 +623,7 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] If you used `self.idb` in your own source, switch to `indexedDB.open()`
 - [ ] Replace `background_fetch` with your own `backgroundfetchsuccess` handler
 - [ ] Declare the caches you open yourself with `registerClearCacheListener()`
+- [ ] Move `workbox.offline_fallback` to `serviceworker.offline_fallback`; with Workbox disabled, check that you want the fallbacks it now enables
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
 - [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings: a pinned version is not served from your own server

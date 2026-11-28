@@ -27,7 +27,7 @@ Hereafter the main benefits of Precache:
 * **Runtime Caching**: Flexible strategies for handling runtime requests, such as stale-while-revalidate, cache first, and network first.
 * **Request Routing**: Easily define how different types of requests are handled by your service worker.
 * **Background Sync**: Integrate background sync to replay failed requests once connectivity is restored.
-* **Offline Fallback**: allow your service worker to serve a web page, image, or font if there's a routing error for any of the three, for instance if a user is offline and there isn't a cache hit.
+* **Offline Fallback**: allow your service worker to serve a web page, image, or font if there's a routing error for any of the three, for instance if a user is offline and there isn't a cache hit. The [offline fallbacks](../offline-fallback.md) work without Workbox too.
 
 ### Disabling Workbox
 
@@ -41,3 +41,11 @@ pwa:
         workbox:
             enabled: false
 ```
+
+Without Workbox, the service worker is your own source, and what the bundle can write with plain listeners:
+
+* the [offline fallbacks](../offline-fallback.md#without-workbox), served by an `install` and a `fetch` listener;
+* [`skip_waiting`](../configuration.md#skip-waiting), with an `install` and an `activate` listener;
+* the listeners of the [widgets](../../experimental-features/widgets-win10+.md).
+
+The caching strategies, background sync, navigation preload, cache cleaning and the helpers that [custom rules](../custom-service-worker-rule.md#available-helpers) rely on are Workbox features: they are not written.

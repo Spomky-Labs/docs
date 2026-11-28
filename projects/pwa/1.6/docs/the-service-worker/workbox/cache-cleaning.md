@@ -21,7 +21,12 @@ pwa:
 
 The bundle keeps a registry of the cache names it creates, filled by `registerCacheName()`. Every
 strategy generated from your configuration goes through it, so the asset cache, the font cache,
-the image cache, the resource caches and the offline fallback are all covered.
+the image cache and the resource caches are all covered.
+
+The offline fallback cache is not purged: its name is registered by the install task that caches the
+fallbacks, which runs after the purge. The fallbacks are cached again over their former copies, and a
+fallback you stop listing stays in it. Without Workbox, nothing is purged at all: see
+[Offline fallbacks](../offline-fallback.md#without-workbox).
 
 Caches you create yourself are not, for the simple reason that the bundle has no way of knowing
 about them.
