@@ -648,6 +648,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4047,6 +4058,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4309,23 +4331,55 @@
 <h2 id="logging-configuration">Logging configuration<a class="headerlink" href="#logging-configuration" title="Link to this section">&para;</a></h2>
 <p>The bundle uses PSR-3 logging to record important events and errors.</p>
 <h3 id="default-logger">Default logger<a class="headerlink" href="#default-logger" title="Link to this section">&para;</a></h3>
-<p>By default, the bundle uses Symfony's default logger channel.</p>
+<p>Without <code>pwa.logger</code>, the bundle logs to the <code>logger</code> service of the application.</p>
+<p>With MonologBundle, that is the <code>pwa</code> channel: the bundle declares it, and its logger is the
+<code>monolog.logger.pwa</code> service, which your own services can also autowire as <code>Psr\Log\LoggerInterface $pwaLogger</code>.
+Your handlers see the channel like any other. List it to send the bundle to a handler of its own, exclude it to
+keep the bundle out of one:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/monolog.yaml</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nt">monolog</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">    </span><span class="nt">handlers</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">        </span><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stream</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">'%kernel.logs_dir%/pwa.log'</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">            </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">debug</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">            </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'pwa'</span><span class="p p-Indicator">]</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">        </span><span class="nt">main</span><span class="p">:</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stream</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">'%kernel.logs_dir%/%kernel.environment%.log'</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="w">            </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">debug</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a><span class="w">            </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'!pwa'</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<p>No <code>monolog.channels</code> entry is needed for this.</p>
+<p>Without MonologBundle, <code>logger</code> is the logger FrameworkBundle registers when the application defines none. It
+writes to PHP's error log, which is stderr on the command line unless <code>error_log</code> is set in <code>php.ini</code>, and only
+keeps the errors. The verbosity of a command lowers that threshold: <code>-v</code> lets the warnings through, <code>-vvv</code> the debug
+messages.</p>
+<div class="language-bash highlight"><span class="filename">terminal</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:compile<span class="w"> </span>-vvv
+</span></code></pre></div>
+<p>In debug mode, the records this logger keeps also show in the profiler of the request.</p>
+<p>With no <code>logger</code> service at all, the bundle does not log.</p>
 <h3 id="custom-logger">Custom logger<a class="headerlink" href="#custom-logger" title="Link to this section">&para;</a></h3>
-<p>Configure a custom logger for PWA-specific logging:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">logger</span><span class="p">:</span><span class="w"> </span><span class="s">'monolog.logger.pwa'</span>
+<p><code>pwa.logger</code> names the service the bundle logs to instead. That service is used as it is: the bundle puts it on no
+channel.</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">logger</span><span class="p">:</span><span class="w"> </span><span class="s">'app.pwa_logger'</span>
 </span></code></pre></div>
-<p>Then define the logger in your Monolog configuration:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/monolog.yaml</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">monolog</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'pwa'</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">handlers</span><span class="p">:</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stream</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7"></a><a href="#__codelineno-4-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">'%kernel.logs_dir%/pwa.log'</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8"></a><a href="#__codelineno-4-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">            </span><span class="nt">level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">debug</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9"></a><a href="#__codelineno-4-9"><span class="linenos" data-linenos="9 "></span></a><span class="w">            </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'pwa'</span><span class="p p-Indicator">]</span>
+<p>You do not need it to route the bundle with Monolog: the <code>pwa</code> channel above does that. It is for a logger of your
+own, or to silence the bundle in any setup, with a <code>Psr\Log\NullLogger</code>:</p>
+<div class="language-yaml highlight"><span class="filename">config/services.yaml</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">Psr\Log\NullLogger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
 </span></code></pre></div>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">logger</span><span class="p">:</span><span class="w"> </span><span class="s">'Psr\Log\NullLogger'</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>With <code>pwa.logger</code> set, the bundle does not declare the <code>pwa</code> channel. A handler that lists
+<code>channels: ['pwa']</code> then needs the channel declared, or the container fails to build:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/monolog.yaml</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">monolog</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'pwa'</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+</div>
 <h3 id="what-gets-logged">What gets logged<a class="headerlink" href="#what-gets-logged" title="Link to this section">&para;</a></h3>
 <p>The bundle logs:
 - Manifest compilation events
@@ -4336,11 +4390,28 @@
 - Runtime warnings</p>
 <h3 id="logging-levels">Logging levels<a class="headerlink" href="#logging-levels" title="Link to this section">&para;</a></h3>
 <ul>
-<li><strong>DEBUG</strong>: Detailed processing information (development only)</li>
-<li><strong>INFO</strong>: Normal operational messages</li>
-<li><strong>WARNING</strong>: Non-critical issues (e.g., missing optional config)</li>
-<li><strong>ERROR</strong>: Critical problems that prevent PWA functionality</li>
+<li><strong>debug</strong>: almost every message, one for each step of the compilation, often with the configuration or the
+  generated content as context</li>
+<li><strong>warning</strong>: a <a href="../the-service-worker/workbox/cdn-and-versions/#choosing-the-version-is-deprecated">pinned Workbox version</a> that is ignored, and
+  screenshots declared with the <code>#[Screenshot]</code> attribute that were never generated</li>
+<li><strong>error</strong>: a preload URL generator alias that does not exist, logged right before the exception it causes</li>
 </ul>
+<p>The bundle logs nothing at the info level.</p>
+<h3 id="in-production">In production<a class="headerlink" href="#in-production" title="Link to this section">&para;</a></h3>
+<p><code>{{ pwa() }}</code> runs the favicons and startup images compilers on every page it renders, to write their <code>&lt;link&gt;</code>
+tags, and that logs about one debug record per icon. A <code>fingers_crossed</code> handler keeps the debug records of the
+request in its buffer, so these push the useful ones out of a limited <code>buffer_size</code>, and fill the log when an
+error flushes it. Keep the channel out of such a handler:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/monolog.yaml</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">when@prod</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">monolog</span><span class="p">:</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">handlers</span><span class="p">:</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">main</span><span class="p">:</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fingers_crossed</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="nt">action_level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">error</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">                </span><span class="nt">handler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nested</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">                </span><span class="nt">buffer_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos="9 "></span></a><span class="w">                </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'!deprecation'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'!pwa'</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
 <h2 id="development-tips">Development tips<a class="headerlink" href="#development-tips" title="Link to this section">&para;</a></h2>
 <h3 id="testing-offline-mode">Testing offline mode<a class="headerlink" href="#testing-offline-mode" title="Link to this section">&para;</a></h3>
 <p><strong>Method 1: Browser DevTools</strong>
@@ -4442,7 +4513,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 17:15:07 UTC">November 28, 2026</span>
   </span>
 
     

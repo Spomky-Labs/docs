@@ -3743,6 +3743,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changed-the-bundle-logs-to-the-default-logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: the bundle logs to the default logger
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#changed-workbox-false-disables-workbox" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3791,6 +3802,17 @@
     <span class="md-ellipsis">
       
         Changed: the compiled manifest only carries what you configured
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changed-the-deprecations-name-the-spomky-labspwa-bundle-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: the deprecations name the spomky-labs/pwa-bundle package
       
     </span>
   </a>
@@ -4118,6 +4140,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changed-the-bundle-logs-to-the-default-logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: the bundle logs to the default logger
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#changed-workbox-false-disables-workbox" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4166,6 +4199,17 @@
     <span class="md-ellipsis">
       
         Changed: the compiled manifest only carries what you configured
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changed-the-deprecations-name-the-spomky-labspwa-bundle-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed: the deprecations name the spomky-labs/pwa-bundle package
       
     </span>
   </a>
@@ -4230,6 +4274,9 @@ described below, with what to do.</p>
 the Workbox files are served from your own server (<code>use_cdn: false</code>, the default) keeps compiling: the
 bundled 7.4.1 files are served, and a warning is logged. See
 <a href="#deprecated-choosing-the-workbox-version">Deprecated: choosing the Workbox version</a>.</p>
+<p>Without <code>pwa.logger</code>, the bundle now logs to the default logger of your application, on a <code>pwa</code> channel
+with MonologBundle, where 1.5.x did not log at all. See
+<a href="#changed-the-bundle-logs-to-the-default-logger">Changed: the bundle logs to the default logger</a>.</p>
 </div>
 <h2 id="the-bundle-is-narrowing-its-scope">The bundle is narrowing its scope<a class="headerlink" href="#the-bundle-is-narrowing-its-scope" title="Link to this section">&para;</a></h2>
 <p>The bundle is going back to what it does well: the <strong>web manifest</strong>, the <strong>service worker</strong>, and
@@ -4381,7 +4428,7 @@ arbitrate an order between the rules the bundle generates, or carry a state shar
 </span></code></pre></div>
 <p>As long as this option is left to <code>true</code>, its default, the bundle triggers a deprecation notice at
 container build time:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Since spomky-labs/pwa-bundle 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask",
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>"openBackgroundFetchDatabase", "structuredPushNotificationSupport", "simplePushNotificationSupport" and
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>"notifyPeriodicSyncClients" are deprecated and will be removed in 2.0.0. Replace them with plain
@@ -4545,7 +4592,7 @@ source image. They now have a section of their own:</p>
 </span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">           </span><span class="c1"># this instead</span>
 </span></code></pre></div>
 <p>Setting <code>use_start_image</code> triggers this deprecation:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Since spomky-labs/pwa-bundle 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 </span></code></pre></div>
 <p>Nothing else has to move. <code>use_start_image</code> still seeds <code>startup_images.enabled</code>, and the images keep
@@ -4668,7 +4715,10 @@ for one version and running against another, failing in the browser rather than 
 <div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>The Workbox version "7.3.0" is ignored: only the bundled version "7.4.1" can be served from the
 </span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>application. Remove the "version" option from the Workbox configuration.
 </span></code></pre></div>
-<p>It reaches your logs when <code>pwa.logger</code> is set.</p>
+<p>It reaches your logs through the default logger: the <code>pwa</code> channel with MonologBundle, or, without it,
+the logger of FrameworkBundle, which prints warnings only for a command run with <code>-v</code>. With <code>pwa.logger</code>
+set, it goes to that service. See
+<a href="#changed-the-bundle-logs-to-the-default-logger">Changed: the bundle logs to the default logger</a>.</p>
 </li>
 <li>
 <p>With <code>use_cdn: true</code>, the CDN still serves the pinned version.</p>
@@ -4689,15 +4739,48 @@ option silences both.</p>
 <p><code>workbox_public_url</code> and <code>debug</code> are <strong>not</strong> deprecated: where your server exposes the files, and whether
 Workbox logs, remain yours to decide.</p>
 <p>See <a href="../../the-service-worker/workbox/cdn-and-versions/">Workbox Files</a>.</p>
+<h2 id="changed-the-bundle-logs-to-the-default-logger">Changed: the bundle logs to the default logger<a class="headerlink" href="#changed-the-bundle-logs-to-the-default-logger" title="Link to this section">&para;</a></h2>
+<p>In 1.5.x, the bundle only logged when <code>pwa.logger</code> named a logger. In 1.6.0, without that option, it logs to the
+<code>logger</code> service of your application:</p>
+<ul>
+<li>With MonologBundle, on the <code>pwa</code> channel. The bundle declares it: its logger is the <code>monolog.logger.pwa</code>
+  service, which your own services can autowire as <code>Psr\Log\LoggerInterface $pwaLogger</code>.</li>
+<li>Without MonologBundle, to the logger FrameworkBundle registers, which writes the errors to PHP's error log and
+  lets the warnings and the debug messages through only for a command run with <code>-v</code> or <code>-vvv</code>.</li>
+</ul>
+<p>With MonologBundle, the two warnings of the bundle, the
+<a href="#deprecated-choosing-the-workbox-version">ignored Workbox version</a> and the missing screenshots, now reach your
+logs without any configuration. So do the debug messages, in every handler that takes the debug level, and there
+are many of them: <code>{{ pwa() }}</code> logs about one debug record per icon on every page it renders.</p>
+<p><strong>What to do:</strong> nothing if you want them. To keep the bundle out of a handler, exclude its channel, starting with
+the <code>fingers_crossed</code> handlers of production, whose buffer these records would fill:</p>
+<div class="language-yaml highlight"><span class="filename">config/packages/monolog.yaml</span><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1"></a><a href="#__codelineno-31-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">when@prod</span><span class="p">:</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2"></a><a href="#__codelineno-31-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">monolog</span><span class="p">:</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3"></a><a href="#__codelineno-31-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">handlers</span><span class="p">:</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4"></a><a href="#__codelineno-31-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">            </span><span class="nt">main</span><span class="p">:</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5"></a><a href="#__codelineno-31-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fingers_crossed</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6"></a><a href="#__codelineno-31-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">                </span><span class="nt">action_level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">error</span>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7"></a><a href="#__codelineno-31-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">                </span><span class="nt">handler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nested</span>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8"></a><a href="#__codelineno-31-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">                </span><span class="nt">buffer_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9"></a><a href="#__codelineno-31-9"><span class="linenos" data-linenos="9 "></span></a><span class="w">                </span><span class="nt">channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'!deprecation'</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">'!pwa'</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<p>To silence the bundle as 1.5.x did, with or without MonologBundle, point <code>pwa.logger</code> at a <code>Psr\Log\NullLogger</code>
+service.</p>
+<p><code>pwa.logger</code> keeps its meaning: the service it names is used as it is, on no channel. The example of the 1.5
+documentation, <code>pwa.logger: 'monolog.logger.pwa'</code> with <code>monolog.channels: ['pwa']</code>, keeps working; you can drop
+both lines together, since the bundle now declares the channel. Up to 1.5.15, that service was ignored and the
+bundle logged to the default logger instead: an application upgrading from one of those releases with
+<code>pwa.logger</code> set sees its records move to the service it names, as they do in 1.5.16.</p>
+<p>See <a href="../../development/#logging-configuration">Logging configuration</a>.</p>
 <h2 id="changed-workbox-false-disables-workbox">Changed: <code>workbox: false</code> disables Workbox<a class="headerlink" href="#changed-workbox-false-disables-workbox" title="Link to this section">&para;</a></h2>
 <p><code>pwa.serviceworker.workbox: false</code> now disables Workbox. In 1.5.x the value was ignored: Workbox stayed
 enabled with all its default caches (asset, image, font, Google Fonts and the <code>pages</code> navigation cache), and
 PHP only reported an "Automatic conversion of false to array" deprecation.</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1"></a><a href="#__codelineno-31-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2"></a><a href="#__codelineno-31-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3"></a><a href="#__codelineno-31-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4"></a><a href="#__codelineno-31-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'sw.js'</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5"></a><a href="#__codelineno-31-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">   </span><span class="c1"># 1.6.0: no Workbox, like {enabled: false}</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1"></a><a href="#__codelineno-32-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2"></a><a href="#__codelineno-32-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3"></a><a href="#__codelineno-32-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4"></a><a href="#__codelineno-32-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">'sw.js'</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5"></a><a href="#__codelineno-32-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">   </span><span class="c1"># 1.6.0: no Workbox, like {enabled: false}</span>
 </span></code></pre></div>
 <p><strong>What to do:</strong> if your service worker relied on these caches, remove <code>workbox: false</code>, or write
 <code>workbox: {}</code>, to keep them.</p>
@@ -4735,6 +4818,16 @@ opts in to the Edge side panel.</p>
 <p><strong>What to do:</strong> nothing in the configuration. If your own code reads the compiled manifest, in a
 <code>PostManifestCompileEvent</code> listener or in JavaScript, stop expecting a collection to be there when it is
 empty: read <code>$manifest['shortcuts'] ?? []</code>.</p>
+<h2 id="changed-the-deprecations-name-the-spomky-labspwa-bundle-package">Changed: the deprecations name the <code>spomky-labs/pwa-bundle</code> package<a class="headerlink" href="#changed-the-deprecations-name-the-spomky-labspwa-bundle-package" title="Link to this section">&para;</a></h2>
+<p>Symfony prints the package a deprecation comes from at the start of its message, <code>Since &lt;package&gt; &lt;version&gt;:</code>,
+and the deprecation baselines and filters match on that text. Most deprecations of 1.5.x named <code>spomky-labs/phpwa</code>,
+which is not the name Composer knows the bundle by. Every deprecation of 1.6.0 names <code>spomky-labs/pwa-bundle</code>,
+the <code>name</code> of its <code>composer.json</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>Since spomky-labs/pwa-bundle 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
+</span></code></pre></div>
+<p><strong>What to do:</strong> if your application filters or baselines deprecations on "spomky-labs/phpwa", make the filter
+match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.</p>
 <h2 id="migration-checklist">Migration checklist<a class="headerlink" href="#migration-checklist" title="Link to this section">&para;</a></h2>
 <ul>
 <li>[ ] Copy the Stimulus controllers you use into your own application, register them there</li>
@@ -4750,9 +4843,11 @@ empty: read <code>$manifest['shortcuts'] ?? []</code>.</p>
 <li>[ ] Move <code>favicons.use_start_image</code> to <code>startup_images.enabled</code></li>
 <li>[ ] With the favicons enabled, set <code>startup_images.enabled</code> explicitly, <code>true</code> or <code>false</code></li>
 <li>[ ] Remove <code>use_cdn</code> and <code>version</code> from the Workbox configuration, both spellings: a pinned version is not served from your own server</li>
+<li>[ ] Decide which log handlers get the <code>pwa</code> channel, and exclude it from the <code>fingers_crossed</code> ones in production</li>
 <li>[ ] If you wrote <code>workbox: false</code> and relied on the Workbox caches, remove it or write <code>workbox: {}</code></li>
 <li>[ ] Replace any remaining <code>Dto\PageCache</code> reference with <code>Dto\ResourceCache</code></li>
 <li>[ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written</li>
+<li>[ ] Update the deprecation filters and baselines that match "spomky-labs/phpwa": the deprecations now name "spomky-labs/pwa-bundle"</li>
 <li>[ ] Run <code>php bin/console pwa:compile</code> and test with <code>APP_ENV=dev</code> to surface the deprecations</li>
 </ul>
 <h2 id="still-deprecated-from-earlier-versions">Still deprecated (from earlier versions)<a class="headerlink" href="#still-deprecated-from-earlier-versions" title="Link to this section">&para;</a></h2>
@@ -4838,7 +4933,7 @@ empty: read <code>$manifest['shortcuts'] ?? []</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 16:26:28 UTC">November 28, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 17:15:32 UTC">November 28, 2026</span>
   </span>
 
     
