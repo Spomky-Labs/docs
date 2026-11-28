@@ -4,12 +4,13 @@ This page describes the changes you need to make when upgrading from version 1.5
 
 !!! success
 
-    **The deprecated pieces keep working in 1.6.0.** The release exists to give you a full minor
-    version to migrate before 2.0.0 takes them away.
+    **Nothing is removed in 1.6.0.** The deprecated pieces keep working, and the release exists to give
+    you a full minor version to migrate before 2.0.0 takes them away. The few behaviours that change are
+    listed below, each in a "Changed" section.
 
-    One thing is already gone: since 1.6.0, the bundle ships Workbox 7.4.1 only, and no longer the 7.0.0
-    and 7.3.0 copies. A version other than 7.4.1, pinned while the Workbox files are served from your own
-    server (`use_cdn: false`, the default), is not served from the bundle. See
+    The bundle ships Workbox 7.4.1 only, and no longer the 7.0.0 and 7.3.0 copies. A version pinned while
+    the Workbox files are served from your own server (`use_cdn: false`, the default) keeps compiling: the
+    bundled 7.4.1 files are served, and a warning is logged. See
     [Deprecated: choosing the Workbox version](#deprecated-choosing-the-workbox-version).
 
 ## The bundle is narrowing its scope
@@ -479,11 +480,26 @@ Everything the bundle generates — the imports, the caching strategies, the plu
 written against the API of the version it ships. Pinning another one produced a service worker written
 for one version and running against another, failing in the browser rather than at compile time.
 
-**What to do:** remove both options and let the bundled files be served from your own public folder.
-Then clear the stale copies, which `pwa:compile` writes past but never removes:
+A pinned version still compiles until 2.0.0:
+
+* With `use_cdn: false`, the default, the files are served from your own server, and only the bundled
+  ones can be: a pinned version, `config.version` or the flat `version`, is ignored, and the 7.4.1 files
+  are served. When it compiles them, the bundle logs this warning, here for `version: '7.3.0'`:
+
+    ```
+    The Workbox version "7.3.0" is ignored: only the bundled version "7.4.1" can be served from the
+    application. Remove the "version" option from the Workbox configuration.
+    ```
+
+    It reaches your logs when `pwa.logger` is set.
+
+* With `use_cdn: true`, the CDN still serves the pinned version.
+
+**What to do:** remove both options and let the bundled files be served from your own public folder,
+then compile again. The files keep their names and their place under `workbox_public_url`, so
+`pwa:compile` writes the 7.4.1 ones over those of the former version:
 
 ```bash title="terminal"
-rm -rf public/workbox-v7.0.0 public/workbox-v7.3.0
 php bin/console pwa:compile
 ```
 
@@ -556,7 +572,7 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] Declare the caches you open yourself with `registerClearCacheListener()`
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
-- [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings, and delete the stale `workbox-v7.*` folders from `public/`
+- [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings: a pinned version is not served from your own server
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations

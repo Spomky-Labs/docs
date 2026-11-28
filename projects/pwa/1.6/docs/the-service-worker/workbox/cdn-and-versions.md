@@ -23,18 +23,30 @@ pwa:
                 version: '7.3.0'    # deprecated since 1.6.0
 ```
 
+A pinned version still compiles until 2.0.0:
+
+* With `use_cdn: false`, the default, the files are served from your own server, and only the bundled ones can be. A pinned version, `config.version` or the flat `version`, is ignored, the 7.4.1 files are served, and the bundle logs this warning when it compiles them, here for `version: '7.3.0'`:
+
+    ```
+    The Workbox version "7.3.0" is ignored: only the bundled version "7.4.1" can be served from the
+    application. Remove the "version" option from the Workbox configuration.
+    ```
+
+    It reaches your logs when [`pwa.logger`](../../development.md#logging-configuration) is set.
+
+* With `use_cdn: true`, the service worker imports the pinned version from the CDN.
+
 **What to do:** remove both options. The bundled files are what the generated service worker expects.
 
 !!! info
 
     Both spellings are deprecated: the flat `workbox.use_cdn` and `workbox.version`, deprecated since 1.5.0, and their `workbox.config.*` counterparts. An application still using the flat ones is told twice — once for the option it wrote, once for the section the value is migrated into. Removing the option silences both.
 
-### Cleaning up
+### Compiling again
 
-Switching back from the CDN leaves nothing behind, but switching version does: `pwa:compile` writes the new files without removing the folder of the old one.
+The files have always been written under `workbox_public_url`, whatever the version, with the same names. Once the options are removed, compile again: `pwa:compile` writes the 7.4.1 files over those of the former version, and nothing is left behind.
 
 ```bash title="terminal"
-rm -rf public/workbox-v7.0.0 public/workbox-v7.3.0
 php bin/console pwa:compile
 ```
 
