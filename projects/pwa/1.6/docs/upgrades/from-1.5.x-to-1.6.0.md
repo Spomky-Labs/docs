@@ -165,7 +165,7 @@ As long as this option is left to `true`, its default, the bundle triggers a dep
 container build time:
 
 ```
-Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
+Since spomky-labs/pwa-bundle 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
 "registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask",
 "openBackgroundFetchDatabase", "structuredPushNotificationSupport", "simplePushNotificationSupport" and
 "notifyPeriodicSyncClients" are deprecated and will be removed in 2.0.0. Replace them with plain
@@ -395,7 +395,7 @@ pwa:
 Setting `use_start_image` triggers this deprecation:
 
 ```
-Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+Since spomky-labs/pwa-bundle 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
 in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 ```
 
@@ -703,6 +703,21 @@ opts in to the Edge side panel.
 `PostManifestCompileEvent` listener or in JavaScript, stop expecting a collection to be there when it is
 empty: read `$manifest['shortcuts'] ?? []`.
 
+## Changed: the deprecations name the `spomky-labs/pwa-bundle` package
+
+Symfony prints the package a deprecation comes from at the start of its message, `Since <package> <version>:`,
+and the deprecation baselines and filters match on that text. Most deprecations of 1.5.x named `spomky-labs/phpwa`,
+which is not the name Composer knows the bundle by. Every deprecation of 1.6.0 names `spomky-labs/pwa-bundle`,
+the `name` of its `composer.json`:
+
+```
+Since spomky-labs/pwa-bundle 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
+```
+
+**What to do:** if your application filters or baselines deprecations on "spomky-labs/phpwa", make the filter
+match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.
+
 ## Migration checklist
 
 - [ ] Copy the Stimulus controllers you use into your own application, register them there
@@ -722,6 +737,7 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] If you wrote `workbox: false` and relied on the Workbox caches, remove it or write `workbox: {}`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
+- [ ] Update the deprecation filters and baselines that match "spomky-labs/phpwa": the deprecations now name "spomky-labs/pwa-bundle"
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations
 
 ## Still deprecated (from earlier versions)
