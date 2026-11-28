@@ -53,6 +53,9 @@ pwa:
         enabled: true
         default:
             src: icons/favicon.svg
+
+    startup_images:
+        enabled: true # or false: see below
 ```
 
 **That's it!** The bundle automatically generates all required favicon sizes and formats for:
@@ -61,6 +64,16 @@ pwa:
 - Windows tiles (70x70 to 310x310)
 - Safari pinned tabs
 - And more...
+
+!!! warning
+
+    **Enabling the favicons also generates the iOS [startup images](startup-images.md)**: one full-screen PNG
+    per iOS screen geometry and orientation, 42 of them, up to 2752x2064 pixels, and 42 more when a `dark`
+    theme is configured.
+
+    Relying on this is deprecated since 1.6.0. When `pwa.startup_images.enabled` is left out, the favicons
+    trigger a deprecation, and 2.0.0 stops generating the startup images unless they are asked for. Set it
+    explicitly: `true` to keep the splash screens, `false` to generate the favicons only.
 
 ## Icon source options
 
@@ -336,6 +349,10 @@ pwa:
         # Additional options
         low_resolution: false
         potrace: 'potrace'
+
+    # The iOS startup images, generated from the same source
+    startup_images:
+        enabled: true
 ```
 
 !!! warning
