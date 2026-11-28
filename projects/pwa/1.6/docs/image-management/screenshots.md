@@ -82,7 +82,7 @@ When a screenshot file exists, it's automatically added to the manifest with:
 - `form_factor`: Auto-calculated (wide/narrow based on dimensions)
 - `platform`: From the attribute
 - `type`: Based on format (e.g., "image/webp")
-- `label`: From the attribute (supports translation via the `pwa` domain)
+- `label`: From the attribute (supports translation via the [translation domain](../experimental-features/translations.md#the-translation-domain), `pwa` by default)
 - `reference`: The generated URL for the route
 
 **No manual configuration needed!**

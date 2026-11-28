@@ -160,13 +160,14 @@ The browser is started once and reused for the whole compilation: there are more
 | `theme_color` | `pwa.manifest.theme_color`, or its dark counterpart |
 | `app_name`, `short_name`, `description` | What the manifest declares |
 | `lang`, `dir` | The language and writing direction of the manifest |
+| `translation_domain` | The [translation domain](../experimental-features/translations.md#the-translation-domain) of the bundle, `pwa` unless `pwa.translation_domain` says otherwise |
 | `icon` | The source image, inlined as a `data:` URI |
 | `icon_svg` | The source markup when it is an SVG, `null` otherwise |
 | `context` | Whatever you declared under `context` |
 
 !!! info
 
-    The manifest values are the raw configured ones. When they are translation keys, run them through the `trans` filter with the `pwa` domain: `{{ app_name|trans({}, 'pwa') }}`.
+    The manifest values are the raw configured ones. When they are translation keys, run them through the `trans` filter with the domain handed to the template: `{{ app_name|trans({}, translation_domain) }}`.
 
 The document is painted from a temporary file with no application URL to resolve an asset against, which is why the source image is handed over inlined rather than as a path. For the same reason, any font, image or stylesheet the template pulls in must be inlined too.
 
@@ -178,7 +179,7 @@ The document is painted from a temporary file with no application URL to resolve
 {% extends '@SpomkyLabsPwa/StartupImage/default.html.twig' %}
 
 {% block subtitle %}
-    <p class="subtitle">{{ context.subtitle|trans({}, 'pwa') }}</p>
+    <p class="subtitle">{{ context.subtitle|trans({}, translation_domain) }}</p>
 {% endblock %}
 ```
 

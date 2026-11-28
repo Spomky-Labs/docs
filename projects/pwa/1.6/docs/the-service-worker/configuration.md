@@ -108,8 +108,8 @@ pwa:
 |--------|------|---------|-------------|
 | `success_url` | URL/route | - | URL to open when download completes |
 | `progress_url` | URL/route | - | URL to display download progress |
-| `success_message` | string | `null` | Success notification message (translatable) |
-| `failure_message` | string | `null` | Failure notification message (translatable) |
+| `success_message` | string | `null` | Success notification message, translated with the [translation domain](../experimental-features/translations.md#the-translation-domain) |
+| `failure_message` | string | `null` | Failure notification message, translated with the [translation domain](../experimental-features/translations.md#the-translation-domain) |
 | `db_name` | string | `bgfetch-completed` | IndexedDB name for download storage |
 
 !!! info

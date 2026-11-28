@@ -2,7 +2,7 @@
 
 The bundle can leverage the Symfony Translation component. The text you provide for almost all names, abbreviations, descriptions, labels, etc., can be used as translation keys.
 
-These translations must be placed in a `pwa` domain (e.g. `pwa.en.yaml` or `pwa.fr.yaml`)
+These translations are looked up in the `pwa` domain by default (e.g. `pwa.en.yaml` or `pwa.fr.yaml`). Another domain can be chosen, see [The translation domain](#the-translation-domain).
 
 ```yaml title="/config/packages/pwa.yaml" linenums="1"
 pwa:
@@ -38,6 +38,36 @@ app:
 !!! warning
 
     This feature is in early development stage and may not work as expected. Use with caution
+
+## The translation domain
+
+The bundle looks the keys up in the `pwa` domain unless told otherwise. Since 1.6.0, `translation_domain` points it at another one, for instance the `messages` domain your application already translates:
+
+```yaml title="/config/packages/pwa.yaml" linenums="1"
+pwa:
+    translation_domain: 'messages'
+    manifest:
+        enabled: true
+        name: "app.name"
+        short_name: "app.short_name"
+```
+
+```yaml title="/translations/messages.en.yaml" linenums="1"
+app:
+    name: "My App"
+    short_name: "My App"
+```
+
+The option is read wherever the bundle translates a value:
+
+* the members of the manifest: `name`, `short_name`, `description` and `categories`, the names and descriptions of the shortcuts and widgets, the labels of the screenshots, and the `title` and `text` parameters of the share target;
+* the `*_localized` members described below;
+* the success and failure messages of [background fetch](../the-service-worker/configuration.md#background-fetch);
+* the manifest tab of the Symfony profiler.
+
+[Startup image templates](../favicons/startup-images.md#the-variables-handed-to-the-template) receive it as the `translation_domain` variable.
+
+A shortcut, a screenshot or any other member added by a [`PreManifestCompileEvent`](../events.md) listener gets the domain as well: it is applied to the whole manifest when it is compiled, right after the event.
 
 ## Localization strategies
 
@@ -141,7 +171,7 @@ pwa:
 
 ## What ends up in the localized members
 
-The textual members need no additional configuration: their values already are translation keys of the `pwa` domain, so the localized map is derived from the enabled locales.
+The textual members need no additional configuration: their values already are translation keys of the translation domain, `pwa` by default, so the localized map is derived from the enabled locales.
 
 A locale is left out of the map when its translation resolves to the value already carried by the plain member, or to the key itself because nothing translates it. An application that translates nothing therefore gets no `*_localized` member at all, and with the `both` strategy the locale of a file never repeats itself inside its own map.
 

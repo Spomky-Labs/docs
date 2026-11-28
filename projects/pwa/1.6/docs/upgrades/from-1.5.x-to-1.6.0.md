@@ -260,6 +260,24 @@ pwa:
 
 See [Translations](../experimental-features/translations.md).
 
+## New: a translation domain of your own
+
+The translation keys of the configuration had to live in the `pwa` domain. Any domain can now be used, for
+instance the one your application already translates:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    translation_domain: 'messages'   # "pwa" when omitted
+```
+
+It is read everywhere the bundle translates a value: the members of the manifest and their `*_localized`
+counterparts, the background fetch messages and the profiler panel. Startup image templates receive it as
+the `translation_domain` variable, to write `{{ app_name|trans({}, translation_domain) }}`.
+
+`pwa` stays the default, so an application keeping its `pwa.*.yaml` files has nothing to change.
+
+See [The translation domain](../experimental-features/translations.md#the-translation-domain).
+
 ## Deprecated: choosing the Workbox version
 
 The bundle carried two copies of the Workbox libraries, 7.0.0 and 7.3.0. Both are replaced by a single
