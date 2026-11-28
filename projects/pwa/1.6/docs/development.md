@@ -116,30 +116,75 @@ The bundle uses PSR-3 logging to record important events and errors.
 
 ### Default logger
 
-By default, the bundle uses Symfony's default logger channel.
+Without `pwa.logger`, the bundle logs to the `logger` service of the application.
 
-### Custom logger
-
-Configure a custom logger for PWA-specific logging:
-
-```yaml title="config/packages/pwa.yaml" linenums="1"
-pwa:
-    logger: 'monolog.logger.pwa'
-```
-
-Then define the logger in your Monolog configuration:
+With MonologBundle, that is the `pwa` channel: the bundle declares it, and its logger is the
+`monolog.logger.pwa` service, which your own services can also autowire as `Psr\Log\LoggerInterface $pwaLogger`.
+Your handlers see the channel like any other. List it to send the bundle to a handler of its own, exclude it to
+keep the bundle out of one:
 
 ```yaml title="config/packages/monolog.yaml" linenums="1"
 monolog:
-    channels: ['pwa']
-
     handlers:
         pwa:
             type: stream
             path: '%kernel.logs_dir%/pwa.log'
             level: debug
             channels: ['pwa']
+        main:
+            type: stream
+            path: '%kernel.logs_dir%/%kernel.environment%.log'
+            level: debug
+            channels: ['!pwa']
 ```
+
+No `monolog.channels` entry is needed for this.
+
+Without MonologBundle, `logger` is the logger FrameworkBundle registers when the application defines none. It
+writes to PHP's error log, which is stderr on the command line unless `error_log` is set in `php.ini`, and only
+keeps the errors. The verbosity of a command lowers that threshold: `-v` lets the warnings through, `-vvv` the debug
+messages.
+
+```bash title="terminal"
+php bin/console pwa:compile -vvv
+```
+
+In debug mode, the records this logger keeps also show in the profiler of the request.
+
+With no `logger` service at all, the bundle does not log.
+
+### Custom logger
+
+`pwa.logger` names the service the bundle logs to instead. That service is used as it is: the bundle puts it on no
+channel.
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    logger: 'app.pwa_logger'
+```
+
+You do not need it to route the bundle with Monolog: the `pwa` channel above does that. It is for a logger of your
+own, or to silence the bundle in any setup, with a `Psr\Log\NullLogger`:
+
+```yaml title="config/services.yaml" linenums="1"
+services:
+    Psr\Log\NullLogger: ~
+```
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    logger: 'Psr\Log\NullLogger'
+```
+
+!!! warning
+
+    With `pwa.logger` set, the bundle does not declare the `pwa` channel. A handler that lists
+    `channels: ['pwa']` then needs the channel declared, or the container fails to build:
+
+    ```yaml title="config/packages/monolog.yaml" linenums="1"
+    monolog:
+        channels: ['pwa']
+    ```
 
 ### What gets logged
 
@@ -153,10 +198,32 @@ The bundle logs:
 
 ### Logging levels
 
-- **DEBUG**: Detailed processing information (development only)
-- **INFO**: Normal operational messages
-- **WARNING**: Non-critical issues (e.g., missing optional config)
-- **ERROR**: Critical problems that prevent PWA functionality
+- **debug**: almost every message, one for each step of the compilation, often with the configuration or the
+  generated content as context
+- **warning**: a [pinned Workbox version](the-service-worker/workbox/cdn-and-versions.md#choosing-the-version-is-deprecated) that is ignored, and
+  screenshots declared with the `#[Screenshot]` attribute that were never generated
+- **error**: a preload URL generator alias that does not exist, logged right before the exception it causes
+
+The bundle logs nothing at the info level.
+
+### In production
+
+`{{ pwa() }}` runs the favicons and startup images compilers on every page it renders, to write their `<link>`
+tags, and that logs about one debug record per icon. A `fingers_crossed` handler keeps the debug records of the
+request in its buffer, so these push the useful ones out of a limited `buffer_size`, and fill the log when an
+error flushes it. Keep the channel out of such a handler:
+
+```yaml title="config/packages/monolog.yaml" linenums="1"
+when@prod:
+    monolog:
+        handlers:
+            main:
+                type: fingers_crossed
+                action_level: error
+                handler: nested
+                buffer_size: 50
+                channels: ['!deprecation', '!pwa']
+```
 
 ## Development tips
 

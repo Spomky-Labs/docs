@@ -13,6 +13,10 @@ This page describes the changes you need to make when upgrading from version 1.5
     bundled 7.4.1 files are served, and a warning is logged. See
     [Deprecated: choosing the Workbox version](#deprecated-choosing-the-workbox-version).
 
+    Without `pwa.logger`, the bundle now logs to the default logger of your application, on a `pwa` channel
+    with MonologBundle, where 1.5.x did not log at all. See
+    [Changed: the bundle logs to the default logger](#changed-the-bundle-logs-to-the-default-logger).
+
 ## The bundle is narrowing its scope
 
 The bundle is going back to what it does well: the **web manifest**, the **service worker**, and
@@ -566,7 +570,10 @@ A pinned version still compiles until 2.0.0:
     application. Remove the "version" option from the Workbox configuration.
     ```
 
-    It reaches your logs when `pwa.logger` is set.
+    It reaches your logs through the default logger: the `pwa` channel with MonologBundle, or, without it,
+    the logger of FrameworkBundle, which prints warnings only for a command run with `-v`. With `pwa.logger`
+    set, it goes to that service. See
+    [Changed: the bundle logs to the default logger](#changed-the-bundle-logs-to-the-default-logger).
 
 * With `use_cdn: true`, the CDN still serves the pinned version.
 
@@ -589,6 +596,47 @@ php bin/console pwa:compile
 Workbox logs, remain yours to decide.
 
 See [Workbox Files](../the-service-worker/workbox/cdn-and-versions.md).
+
+## Changed: the bundle logs to the default logger
+
+In 1.5.x, the bundle only logged when `pwa.logger` named a logger. In 1.6.0, without that option, it logs to the
+`logger` service of your application:
+
+* With MonologBundle, on the `pwa` channel. The bundle declares it: its logger is the `monolog.logger.pwa`
+  service, which your own services can autowire as `Psr\Log\LoggerInterface $pwaLogger`.
+* Without MonologBundle, to the logger FrameworkBundle registers, which writes the errors to PHP's error log and
+  lets the warnings and the debug messages through only for a command run with `-v` or `-vvv`.
+
+With MonologBundle, the two warnings of the bundle, the
+[ignored Workbox version](#deprecated-choosing-the-workbox-version) and the missing screenshots, now reach your
+logs without any configuration. So do the debug messages, in every handler that takes the debug level, and there
+are many of them: `{{ pwa() }}` logs about one debug record per icon on every page it renders.
+
+**What to do:** nothing if you want them. To keep the bundle out of a handler, exclude its channel, starting with
+the `fingers_crossed` handlers of production, whose buffer these records would fill:
+
+```yaml title="config/packages/monolog.yaml" linenums="1"
+when@prod:
+    monolog:
+        handlers:
+            main:
+                type: fingers_crossed
+                action_level: error
+                handler: nested
+                buffer_size: 50
+                channels: ['!deprecation', '!pwa']
+```
+
+To silence the bundle as 1.5.x did, with or without MonologBundle, point `pwa.logger` at a `Psr\Log\NullLogger`
+service.
+
+`pwa.logger` keeps its meaning: the service it names is used as it is, on no channel. The example of the 1.5
+documentation, `pwa.logger: 'monolog.logger.pwa'` with `monolog.channels: ['pwa']`, keeps working; you can drop
+both lines together, since the bundle now declares the channel. Up to 1.5.15, that service was ignored and the
+bundle logged to the default logger instead: an application upgrading from one of those releases with
+`pwa.logger` set sees its records move to the service it names, as they do in 1.5.16.
+
+See [Logging configuration](../development.md#logging-configuration).
 
 ## Changed: `workbox: false` disables Workbox
 
@@ -670,6 +718,7 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
 - [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings: a pinned version is not served from your own server
+- [ ] Decide which log handlers get the `pwa` channel, and exclude it from the `fingers_crossed` ones in production
 - [ ] If you wrote `workbox: false` and relied on the Workbox caches, remove it or write `workbox: {}`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
