@@ -256,6 +256,49 @@ An application that does not listen to the event gets the reload, as before.
 
 See [Updates](../the-service-worker/configuration.md#updates).
 
+## New: one offline page per URL
+
+`offline_fallback.page` resolves to a single URL, so with localized routes every visitor got the offline page
+of one locale. `pages` lists offline pages chosen by the URL of the failed navigation:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        workbox:
+            offline_fallback:
+                page: { path: 'app_offline', params: { _locale: 'en' } }
+                pages:
+                    - { page: { path: 'app_offline', params: { _locale: 'fr' } }, match: '^https?://[^/]+/fr(/|$)' }
+                    - { page: { path: 'app_offline', params: { _locale: 'de' } }, match: '^https?://[^/]+/de(/|$)' }
+```
+
+`match` is a JavaScript regular expression, without delimiters, tested against the full URL of the failed
+navigation. The first page whose pattern matches is served, `page` when none does, and every page is cached
+when the service worker installs. `page` keeps working as before, as the default page.
+
+See [One offline page per URL](../the-service-worker/workbox/offline-fallback.md#one-offline-page-per-url).
+
+## New: a version to refresh the offline fallbacks
+
+The offline fallbacks are cached when the service worker installs, and a browser installs it again only when
+its script changes. A reworded offline page left the script as it was, and visitors kept the old copy.
+
+`offline_fallback.version` is written into the service worker. Change it whenever a fallback changes, and the
+fallbacks are cached again, into the same cache:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        workbox:
+            offline_fallback:
+                page: 'app_offline'
+                version: '2025-01-15'
+```
+
+Without `version` and `pages`, the compiled service worker is the same as before.
+
+See [Refreshing the fallbacks](../the-service-worker/workbox/offline-fallback.md#refreshing-the-fallbacks).
+
 ## Deprecated: `favicons.use_start_image`
 
 The iOS startup images used to be a favicon setting, which they only ever were because they shared a
