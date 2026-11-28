@@ -91,8 +91,22 @@ The following helpers are deprecated:
 | `simplePushNotificationSupport()` | Same |
 | `notifyPeriodicSyncClients()` | Create your own `BroadcastChannel` and post to it |
 
-Each of them warns in the console **when it is actually called**, so an application that already
-stopped using them gets a silent service worker.
+Each of them warns in the console **when it is actually called**, once per helper, so an application
+that already stopped using them gets a silent service worker. The warning names the replacement:
+
+```
+[pwa-bundle] registerPushTask() is deprecated since 1.6.0 and will be removed in 2.0.0. Use
+self.addEventListener("push", (event) => event.waitUntil(...)).
+```
+
+The warning of `openBackgroundFetchDatabase()` points at the database, not at a listener. `self.idb` is not
+a way out, since the library goes away with the helpers:
+
+```
+[pwa-bundle] openBackgroundFetchDatabase() is deprecated since 1.6.0 and will be removed in 2.0.0. Open
+your own database with indexedDB.open(), or import idb yourself: self.idb is only imported while
+"pwa.serviceworker.workbox.keep_deprecated_helpers" is true.
+```
 
 ### What stays
 
@@ -148,8 +162,9 @@ container build time:
 
 ```
 Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
-"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask"
-and "openBackgroundFetchDatabase" are deprecated and will be removed in 2.0.0. Replace them with plain
+"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask",
+"openBackgroundFetchDatabase", "structuredPushNotificationSupport", "simplePushNotificationSupport" and
+"notifyPeriodicSyncClients" are deprecated and will be removed in 2.0.0. Replace them with plain
 "self.addEventListener()" calls in your own service worker source, then set
 "pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
 ```
@@ -371,6 +386,13 @@ pwa:
 
     startup_images:
         enabled: false           # this instead
+```
+
+Setting `use_start_image` triggers this deprecation:
+
+```
+Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 ```
 
 Nothing else has to move. `use_start_image` still seeds `startup_images.enabled`, and the images keep

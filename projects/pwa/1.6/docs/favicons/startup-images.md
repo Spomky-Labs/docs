@@ -76,7 +76,12 @@ pwa:
 
 !!! warning
 
-    `pwa.favicons.use_start_image` is deprecated since 1.6.0 and will be removed in 2.0.0. It now only seeds `pwa.startup_images.enabled`; set that one instead. Its default is `null`, considered `true`: an application that sets it has made its choice, and is only told about this key.
+    `pwa.favicons.use_start_image` is deprecated since 1.6.0 and will be removed in 2.0.0. It now only seeds `pwa.startup_images.enabled`; set that one instead. Its default is `null`, considered `true`: an application that sets it has made its choice, and is only told about this key:
+
+    ```
+    Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+    in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
+    ```
 
 A color scheme nobody described an image for is simply not declined, and when no `default` source can be resolved at all, no startup image is generated.
 
