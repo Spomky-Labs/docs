@@ -262,6 +262,32 @@ the favicons.
 
 See [Startup Images](../favicons/startup-images.md#inherited-from-the-favicons).
 
+## New: an apple-touch-icon of its own
+
+Every favicon used the background color, border radius and image scale of its theme. iOS fills the
+transparent areas of the apple-touch-icon with black, so a transparent round logo, right for the browser
+tabs, showed on a black square on the home screen, and a background color turned the tab icon into a square.
+
+`favicons.apple_touch_icon` lets the home screen icon differ from the others:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    favicons:
+        enabled: true
+        default:
+            src: 'images/logo.png'   # used as is for the tab icons
+        apple_touch_icon:
+            background_color: '#00bc7d'
+            image_scale: 80
+```
+
+It takes `src`, `background_color`, `border_radius` and `image_scale`, each falling back to the theme the icon
+is generated for, and one block applies to both color schemes. Only the `apple-touch-icon` files follow it:
+the 180x180 one, and the low resolution sizes when they are enabled. Without the key, the generated files do
+not change.
+
+See [Apple touch icon](../favicons/create-favicons.md#apple-touch-icon).
+
 ## New: startup images described by a Twig template
 
 A startup image could only ever be the favicon source, scaled down and centered over a background
