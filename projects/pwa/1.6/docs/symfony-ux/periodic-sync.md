@@ -48,6 +48,13 @@ Before using Periodic Sync, ensure that:
 2. **Workbox is enabled** as it provides the necessary helpers
 3. The user has granted the **periodic-background-sync permission**
 
+!!! danger
+
+    The helpers this page relies on are deprecated since 1.6.0 and removed in 2.0.0: `registerPeriodicSync()`
+    and `onPeriodicSync()` on the page side, `registerPeriodicSyncTask()` and `notifyPeriodicSyncClients()` in
+    the service worker. [Periodic sync](../the-service-worker/periodic-sync.md) shows the same thing written
+    with the native APIs, and the [upgrade guide](../upgrades/from-1.5.x-to-1.6.0.md) how to migrate.
+
 ## Usage
 
 ### Basic periodic sync registration

@@ -26,11 +26,13 @@ The full rationale is in
 All 27 controllers shipped by the bundle are deprecated and will be removed in 2.0.0, along with
 the `@spomky-labs/pwa-bundle` npm package.
 
-Each one prints a warning in the browser console the first time it is mounted:
+Each one prints a warning in the browser console the first time it is mounted, once per controller
+identifier:
 
 ```
 [pwa-bundle] The "pwa--web-push" Stimulus controller is deprecated since 1.6.0 and will be
 removed in 2.0.0. Copy the controller into your own application and register it there.
+See https://github.com/Spomky-Labs/pwa-bundle/issues/372#issuecomment-5295710299
 ```
 
 **What to do:** copy the controllers you actually use into your own application and register them
@@ -135,9 +137,18 @@ pwa:
             keep_deprecated_helpers: false
 ```
 
-As long as this option is left to `true`, the bundle triggers a deprecation notice at container
-build time. Setting it to `false` is what silences it, and it is the exact change 2.0.0 will make
-for you.
+As long as this option is left to `true`, its default, the bundle triggers a deprecation notice at
+container build time:
+
+```
+Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
+"registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask"
+and "openBackgroundFetchDatabase" are deprecated and will be removed in 2.0.0. Replace them with plain
+"self.addEventListener()" calls in your own service worker source, then set
+"pwa.serviceworker.workbox.keep_deprecated_helpers" to false.
+```
+
+Setting it to `false` is what silences it, and it is the exact change 2.0.0 will make for you.
 
 !!! warning
 
@@ -184,6 +195,21 @@ self.addEventListener('backgroundfetchsuccess', (event) => {
     build time with an explicit message, rather than producing a service worker that throws a
     `ReferenceError` in the browser.
 
+## New: a command to create the configuration file
+
+Creating a PWA used to start with a `config/packages/pwa.yaml` copied from another project. `pwa:create:config`
+writes it, step by step, or from options alone:
+
+```bash title="terminal"
+php bin/console pwa:create:config
+php bin/console pwa:create:config --no-interaction --name="HackerNews PWA" --icon=images/logo.svg
+```
+
+It never overwrites an existing file without `--force`, and `--dry-run` prints the configuration instead. An
+application that already has its configuration has nothing to do.
+
+See [Creating the configuration file](../installation.md#creating-the-configuration-file).
+
 ## New: purging your own caches
 
 `clear_cache` only ever deleted the caches the bundle registers itself through
@@ -207,6 +233,72 @@ Callbacks may be async, and one throwing is logged without stopping the others.
 
 See [Cache Cleaning](../the-service-worker/workbox/cache-cleaning.md).
 
+## New: keeping the page when a new service worker takes control
+
+With Workbox enabled, the script injected by `pwa()` reloads the page as soon as a new service worker takes
+control of it. With `skip_waiting: true`, a deploy reloads every open tab and can throw a half-filled form
+away, and the application had no say in it. As in 1.5.16, a first visit does not reload the page.
+
+Before reloading, the script now dispatches a cancelable `sw:controller-changed` event on `window`, the same
+way it dispatches `sw:update-available`, with the `workbox.Workbox` instance in `event.detail.wb`. The page is
+reloaded only if no listener called `preventDefault()`, synchronously:
+
+```javascript title="assets/app.js" linenums="1"
+window.addEventListener('sw:controller-changed', (event) => {
+    if (formHasUnsavedChanges()) {
+        event.preventDefault();
+        showReloadToast(() => window.location.reload());
+    }
+});
+```
+
+An application that does not listen to the event gets the reload, as before.
+
+See [Updates](../the-service-worker/configuration.md#updates).
+
+## New: one offline page per URL
+
+`offline_fallback.page` resolves to a single URL, so with localized routes every visitor got the offline page
+of one locale. `pages` lists offline pages chosen by the URL of the failed navigation:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        workbox:
+            offline_fallback:
+                page: { path: 'app_offline', params: { _locale: 'en' } }
+                pages:
+                    - { page: { path: 'app_offline', params: { _locale: 'fr' } }, match: '^https?://[^/]+/fr(/|$)' }
+                    - { page: { path: 'app_offline', params: { _locale: 'de' } }, match: '^https?://[^/]+/de(/|$)' }
+```
+
+`match` is a JavaScript regular expression, without delimiters, tested against the full URL of the failed
+navigation. The first page whose pattern matches is served, `page` when none does, and every page is cached
+when the service worker installs. `page` keeps working as before, as the default page.
+
+See [One offline page per URL](../the-service-worker/workbox/offline-fallback.md#one-offline-page-per-url).
+
+## New: a version to refresh the offline fallbacks
+
+The offline fallbacks are cached when the service worker installs, and a browser installs it again only when
+its script changes. A reworded offline page left the script as it was, and visitors kept the old copy.
+
+`offline_fallback.version` is written into the service worker. Change it whenever a fallback changes, and the
+fallbacks are cached again, into the same cache:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    serviceworker:
+        workbox:
+            offline_fallback:
+                page: 'app_offline'
+                version: '2025-01-15'
+```
+
+Without `version` and `pages`, the compiled service worker is the same as before.
+
+See [Refreshing the fallbacks](../the-service-worker/workbox/offline-fallback.md#refreshing-the-fallbacks).
+
 ## Deprecated: `favicons.use_start_image`
 
 The iOS startup images used to be a favicon setting, which they only ever were because they shared a
@@ -225,6 +317,68 @@ pwa:
 Nothing else has to move. `use_start_image` still seeds `startup_images.enabled`, and the images keep
 borrowing their source, background color, border radius and SVG attributes from the favicon of the same
 color scheme. An existing configuration produces the very same files, content hashes included.
+
+## Deprecated: the startup images generated by default with the favicons
+
+Enabling the favicons also generates the iOS startup images, unless told otherwise: 42 full-screen PNGs
+up to 2752x2064 pixels, 84 with a dark theme. That is not what an application asks for when it asks for
+favicons, and 2.0.0 only generates them on request.
+
+The default does not change in 1.6, as changing it would silently remove the splash screens of every
+application relying on it. An application that enables the favicons and sets neither
+`startup_images.enabled` nor `favicons.use_start_image` is told instead:
+
+```
+Since spomky-labs/pwa-bundle 1.6.0: The iOS startup images are generated by default when "pwa.favicons"
+is enabled. This default becomes false in 2.0.0. Set "pwa.startup_images.enabled" explicitly: true to
+keep generating them, false to stop.
+```
+
+**What to do:** make the choice.
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    favicons:
+        enabled: true
+        default:
+            src: 'icons/logo.svg'
+
+    startup_images:
+        enabled: true   # to keep the splash screens, false to stop generating them
+```
+
+The generated files do not change. `favicons.use_start_image` now defaults to `null`, still considered
+`true` when omitted: an application that sets it has made its choice too, and only gets the deprecation of
+that key, described above. [`pwa:create:config`](../installation.md#creating-the-configuration-file) writes
+`startup_images.enabled: true` whenever it enables the favicons.
+
+See [Startup Images](../favicons/startup-images.md#inherited-from-the-favicons).
+
+## New: an apple-touch-icon of its own
+
+Every favicon used the background color, border radius and image scale of its theme. iOS fills the
+transparent areas of the apple-touch-icon with black, so a transparent round logo, right for the browser
+tabs, showed on a black square on the home screen, and a background color turned the tab icon into a square.
+
+`favicons.apple_touch_icon` lets the home screen icon differ from the others:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    favicons:
+        enabled: true
+        default:
+            src: 'images/logo.png'   # used as is for the tab icons
+        apple_touch_icon:
+            background_color: '#00bc7d'
+            image_scale: 80
+```
+
+It takes `src`, `background_color`, `border_radius` and `image_scale`, each falling back to the theme the icon
+is generated for, and one block applies to both color schemes. Only the `apple-touch-icon` files follow it:
+the 180x180 one, and the low resolution sizes when they are enabled. Without the key, the generated files do
+not change.
+
+See [Apple touch icon](../favicons/create-favicons.md#apple-touch-icon).
 
 ## New: startup images described by a Twig template
 
@@ -259,6 +413,24 @@ pwa:
 `files` is the default and the historical behaviour, so nothing changes unless you ask for it.
 
 See [Translations](../experimental-features/translations.md).
+
+## New: a translation domain of your own
+
+The translation keys of the configuration had to live in the `pwa` domain. Any domain can now be used, for
+instance the one your application already translates:
+
+```yaml title="config/packages/pwa.yaml" linenums="1"
+pwa:
+    translation_domain: 'messages'   # "pwa" when omitted
+```
+
+It is read everywhere the bundle translates a value: the members of the manifest and their `*_localized`
+counterparts, the background fetch messages and the profiler panel. Startup image templates receive it as
+the `translation_domain` variable, to write `{{ app_name|trans({}, translation_domain) }}`.
+
+`pwa` stays the default, so an application keeping its `pwa.*.yaml` files has nothing to change.
+
+See [The translation domain](../experimental-features/translations.md#the-translation-domain).
 
 ## Deprecated: choosing the Workbox version
 
@@ -325,6 +497,23 @@ The name is now a class alias. It still resolves, still passes any `instanceof R
 triggers a deprecation of its own instead of a spurious one. Nothing to change beyond migrating to
 `ResourceCache`, as 1.2.0 already asked.
 
+## Changed: the compiled manifest only carries what you configured
+
+A minimal configuration used to compile into a manifest full of members saying nothing:
+`"display_override": []`, `"screenshots": []`, `"shortcuts": []` and the other empty collections, plus
+`"prefer_related_applications": false`, which is what the specification assumes when the member is absent.
+
+The top-level members that are an empty collection, `null`, or equal to their default in the specification
+are now left out of the compiled file. Browsers read an absent member exactly as they read those values, so
+nothing changes for them.
+
+An empty object is still written: `edge_side_panel: ~` gives `"edge_side_panel": {}`, which is how a manifest
+opts in to the Edge side panel.
+
+**What to do:** nothing in the configuration. If your own code reads the compiled manifest, in a
+`PostManifestCompileEvent` listener or in JavaScript, stop expecting a collection to be there when it is
+empty: read `$manifest['shortcuts'] ?? []`.
+
 ## Migration checklist
 
 - [ ] Copy the Stimulus controllers you use into your own application, register them there
@@ -337,8 +526,10 @@ triggers a deprecation of its own instead of a spurious one. Nothing to change b
 - [ ] Replace `background_fetch` with your own `backgroundfetchsuccess` handler
 - [ ] Declare the caches you open yourself with `registerClearCacheListener()`
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
+- [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
 - [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings, and delete the stale `workbox-v7.*` folders from `public/`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
+- [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations
 
 ## Still deprecated (from earlier versions)

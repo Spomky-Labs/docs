@@ -65,7 +65,11 @@ pwa:
 
             # Offline fallback
             offline_fallback:
+                version: '2025-01-15' # change it when a fallback changes
                 page: '/offline'
+                pages:
+                    - page: '/fr/offline'
+                      match: '^https?://[^/]+/fr(/|$)'
                 image: '/images/offline.svg'
                 font: '/fonts/fallback.woff2'
 
@@ -101,7 +105,8 @@ Static resources are cached with long expiration times for instant loading:
 
 ### Offline support
 
-- Offline fallback page shown when no cached page is available
+- Offline fallback page shown when no cached page is available, the French one for the URLs under `/fr`
+- The fallbacks cached again whenever `version` changes
 - Fallback image and font for graceful degradation
 - Background sync queues form submissions for retry when back online
 

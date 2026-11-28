@@ -162,6 +162,14 @@ class WebPush
 
 ### Service worker hooks
 
+!!! danger
+
+    `registerPushTask()`, `structuredPushNotificationSupport()`, `simplePushNotificationSupport()` and
+    `registerNotificationAction()`, used below, are deprecated since 1.6.0 and removed in 2.0.0. They wrap the
+    `push` and `notificationclick` events, which a plain `self.addEventListener()` in your own service worker
+    source handles just as well: see [Push notifications](../the-service-worker/push-notifications.md) and the
+    [upgrade guide](../upgrades/from-1.5.x-to-1.6.0.md#migrating).
+
 The service worker shall be enable when using web push notifications. Please make sure [the configuration](../the-service-worker/configuration.md) is set accordingly.
 
 In your service wroker JS file (we consider it is in `assets/sw.js` in this example), you must at least enable the push notification support. There are two types of notifications:

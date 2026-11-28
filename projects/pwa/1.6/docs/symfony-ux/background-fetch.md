@@ -37,6 +37,13 @@ The Background Fetch API is a relatively new feature with limited but growing su
 
     Background Fetch requires a registered service worker to function. Ensure your PWA has an active service worker before using this component.
 
+!!! danger
+
+    The completed downloads this component lists are stored by the service worker when
+    [`background_fetch`](../the-service-worker/configuration.md#background-fetch) is enabled. That option is
+    deprecated since 1.6.0 and removed in 2.0.0 as well, together with the service worker helpers it relies on.
+    See the [upgrade guide](../upgrades/from-1.5.x-to-1.6.0.md#deprecated-background-fetch).
+
 ## Usage
 
 ### Basic file download

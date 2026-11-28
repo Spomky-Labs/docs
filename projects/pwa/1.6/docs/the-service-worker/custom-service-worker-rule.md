@@ -130,6 +130,9 @@ takes an extra channel name and reports queue progress on a `BroadcastChannel`.
 
     A number of other helpers, `registerPushTask()`, `registerMessageTask()`,
     `registerNotificationAction()`, `registerPeriodicSyncTask()`, `registerBackgroundFetchTask()`,
-    `registerCacheFirst()` and `openBackgroundFetchDatabase()`, are deprecated since 1.6.0 and removed
-    in 2.0.0. They wrap events the bundle never handles, so a plain `self.addEventListener()` in your
-    own source does the same job. See the [upgrade guide](../upgrades/from-1.5.x-to-1.6.0.md).
+    `registerCacheFirst()`, `openBackgroundFetchDatabase()`, `structuredPushNotificationSupport()`,
+    `simplePushNotificationSupport()` and `notifyPeriodicSyncClients()`, are deprecated since 1.6.0 and
+    removed in 2.0.0. They wrap events the bundle never handles, so a plain `self.addEventListener()` in
+    your own source does the same job. Once you no longer call them, set
+    `pwa.serviceworker.workbox.keep_deprecated_helpers` to `false` and they are no longer emitted. See the
+    [upgrade guide](../upgrades/from-1.5.x-to-1.6.0.md#deprecated-part-of-the-service-worker-helpers).

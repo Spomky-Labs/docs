@@ -4,6 +4,9 @@ The `prefer_related_applications` member is a boolean value that specifies that 
 
 If the `prefer_related_applications` member is set to `true`, the user agent might suggest installing one of the related applications instead of this web application.
 
+`false` is the default, and the value the specification assumes when the member is absent: the member is only
+written to the compiled manifest when it is `true`.
+
 ```yaml title="/config/packages/pwa.yaml" linenums="1"
 pwa:
     manifest:
