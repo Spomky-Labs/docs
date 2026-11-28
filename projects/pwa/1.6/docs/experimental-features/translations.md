@@ -60,10 +60,12 @@ app:
 
 The option is read wherever the bundle translates a value:
 
-* the members of the manifest: `name`, `short_name`, `description` and `categories`, the names and descriptions of the shortcuts and widgets, the labels of the screenshots, and the `title` and `text` parameters of the share target;
+* the members of the manifest: `name`, `short_name`, `description` and `categories`, the names and descriptions of the shortcuts and widgets, and the labels of the screenshots;
 * the `*_localized` members described below;
 * the success and failure messages of [background fetch](../the-service-worker/configuration.md#background-fetch);
 * the manifest tab of the Symfony profiler.
+
+The `title`, `text` and `url` parameters of the [share target](../the-manifest/share-target.md) are never translated: they name the query parameters the shared data is sent in, which the receiving endpoint reads. Up to 1.5.15 the bundle translated `title` and `text`; since 1.5.16 they are written as configured.
 
 [Startup image templates](../favicons/startup-images.md#the-variables-handed-to-the-template) receive it as the `translation_domain` variable.
 
