@@ -4027,6 +4027,14 @@
 - <code>label</code>: From the attribute (supports translation via the <a href="../../experimental-features/translations/#the-translation-domain">translation domain</a>, <code>pwa</code> by default)
 - <code>reference</code>: The generated URL for the route</p>
 <p><strong>No manual configuration needed!</strong></p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The labels are translated, but <code>debug:translation</code> and <code>translation:extract</code> do not see them: unlike the
+screenshots of the configuration, they are added to the manifest while it is compiled, so they are not
+<a href="../../experimental-features/translations/#extracting-the-strings">extracted</a>. Add them to the catalogue of
+the translation domain by hand. <code>debug:translation</code> then lists them as unused, and
+<code>translation:extract --clean</code> removes them from the catalogues it writes.</p>
+</div>
 <h3 id="multi-locale-support">Multi-locale support<a class="headerlink" href="#multi-locale-support" title="Link to this section">&para;</a></h3>
 <p>For internationalized applications, use the <code>locales</code> parameter to generate screenshots for multiple locales with a single attribute:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">#[</span><span class="nd">Route</span><span class="p">(</span><span class="s1">'/{_locale}/dashboard'</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">'app_dashboard'</span><span class="p">)]</span>
@@ -4366,7 +4374,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 14:29:46 UTC">November 28, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 15:20:03 UTC">November 28, 2026</span>
   </span>
 
     
