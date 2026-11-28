@@ -131,7 +131,7 @@ pwa:
 
 !!! info
 
-    The share of the screen the logo takes is derived from the screen diagonal: the bigger the screen, the smaller the share. A logo scaled to a third of an iPad screen reads as a poster, where the very same share of an iPhone SE screen reads as an icon. The `image_scale` option is therefore not applied to startup images.
+    The share of the screen the logo takes is derived from the screen diagonal: the bigger the screen, the smaller the share. A logo scaled to a third of an iPad screen reads as a poster, where the very same share of an iPhone SE screen reads as an icon.
 
 ### A Twig template
 
@@ -244,7 +244,7 @@ pwa:
                 baseline: 'Your nightly companion'   # overrides the shared one
 ```
 
-`border_radius` and `image_scale` are ignored when a template is used: the template is free to size and shape the image as it sees fit.
+`border_radius` is ignored when a template is used: the template is free to size and shape the image as it sees fit.
 
 ### Painting the document yourself
 
@@ -287,7 +287,6 @@ pwa:
             src: ~              # Asset Mapper path, absolute path or UX Icon name
             background_color: ~
             border_radius: ~    # 1 to 50, ignored when a template is used
-            image_scale: ~      # 1 to 100, not applied to startup images
             svg_attr: []        # attributes added to the SVG root
             context: []         # merged over the shared ones
         dark:
