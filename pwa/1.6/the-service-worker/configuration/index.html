@@ -1415,6 +1415,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#compiling-the-service-worker" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3655,6 +3666,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#compiling-the-service-worker" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3751,25 +3773,92 @@
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7"></a><a href="#__codelineno-4-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">        </span><span class="nt">use_cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8"></a><a href="#__codelineno-4-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">        </span><span class="nt">skip_waiting</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </span></code></pre></div>
+<h3 id="updates">Updates<a class="headerlink" href="#updates" title="Link to this section">&para;</a></h3>
+<p>With Workbox enabled, the registration script injected by <code>{{ pwa() }}</code> tells the page what happens to its
+service worker through two events. Both are <code>CustomEvent</code>s dispatched on <code>window</code>, and both carry the
+<code>workbox.Workbox</code> instance in <code>event.detail.wb</code>, which is also exposed as <code>window.workbox</code> once the service
+worker is registered.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Dispatched when</th>
+<th>Cancelable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sw:update-available</code></td>
+<td>A new service worker is installed and waits for the current one to let go</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>sw:controller-changed</code></td>
+<td>A new service worker took control of the page, right before the page is reloaded</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Without Workbox, the registration script dispatches neither event and never reloads the page.</p>
+<h4 id="a-new-version-is-waiting">A new version is waiting<a class="headerlink" href="#a-new-version-is-waiting" title="Link to this section">&para;</a></h4>
+<p>With <code>skip_waiting: false</code>, a new service worker waits until every tab using the current one is closed. The
+page can ask it to take over instead: <code>messageSkipWaiting()</code> sends the <code>SKIP_WAITING</code> message the generated
+service worker listens to.</p>
+<div class="language-javascript highlight"><span class="filename">assets/app.js</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'sw:update-available'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="s1">'A new version is available. Use it now?'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">wb</span><span class="p">.</span><span class="nx">messageSkipWaiting</span><span class="p">();</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a><span class="p">});</span>
+</span></code></pre></div>
+<h4 id="the-page-is-about-to-be-reloaded">The page is about to be reloaded<a class="headerlink" href="#the-page-is-about-to-be-reloaded" title="Link to this section">&para;</a></h4>
+<p>When a new service worker takes control of the page, the script reloads it, so that the page and its service
+worker come from the same version. The page is not reloaded on a first visit, when a service worker takes
+control of a page no service worker controlled yet: nothing was updated.</p>
+<p>With <code>skip_waiting: true</code>, a deploy reloads every open tab, and a half-filled form with it. Since 1.6.0, the
+cancelable <code>sw:controller-changed</code> event is dispatched right before the reload, and the page is reloaded only
+if no listener called <code>preventDefault()</code> on it:</p>
+<div class="language-javascript highlight"><span class="filename">assets/app.js</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'sw:controller-changed'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">formHasUnsavedChanges</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">        </span><span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">        </span><span class="nx">showReloadToast</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">reload</span><span class="p">());</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos="6 "></span></a><span class="p">});</span>
+</span></code></pre></div>
+<p>When the reload is prevented, the page is left as it is, and reloading it is up to your application, for
+instance once the form is saved. Should the controller change again, the event is dispatched again.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Call <code>preventDefault()</code> synchronously, in the listener itself. The script reads the outcome as soon as the
+event is dispatched: a call made after an <code>await</code> comes too late, and the page is already reloading.</p>
+</div>
 <h3 id="compiling-the-service-worker">Compiling the service worker<a class="headerlink" href="#compiling-the-service-worker" title="Link to this section">&para;</a></h3>
 <p>The service worker is compiled using the <code>pwa:compile</code> command:</p>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:compile
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:compile
 </span></code></pre></div>
 <p><strong>Options:</strong>
 - <code>--context-only</code> - Compile only assets that depend on the application context (e.g., the manifest). Useful for locale-specific compilations.
 - <code>--no-screenshots</code> - Skip screenshot generation during compilation.</p>
 <h3 id="background-fetch">Background Fetch<a class="headerlink" href="#background-fetch" title="Link to this section">&para;</a></h3>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Deprecated since 1.6.0, removed in 2.0.0.</strong> The option decides for you what a click opens, how the
+downloads are stored and what the notification says. Handle the <code>backgroundfetchsuccess</code> event and its
+siblings in your own service worker source instead.</p>
+<p>It relies on <code>registerBackgroundFetchTask()</code>, one of the deprecated service worker helpers: enabling it
+while <code>keep_deprecated_helpers</code> is <code>false</code> fails at container build time. See the
+<a href="../../upgrades/from-1.5.x-to-1.6.0/#deprecated-background-fetch">upgrade guide</a>.</p>
+</div>
 <p>The Background Fetch API allows your PWA to handle long-running downloads in the background. Configure it in the workbox section:</p>
-<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">            </span><span class="nt">background_fetch</span><span class="p">:</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">                </span><span class="nt">success_url</span><span class="p">:</span><span class="w"> </span><span class="s">'app_download_success'</span><span class="w">  </span><span class="c1"># Route name or URL</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">                </span><span class="nt">progress_url</span><span class="p">:</span><span class="w"> </span><span class="s">'app_download_progress'</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">                </span><span class="nt">success_message</span><span class="p">:</span><span class="w"> </span><span class="s">'Download</span><span class="nv"> </span><span class="s">complete!'</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">                </span><span class="nt">failure_message</span><span class="p">:</span><span class="w"> </span><span class="s">'Download</span><span class="nv"> </span><span class="s">failed.'</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">                </span><span class="nt">db_name</span><span class="p">:</span><span class="w"> </span><span class="s">'bgfetch-completed'</span>
+<div class="language-yaml highlight"><span class="filename">config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">        </span><span class="nt">workbox</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">            </span><span class="nt">background_fetch</span><span class="p">:</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">                </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">                </span><span class="nt">success_url</span><span class="p">:</span><span class="w"> </span><span class="s">'app_download_success'</span><span class="w">  </span><span class="c1"># Route name or URL</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">                </span><span class="nt">progress_url</span><span class="p">:</span><span class="w"> </span><span class="s">'app_download_progress'</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">                </span><span class="nt">success_message</span><span class="p">:</span><span class="w"> </span><span class="s">'Download</span><span class="nv"> </span><span class="s">complete!'</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9"></a><a href="#__codelineno-8-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">                </span><span class="nt">failure_message</span><span class="p">:</span><span class="w"> </span><span class="s">'Download</span><span class="nv"> </span><span class="s">failed.'</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10"></a><a href="#__codelineno-8-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">                </span><span class="nt">db_name</span><span class="p">:</span><span class="w"> </span><span class="s">'bgfetch-completed'</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -3797,13 +3886,13 @@
 <td><code>success_message</code></td>
 <td>string</td>
 <td><code>null</code></td>
-<td>Success notification message (translatable)</td>
+<td>Success notification message, translated with the <a href="../../experimental-features/translations/#the-translation-domain">translation domain</a></td>
 </tr>
 <tr>
 <td><code>failure_message</code></td>
 <td>string</td>
 <td><code>null</code></td>
-<td>Failure notification message (translatable)</td>
+<td>Failure notification message, translated with the <a href="../../experimental-features/translations/#the-translation-domain">translation domain</a></td>
 </tr>
 <tr>
 <td><code>db_name</code></td>
@@ -3837,7 +3926,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 14:38:31 UTC">November 28, 2026</span>
   </span>
 
     

@@ -2,46 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.spomky-labs.com/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/contact/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/legal-notice/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/privacy/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/cbor/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/cose/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/jwt/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/otphp/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/pki/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
     <url>
          <loc>https://docs.spomky-labs.com/security/webauthn/</loc>
-         <lastmod>2026-11-23</lastmod>
+         <lastmod>2026-11-28</lastmod>
     </url>
 </urlset>

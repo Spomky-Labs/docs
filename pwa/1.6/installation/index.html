@@ -466,6 +466,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#creating-the-configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating the configuration file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#twig-function-options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3626,6 +3637,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#creating-the-configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating the configuration file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#twig-function-options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3693,7 +3715,7 @@
 <p>To install the bundle, the recommended way is using Composer:</p>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>composer<span class="w"> </span>require<span class="w"> </span>spomky-labs/pwa-bundle
 </span></code></pre></div>
-<p>No Flex recipe exists for this bundle, but you can create a configuration file that will be modified as you progress in the integration of the features.</p>
+<p>No Flex recipe exists for this bundle. The configuration file is yours to create, and it grows as you integrate the features. The <a href="#creating-the-configuration-file"><code>pwa:create:config</code> command</a> writes a first one for you; an empty one is enough to start with:</p>
 <div class="language-yaml highlight"><span class="filename">/config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">pwa</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
 </span></code></pre></div>
 <p>The integration in your application is very simple. You are only required to add a Twig function inside the end of the <code>&lt;head&gt;</code> tag of your HTML pages.</p>
@@ -3711,17 +3733,165 @@
 <p class="admonition-title">Info</p>
 <p>You may need to clear the cache after the bundle is installed</p>
 </div>
+<h2 id="creating-the-configuration-file">Creating the configuration file<a class="headerlink" href="#creating-the-configuration-file" title="Link to this section">&para;</a></h2>
+<p>Since 1.6.0, <code>pwa:create:config</code> writes <code>config/packages/pwa.yaml</code> for you: the manifest, the icons and the favicons generated from one source image, and the service worker. Run it without any option to be guided step by step:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a> Name of the application [Hacker News]:
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a> &gt; HackerNews PWA
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a> Short name, displayed under the icon [HackerNews]:
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a> &gt;
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a> Description of the application (optional):
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a> &gt; A HackerNews implementation based on Symfony
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a> URL loaded when the application starts [/]:
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a> &gt;
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a> Display mode [standalone]:
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  [0] fullscreen
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  [1] standalone
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>  [2] minimal-ui
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>  [3] browser
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a> &gt;
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a> Theme color [#ffffff]:
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a> &gt;
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a> Background color [#ffffff]:
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a> &gt;
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a> Source image of the application (leave empty to skip):
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a> &gt; images/logo.svg
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a> Generate the favicons from this image? (yes/no) [yes]:
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a> &gt;
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a> Enable the service worker (offline support, caching, push notifications)? (yes/no) [yes]:
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a> &gt;
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a> Path to the service worker source file [sw.js]:
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a> &gt;
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a> [OK] The configuration file "config/packages/pwa.yaml" has been created.
+</span></code></pre></div>
+<p>Every value has an option of its own, so the command can be scripted. The command only asks for what the options leave out, and with <code>--no-interaction</code> it asks nothing and takes the defaults for the rest:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config<span class="w"> </span>--no-interaction<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>--name<span class="o">=</span><span class="s2">"HackerNews PWA"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>--description<span class="o">=</span><span class="s2">"A HackerNews implementation based on Symfony"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span>--icon<span class="o">=</span>images/logo.svg
+</span></code></pre></div>
+<p>With the Imagick extension loaded, both produce this file:</p>
+<div class="language-yaml highlight"><span class="filename">/config/packages/pwa.yaml</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="c1"># See https://docs.spomky-labs.com/pwa/ for the complete list of options.</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nt">pwa</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="nt">image_processor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">imagick</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">    </span><span class="nt">manifest</span><span class="p">:</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">'HackerNews</span><span class="nv"> </span><span class="s">PWA'</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">        </span><span class="nt">short_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HackerNews</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">'A</span><span class="nv"> </span><span class="s">HackerNews</span><span class="nv"> </span><span class="s">implementation</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">Symfony'</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">        </span><span class="nt">start_url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">        </span><span class="nt">display</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">standalone</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11"></a><a href="#__codelineno-6-11"><span class="linenos" data-linenos="11 "></span></a><span class="w">        </span><span class="nt">theme_color</span><span class="p">:</span><span class="w"> </span><span class="s">'#ffffff'</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12"></a><a href="#__codelineno-6-12"><span class="linenos" data-linenos="12 "></span></a><span class="w">        </span><span class="nt">background_color</span><span class="p">:</span><span class="w"> </span><span class="s">'#ffffff'</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13"></a><a href="#__codelineno-6-13"><span class="linenos" data-linenos="13 "></span></a><span class="w">        </span><span class="nt">icons</span><span class="p">:</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14"></a><a href="#__codelineno-6-14"><span class="linenos" data-linenos="14 "></span></a><span class="w">            </span><span class="p p-Indicator">-</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15"></a><a href="#__codelineno-6-15"><span class="linenos" data-linenos="15 "></span></a><span class="w">                </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images/logo.svg</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16"></a><a href="#__codelineno-6-16"><span class="linenos" data-linenos="16 "></span></a><span class="w">                </span><span class="nt">sizes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">48</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">72</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">96</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">128</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">144</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">168</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">192</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">512</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17"></a><a href="#__codelineno-6-17"><span class="linenos" data-linenos="17 "></span></a><span class="w">                </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">png</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18"></a><a href="#__codelineno-6-18"><span class="linenos" data-linenos="18 "></span></a><span class="w">    </span><span class="nt">favicons</span><span class="p">:</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19"></a><a href="#__codelineno-6-19"><span class="linenos" data-linenos="19 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20"></a><a href="#__codelineno-6-20"><span class="linenos" data-linenos="20 "></span></a><span class="w">        </span><span class="nt">default</span><span class="p">:</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21"></a><a href="#__codelineno-6-21"><span class="linenos" data-linenos="21 "></span></a><span class="w">            </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images/logo.svg</span>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22"></a><a href="#__codelineno-6-22"><span class="linenos" data-linenos="22 "></span></a><span class="w">            </span><span class="nt">background_color</span><span class="p">:</span><span class="w"> </span><span class="s">'#ffffff'</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23"></a><a href="#__codelineno-6-23"><span class="linenos" data-linenos="23 "></span></a><span class="w">    </span><span class="nt">startup_images</span><span class="p">:</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24"></a><a href="#__codelineno-6-24"><span class="linenos" data-linenos="24 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25"></a><a href="#__codelineno-6-25"><span class="linenos" data-linenos="25 "></span></a><span class="w">    </span><span class="nt">serviceworker</span><span class="p">:</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26"></a><a href="#__codelineno-6-26"><span class="linenos" data-linenos="26 "></span></a><span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27"></a><a href="#__codelineno-6-27"><span class="linenos" data-linenos="27 "></span></a><span class="w">        </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sw.js</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--name</code></td>
+<td>The name of the application. Defaults to the name of the project directory</td>
+</tr>
+<tr>
+<td><code>--short-name</code></td>
+<td>The short name, displayed under the icon. Defaults to the name, cut to 12 characters on a word boundary</td>
+</tr>
+<tr>
+<td><code>--description</code></td>
+<td>The description of the application, left out when empty</td>
+</tr>
+<tr>
+<td><code>--start-url</code></td>
+<td>The URL loaded when the application starts, <code>/</code> by default</td>
+</tr>
+<tr>
+<td><code>--display</code></td>
+<td>The display mode: <code>fullscreen</code>, <code>standalone</code> (default), <code>minimal-ui</code> or <code>browser</code></td>
+</tr>
+<tr>
+<td><code>--theme-color</code></td>
+<td>The theme color, <code>#ffffff</code> by default</td>
+</tr>
+<tr>
+<td><code>--background-color</code></td>
+<td>The background color, <code>#ffffff</code> by default</td>
+</tr>
+<tr>
+<td><code>--icon</code></td>
+<td>The source image of the icons and the favicons: an Asset Mapper logical path or a path to a file</td>
+</tr>
+<tr>
+<td><code>--favicons</code> / <code>--no-favicons</code></td>
+<td>Whether the favicons are generated. Defaults to yes when <code>--icon</code> is given</td>
+</tr>
+<tr>
+<td><code>--serviceworker</code> / <code>--no-serviceworker</code></td>
+<td>Whether the service worker is enabled, yes by default</td>
+</tr>
+<tr>
+<td><code>--serviceworker-src</code></td>
+<td>The service worker source file, <code>sw.js</code> by default</td>
+</tr>
+<tr>
+<td><code>--image-processor</code></td>
+<td><code>imagick</code>, <code>gd</code> or <code>none</code>. Detected when omitted</td>
+</tr>
+<tr>
+<td><code>--path</code></td>
+<td>The file to write, <code>config/packages/pwa.yaml</code> by default</td>
+</tr>
+<tr>
+<td><code>-f</code>, <code>--force</code></td>
+<td>Overwrite the file if it already exists</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Print the configuration on the standard output instead of writing it</td>
+</tr>
+</tbody>
+</table>
+<p>A few things the command does on its own:</p>
+<ul>
+<li><strong>The image processor</strong>, when <code>--image-processor</code> is omitted, is detected and only written when an icon is given. Imagick is preferred, being the only one able to read an SVG source, then GD. Asking for <code>imagick</code> or <code>gd</code> without its PHP extension fails, rather than writing a configuration that breaks the container.</li>
+<li><strong>The favicons</strong> need a source image: <code>--favicons</code> without <code>--icon</code> fails. When the favicons are enabled, <code>startup_images.enabled: true</code> is written next to them, so the iOS <a href="../favicons/startup-images/">startup images</a> are kept without the deprecation of their implicit default.</li>
+<li><strong>The service worker source file</strong> is created empty in <code>assets/</code> when it does not exist, as Asset Mapper needs a file to serve. The bundle populates it.</li>
+<li><strong>An existing file</strong> is never overwritten without <code>--force</code>, or a confirmation in interactive mode.</li>
+</ul>
+<p><code>--dry-run</code> writes the configuration and nothing else on the standard output, so it can be redirected:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>php<span class="w"> </span>bin/console<span class="w"> </span>pwa:create:config<span class="w"> </span>--no-interaction<span class="w"> </span>--dry-run<span class="w"> </span>&gt;<span class="w"> </span>config/packages/pwa.yaml
+</span></code></pre></div>
 <h2 id="twig-function-options">Twig function options<a class="headerlink" href="#twig-function-options" title="Link to this section">&para;</a></h2>
 <p>The <code>pwa()</code> Twig function accepts several optional parameters to control what is injected:</p>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">{{</span> <span class="nv">pwa</span><span class="o">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="nv">injectThemeColor</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="nv">injectFavicons</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="nv">injectSW</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="nv">swAttributes</span><span class="o">:</span> <span class="o">{},</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="nv">locale</span><span class="o">:</span> <span class="kp">null</span><span class="o">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="nv">injectResourceHints</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="nv">injectSpeculationRules</span><span class="o">:</span> <span class="kp">true</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="o">)</span> <span class="cp">}}</span>
+<div class="language-twig highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="cp">{{</span> <span class="nv">pwa</span><span class="o">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nv">injectThemeColor</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="nv">injectFavicons</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="nv">injectSW</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="nv">swAttributes</span><span class="o">:</span> <span class="o">{},</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="nv">locale</span><span class="o">:</span> <span class="kp">null</span><span class="o">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="nv">injectResourceHints</span><span class="o">:</span> <span class="kp">true</span><span class="o">,</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="nv">injectSpeculationRules</span><span class="o">:</span> <span class="kp">true</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="o">)</span> <span class="cp">}}</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -3778,10 +3948,10 @@
 </tbody>
 </table>
 <h3 id="example-disable-resource-hints">Example: Disable resource hints<a class="headerlink" href="#example-disable-resource-hints" title="Link to this section">&para;</a></h3>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cp">{{</span> <span class="nv">pwa</span><span class="o">(</span><span class="nv">injectResourceHints</span><span class="o">:</span> <span class="kp">false</span><span class="o">)</span> <span class="cp">}}</span>
+<div class="language-twig highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cp">{{</span> <span class="nv">pwa</span><span class="o">(</span><span class="nv">injectResourceHints</span><span class="o">:</span> <span class="kp">false</span><span class="o">)</span> <span class="cp">}}</span>
 </span></code></pre></div>
 <h3 id="example-localized-manifest">Example: Localized manifest<a class="headerlink" href="#example-localized-manifest" title="Link to this section">&para;</a></h3>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">{{</span> <span class="nv">pwa</span><span class="o">(</span><span class="nv">locale</span><span class="o">:</span> <span class="nv">app.request.locale</span><span class="o">)</span> <span class="cp">}}</span>
+<div class="language-twig highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="cp">{{</span> <span class="nv">pwa</span><span class="o">(</span><span class="nv">locale</span><span class="o">:</span> <span class="nv">app.request.locale</span><span class="o">)</span> <span class="cp">}}</span>
 </span></code></pre></div>
 
 
@@ -3803,7 +3973,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2026 14:08:11 UTC">November 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 28, 2026 14:36:48 UTC">November 28, 2026</span>
   </span>
 
     
