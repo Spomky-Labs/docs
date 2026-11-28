@@ -13,6 +13,10 @@ This page describes the changes you need to make when upgrading from version 1.5
     bundled 7.4.1 files are served, and a warning is logged. See
     [Deprecated: choosing the Workbox version](#deprecated-choosing-the-workbox-version).
 
+    Without `pwa.logger`, the bundle now logs to the default logger of your application, on a `pwa` channel
+    with MonologBundle, where 1.5.x did not log at all. See
+    [Changed: the bundle logs to the default logger](#changed-the-bundle-logs-to-the-default-logger).
+
 ## The bundle is narrowing its scope
 
 The bundle is going back to what it does well: the **web manifest**, the **service worker**, and
@@ -161,7 +165,7 @@ As long as this option is left to `true`, its default, the bundle triggers a dep
 container build time:
 
 ```
-Since spomky-labs/phpwa 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
+Since spomky-labs/pwa-bundle 1.6.0: The service worker helpers "registerCacheFirst", "registerMessageTask",
 "registerPushTask", "registerNotificationAction", "registerPeriodicSyncTask", "registerBackgroundFetchTask",
 "openBackgroundFetchDatabase", "structuredPushNotificationSupport", "simplePushNotificationSupport" and
 "notifyPeriodicSyncClients" are deprecated and will be removed in 2.0.0. Replace them with plain
@@ -391,7 +395,7 @@ pwa:
 Setting `use_start_image` triggers this deprecation:
 
 ```
-Since spomky-labs/phpwa 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+Since spomky-labs/pwa-bundle 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
 in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
 ```
 
@@ -566,7 +570,10 @@ A pinned version still compiles until 2.0.0:
     application. Remove the "version" option from the Workbox configuration.
     ```
 
-    It reaches your logs when `pwa.logger` is set.
+    It reaches your logs through the default logger: the `pwa` channel with MonologBundle, or, without it,
+    the logger of FrameworkBundle, which prints warnings only for a command run with `-v`. With `pwa.logger`
+    set, it goes to that service. See
+    [Changed: the bundle logs to the default logger](#changed-the-bundle-logs-to-the-default-logger).
 
 * With `use_cdn: true`, the CDN still serves the pinned version.
 
@@ -589,6 +596,47 @@ php bin/console pwa:compile
 Workbox logs, remain yours to decide.
 
 See [Workbox Files](../the-service-worker/workbox/cdn-and-versions.md).
+
+## Changed: the bundle logs to the default logger
+
+In 1.5.x, the bundle only logged when `pwa.logger` named a logger. In 1.6.0, without that option, it logs to the
+`logger` service of your application:
+
+* With MonologBundle, on the `pwa` channel. The bundle declares it: its logger is the `monolog.logger.pwa`
+  service, which your own services can autowire as `Psr\Log\LoggerInterface $pwaLogger`.
+* Without MonologBundle, to the logger FrameworkBundle registers, which writes the errors to PHP's error log and
+  lets the warnings and the debug messages through only for a command run with `-v` or `-vvv`.
+
+With MonologBundle, the two warnings of the bundle, the
+[ignored Workbox version](#deprecated-choosing-the-workbox-version) and the missing screenshots, now reach your
+logs without any configuration. So do the debug messages, in every handler that takes the debug level, and there
+are many of them: `{{ pwa() }}` logs about one debug record per icon on every page it renders.
+
+**What to do:** nothing if you want them. To keep the bundle out of a handler, exclude its channel, starting with
+the `fingers_crossed` handlers of production, whose buffer these records would fill:
+
+```yaml title="config/packages/monolog.yaml" linenums="1"
+when@prod:
+    monolog:
+        handlers:
+            main:
+                type: fingers_crossed
+                action_level: error
+                handler: nested
+                buffer_size: 50
+                channels: ['!deprecation', '!pwa']
+```
+
+To silence the bundle as 1.5.x did, with or without MonologBundle, point `pwa.logger` at a `Psr\Log\NullLogger`
+service.
+
+`pwa.logger` keeps its meaning: the service it names is used as it is, on no channel. The example of the 1.5
+documentation, `pwa.logger: 'monolog.logger.pwa'` with `monolog.channels: ['pwa']`, keeps working; you can drop
+both lines together, since the bundle now declares the channel. Up to 1.5.15, that service was ignored and the
+bundle logged to the default logger instead: an application upgrading from one of those releases with
+`pwa.logger` set sees its records move to the service it names, as they do in 1.5.16.
+
+See [Logging configuration](../development.md#logging-configuration).
 
 ## Changed: `workbox: false` disables Workbox
 
@@ -655,6 +703,21 @@ opts in to the Edge side panel.
 `PostManifestCompileEvent` listener or in JavaScript, stop expecting a collection to be there when it is
 empty: read `$manifest['shortcuts'] ?? []`.
 
+## Changed: the deprecations name the `spomky-labs/pwa-bundle` package
+
+Symfony prints the package a deprecation comes from at the start of its message, `Since <package> <version>:`,
+and the deprecation baselines and filters match on that text. Most deprecations of 1.5.x named `spomky-labs/phpwa`,
+which is not the name Composer knows the bundle by. Every deprecation of 1.6.0 names `spomky-labs/pwa-bundle`,
+the `name` of its `composer.json`:
+
+```
+Since spomky-labs/pwa-bundle 1.6.0: The "pwa.favicons.use_start_image" option is deprecated and will be removed
+in 2.0.0. Use the "pwa.startup_images.enabled" option instead.
+```
+
+**What to do:** if your application filters or baselines deprecations on "spomky-labs/phpwa", make the filter
+match "spomky-labs/pwa-bundle". The 1.5.x releases keep the former name.
+
 ## Migration checklist
 
 - [ ] Copy the Stimulus controllers you use into your own application, register them there
@@ -670,9 +733,11 @@ empty: read `$manifest['shortcuts'] ?? []`.
 - [ ] Move `favicons.use_start_image` to `startup_images.enabled`
 - [ ] With the favicons enabled, set `startup_images.enabled` explicitly, `true` or `false`
 - [ ] Remove `use_cdn` and `version` from the Workbox configuration, both spellings: a pinned version is not served from your own server
+- [ ] Decide which log handlers get the `pwa` channel, and exclude it from the `fingers_crossed` ones in production
 - [ ] If you wrote `workbox: false` and relied on the Workbox caches, remove it or write `workbox: {}`
 - [ ] Replace any remaining `Dto\PageCache` reference with `Dto\ResourceCache`
 - [ ] If your code reads the compiled manifest, let it cope with the empty members that are no longer written
+- [ ] Update the deprecation filters and baselines that match "spomky-labs/phpwa": the deprecations now name "spomky-labs/pwa-bundle"
 - [ ] Run `php bin/console pwa:compile` and test with `APP_ENV=dev` to surface the deprecations
 
 ## Still deprecated (from earlier versions)

@@ -116,11 +116,11 @@ The bundle uses PSR-3 logging to record important events and errors.
 
 ### Default logger
 
-By default, the bundle uses Symfony's default logger channel.
+Without `pwa.logger`, the bundle does not log at all.
 
 ### Custom logger
 
-Configure a custom logger for PWA-specific logging:
+Set `pwa.logger` to the service the bundle logs to, for instance a Monolog channel of its own:
 
 ```yaml title="config/packages/pwa.yaml" linenums="1"
 pwa:
@@ -141,6 +141,11 @@ monolog:
             channels: ['pwa']
 ```
 
+!!! warning
+
+    Up to 1.5.15, the service named by `pwa.logger` was ignored: setting the option made the bundle log to
+    the application's default logger instead. Since 1.5.16, the bundle logs to the service you name.
+
 ### What gets logged
 
 The bundle logs:
@@ -153,10 +158,11 @@ The bundle logs:
 
 ### Logging levels
 
-- **DEBUG**: Detailed processing information (development only)
-- **INFO**: Normal operational messages
-- **WARNING**: Non-critical issues (e.g., missing optional config)
-- **ERROR**: Critical problems that prevent PWA functionality
+- **DEBUG**: almost every message, one for each step of the compilation
+- **WARNING**: screenshots declared with the `#[Screenshot]` attribute that were never generated
+- **ERROR**: a preload URL generator alias that does not exist, logged right before the exception it causes
+
+The bundle logs nothing at the INFO level.
 
 ## Development tips
 

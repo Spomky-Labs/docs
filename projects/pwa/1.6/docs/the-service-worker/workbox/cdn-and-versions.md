@@ -32,7 +32,7 @@ A pinned version still compiles until 2.0.0:
     application. Remove the "version" option from the Workbox configuration.
     ```
 
-    It reaches your logs when [`pwa.logger`](../../development.md#logging-configuration) is set.
+    It reaches your logs through the [default logger](../../development.md#default-logger): the `pwa` channel with MonologBundle, or, without it, the logger of FrameworkBundle, which prints warnings only for a command run with `-v`. With [`pwa.logger`](../../development.md#custom-logger) set, it goes to that service.
 
 * With `use_cdn: true`, the service worker imports the pinned version from the CDN.
 
